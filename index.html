@@ -251,6 +251,30 @@ table.t td.n{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
 footer{font-size:12px;color:var(--muted);padding-block:10px 30px;display:grid;gap:6px}
 footer .row{gap:14px}
 @media (prefers-reduced-motion:reduce){.toast .ring{animation:none}.prog i{transition:none}}
+
+/* realistic 3D coach */
+.c3wrap{position:relative;min-height:400px;height:min(64vh,520px);background:radial-gradient(120% 90% at 50% 8%,#2B3546 0%,#151A23 58%,#0E1117 100%);overflow:hidden;color:#F1F3F7}
+.c3wrap canvas{display:block;width:100%!important;height:calc(100% - var(--c3ctl,84px))!important;touch-action:none}
+.c3load{position:absolute;inset:0;display:grid;place-items:center;color:#97A1B2;font-size:14px}
+.c3svg{position:absolute;left:0;top:0;width:100%;height:calc(100% - var(--c3ctl,84px));pointer-events:none}
+.m3label{display:inline-flex;flex-direction:column;background:rgba(14,17,23,.86);border:1px solid rgba(255,94,72,.55);border-radius:9px;padding:4px 9px;color:#fff;line-height:1.2;font-family:var(--f-body)}
+.m3label.r{float:right;text-align:right}.m3label b{font-size:12px}.m3label span{font-size:10px;color:#FFC9BE}
+.c3hud{position:absolute;inset:0 0 calc(var(--c3ctl,84px) + 2px);pointer-events:none;padding:10px;display:flex;flex-direction:column;justify-content:space-between}
+.c3top{display:flex;justify-content:space-between;gap:8px}
+.c3chip{display:inline-flex;align-items:center;gap:8px;border-radius:10px;padding:6px 10px;font-size:11px;font-weight:700;background:rgba(14,17,23,.78);border:1px solid rgba(255,255,255,.08)}
+.c3bar{width:70px;height:5px;border-radius:3px;background:rgba(255,255,255,.14);overflow:hidden}.c3bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#FFC15A,#FF5E48)}
+.c3cue{align-self:center;max-width:94%;text-align:center;background:rgba(14,17,23,.72);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:5px 12px;font-size:12px}
+.c3cue b{display:block;font-size:14px}.c3cue span{font-size:12px;color:#97A1B2}
+.c3cue.bad{border-color:rgba(255,77,94,.6);background:rgba(60,12,20,.85)}.c3cue.bad b{color:#FF8C97}
+.c3tempo{height:3px;border-radius:2px;background:rgba(255,255,255,.12);overflow:hidden;margin-top:6px}.c3tempo i{display:block;height:100%;width:0;background:#FF5E48}
+.c3ctl{position:absolute;left:0;right:0;bottom:0;display:flex;flex-wrap:wrap;gap:6px;justify-content:space-between;padding:8px;background:#0E1117;border-top:1px solid rgba(255,255,255,.06)}
+.c3seg{display:flex;gap:4px;flex-wrap:wrap}
+.c3seg button{border:1px solid rgba(255,255,255,.12);background:rgba(30,37,48,.9);color:#F1F3F7;border-radius:9px;padding:6px 9px;font-size:12px;font-weight:700}
+.c3seg button[aria-pressed="true"]{border-color:#FF5E48;color:#FFB3A6}
+.viewTabs{display:flex;gap:4px;padding:8px 10px;background:var(--surface);border-bottom:1px solid var(--line)}
+.viewTabs button{border:1px solid var(--line);background:var(--sunk);border-radius:999px;padding:6px 12px;font-weight:700;font-size:13px}
+.viewTabs button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.mGrid .mLeft{display:flex;flex-direction:column;min-width:0}
 /* tab bar with icons; bottom bar on phones */
 .ni{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
 nav.tabs a{display:inline-flex;align-items:center;gap:7px}
@@ -339,6 +363,8 @@ nav.tabs a{display:inline-flex;align-items:center;gap:7px}
 <dialog id="obDlg" class="ob" aria-label="Welcome to MOVEXA"></dialog>
 <div id="toastHost"></div>
 
+<script type="importmap">{"imports":{"three":"./vendor/three.module.js","three/addons/":"./vendor/jsm/"}}</script>
+<script type="module" src="coach3d.js"></script>
 <script src="coach-kb.js"></script>
 <script src="musclemap.js"></script>
 <script>
@@ -806,7 +832,9 @@ const streak=()=>{let n=0;const t=dayIndex();for(let i=t;i>=0;i--){if(state.done
 const KG2LB=2.20462, toU=kg=>state.unit==="kg"?kg:kg*KG2LB, fromU=v=>state.unit==="kg"?v:v/KG2LB;
 const fmtW=kg=>`${toU(kg).toFixed(1)} ${state.unit}`;
 const thumbs=new Set();
-function stageSVG(id){if(ILL.has(id))return `<span class="demo" role="img" aria-label="${esc(EX[id].name)}: start and finish position"><img class="f1" src="assets/ex/${id}-1.png" alt="" loading="lazy"><img class="f2" src="assets/ex/${id}-2.png" alt="" loading="lazy"></span>`;
+const EX3D=new Set(["bwsquat","rdl","plank","treadmill","bike","rower","elliptical","rope","highknees","mtn","hamstretch","hipflexor","chestopen"]);
+function stageSVG(id){if(EX3D.has(id)&&!ILL.has(id)){const k=who3d();return `<span class="demo d3" role="img" aria-label="${esc(EX[id].name)}: start and finish position"><img class="f1" src="assets/ex3d/${id}-${k}-1.webp" alt="" loading="lazy"><img class="f2" src="assets/ex3d/${id}-${k}-2.webp" alt="" loading="lazy"></span>`}
+  if(ILL.has(id))return `<span class="demo" role="img" aria-label="${esc(EX[id].name)}: start and finish position"><img class="f1" src="assets/ex/${id}-1.png" alt="" loading="lazy"><img class="f2" src="assets/ex/${id}-2.png" alt="" loading="lazy"></span>`;
   return `<svg viewBox="0 0 200 190" data-anim="${id}" role="img" aria-label="${esc(EX[id].name)} demo">${drawSVG(EX[id],0)}</svg>`}
 const musList=id=>{const m=MUS[id]||[[],[]];return `<div class="mtags">${m[0].map(x=>`<span class="mt p">${MNAME[x]}</span>`).join("")}${m[1].map(x=>`<span class="mt">${MNAME[x]}</span>`).join("")}</div>`};
 const catPill=c=>c==="cardio"?`<span class="pill car">Cardio</span>`:c==="mobility"?`<span class="pill mob">Stretch</span>`:`<span class="pill str">Muscle</span>`;
@@ -1376,7 +1404,7 @@ function renderProfile(){
     </div>
   </div>
   <div class="panel"><h3>Legal</h3><div class="row"><button class="btn small ghost" data-legal="terms">Terms of Use</button><button class="btn small ghost" data-legal="privacy">Privacy Policy</button><button class="btn small ghost" data-legal="health">Consumer Health Data Notice</button><button class="btn small ghost" data-legal="disclaimer">Health & Safety Disclaimer</button></div>
-  <p class="muted small">${APP} v${LEGAL.version} · © ${new Date().getFullYear()} ${esc(LEGAL.company)}. Exercise drawings by Everkinetic (CC BY-SA 3.0, adapted). Muscle map, 3D figures and text are original to ${APP}. <button class="linkBtn" data-legal="credits">Credits</button></p></div>`;
+  <p class="muted small">${APP} v${LEGAL.version} · © ${new Date().getFullYear()} ${esc(LEGAL.company)}. Exercise drawings by Everkinetic (CC BY-SA 3.0, adapted). 3D humans built with MakeHuman (CC0). Muscle map, animations and text are original to ${APP}. <button class="linkBtn" data-legal="credits">Credits</button></p></div>`;
   $("#pfSave").onclick=()=>{const p=readProfile("pf-");if(p.age&&p.age<LEGAL.minAge){$("#pfMsg").textContent=`${APP} is for people aged ${LEGAL.minAge} and over.`;return}state.profile=p;save();renderAll();$("#pfMsg").textContent="Saved. Your plan has been updated."};
   $("#prVoice").onchange=e=>{state.voice=e.target.checked;save()};
   $$("[data-unit2]").forEach(b=>b.onclick=()=>{state.unit=b.dataset.unit2;save();renderAll()});
@@ -1456,7 +1484,8 @@ function legalDocs(){
   <h3>Sharing</h3><p>We share consumer health data only with processors that host the App for us under contract. We <b>do not sell</b> consumer health data. We do not use geofencing.</p>
   <h3>Your rights</h3><p>You can confirm whether we collect your consumer health data, access it, delete it, and withdraw consent, directly in the App or by emailing ${E}. If we deny a request, you can appeal by replying to our decision; if your appeal is denied, you can contact your state Attorney General.</p>`],
   credits:["Credits",`<h3>Exercise drawings</h3><p>Exercise drawings by <b>Everkinetic</b>, licensed under <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank" rel="noopener">Creative Commons Attribution-ShareAlike 3.0</a>. Source: <a href="https://github.com/chaosbastler/opentraining-exercises" target="_blank" rel="noopener">opentraining-exercises</a>. ${APP} converted them to transparent line art, cropped and aligned them; these adapted drawings are shared under the same license.</p>
-  <h3>Everything else</h3><p>The muscle map, 3D figures, icons, workout plans, coach answers and text are original to ${APP}.</p>
+  <h3>3D human models</h3><p>The realistic 3D man and woman are built with <a href="https://static.makehumancommunity.org/" target="_blank" rel="noopener">MakeHuman</a> / MPFB using the MakeHuman system assets, released under <a href="https://creativecommons.org/publicdomain/zero/1.0/" target="_blank" rel="noopener">CC0 1.0</a> (public domain). Gym clothing, animation, poses and equipment are original to ${APP}.</p>
+  <h3>Everything else</h3><p>The muscle map, icons, workout plans, coach answers and text are original to ${APP}.</p>
   <h3>Software</h3><p>Built with open-source software including Capacitor (MIT) and three.js (MIT). Fonts: Unbounded, Figtree and JetBrains Mono (SIL Open Font License).</p>`],
   disclaimer:["Health & Safety Disclaimer",`<p><i>Last updated ${U}</i></p>
   <p><b>${APP} is not a substitute for professional medical advice, diagnosis or treatment.</b> Information in the App, including workouts, exercise demonstrations, nutrition estimates and AI coach answers, is general and for educational purposes for healthy adults.</p>
@@ -1689,7 +1718,8 @@ function openEx(id){
   const mach=MACHINES.filter(m=>m.ex===id).map(m=>m.name);
   const alts=(ALT[id]||[]).filter(a=>EQOK[state.profile.equip].includes(EX[a].eq));
   const mm=MUS[id]||[[],[]];
-  dlgHTML(`<div class="mGrid"><div class="mStage ${ILL.has(id)?"ill":""}">${ILL.has(id)?stageSVG(id).replace('class="demo"','class="demo big" id="bigDemo"'):`<svg viewBox="0 0 200 190" data-big="1" role="img" aria-label="${esc(e.name)} demo">${drawSVG(e,0)}</svg>`}<div class="ctrl"><button class="btn small" id="pp">Pause</button><button class="btn small" id="slow">Slow</button></div>${ILL.has(id)?`<span class="credit">Illustration: Everkinetic, CC BY-SA 3.0</span>`:""}</div>
+  const use3d=window.MX3D?window.MX3D.supported:true;
+  dlgHTML(`<div class="mGrid"><div class="mLeft">${use3d?`<div class="viewTabs" role="group" aria-label="View"><button data-view="3d" aria-pressed="true">3D coach</button>${ILL.has(id)?`<button data-view="2d" aria-pressed="false">Drawing</button>`:""}</div><div class="c3wrap" id="c3host"></div>`:""}<div class="mStage ${ILL.has(id)?"ill":""}" id="m2d" ${use3d?"hidden":""}>${ILL.has(id)?stageSVG(id).replace('class="demo"','class="demo big" id="bigDemo"'):`<svg viewBox="0 0 200 190" data-big="1" role="img" aria-label="${esc(e.name)} demo">${drawSVG(e,0)}</svg>`}<div class="ctrl"><button class="btn small" id="pp">Pause</button><button class="btn small" id="slow">Slow</button></div>${ILL.has(id)?`<span class="credit">Illustration: Everkinetic, CC BY-SA 3.0</span>`:""}</div></div>
   <div class="mBody">
     <div>${catPill(e.cat)}<h2 id="dlgTitle" style="margin-top:8px">${esc(e.name)}</h2></div>
     <div class="mapWrap">${window.muscleMap?muscleMap(mm[0],mm[1]):""}</div>
@@ -1702,10 +1732,15 @@ function openEx(id){
     <p class="muted small">Simplified illustration. Stop if you feel pain.</p>
   </div></div>`);
   dlgId=id;paused=false;
+  if(use3d){const mount=()=>window.MX3D.mount($("#c3host"),{id,EX,MUS,kind:who3d(),skin:state.skin3d??1,onKind:k=>{state.view3d=k;save()}});
+    if(window.MX3D&&window.MX3D.ready)mount();else window.addEventListener("mx3d-ready",mount,{once:true});
+    $$("[data-view]",dlg).forEach(b=>b.onclick=()=>{const v=b.dataset.view;$$("[data-view]",dlg).forEach(x=>x.setAttribute("aria-pressed",String(x===b)));$("#c3host").hidden=v!=="3d";$("#m2d").hidden=v!=="2d";if(v==="3d")mount();else window.MX3D?.unmount()})}
   $("#pp").onclick=()=>{paused=!paused;$("#pp").textContent=paused?"Play":"Pause";$("#bigDemo")?.classList.toggle("paused",paused)};
   $("#slow").onclick=()=>{slowMo=!slowMo;$("#slow").textContent=slowMo?"Normal":"Slow";$("#bigDemo")?.classList.toggle("slow",slowMo)};
 }
 dlg.addEventListener("click",e=>{if(e.target===dlg)dlg.close()});
+dlg.addEventListener("close",()=>{try{window.MX3D?.unmount()}catch(e){}});
+function who3d(){if(state.view3d)return state.view3d;const s=state.profile.sex;return s==="male"?"M":s==="female"?"F":(state.coach==="leo"?"M":"F")}
 
 /* =============== animation loop =============== */
 const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
