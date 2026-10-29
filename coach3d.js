@@ -234,7 +234,7 @@ float hiK=hk*(1.-clothK);`)
           const g=.92-.55*f-.25*pu;c[i*3]=g;c[i*3+1]=g*1.01;c[i*3+2]=g*1.03}
         o.geometry=o.geometry.clone();o.geometry.setAttribute("color",new THREE.BufferAttribute(c,3))}}
     // per-vertex anatomy coordinates (rest pose, world space)
-    const geo=body.geometry,P=geo.attributes.position,SI=geo.attributes.skinIndex,SW=geo.attributes.skinWeight,nv=P.count;
+    body.geometry=body.geometry.clone();const geo=body.geometry,P=geo.attributes.position,SI=geo.attributes.skinIndex,SW=geo.attributes.skinWeight,nv=P.count;
     const bn=body.skeleton.bones.map(b=>b.name);
     const fwd=V(1,0,0);
     const meta=new Array(nv),v=V(),cloth=new Float32Array(nv*4),tor=new Float32Array(nv*4),MW=[0,1,2,3,4,5].map(()=>new Float32Array(nv*4));
@@ -283,6 +283,17 @@ float hiK=hk*(1.-clothK);`)
     geo.setAttribute("aCloth",new THREE.BufferAttribute(cloth,4));geo.setAttribute("aTor",new THREE.BufferAttribute(tor,4));
     MW.forEach((a,k)=>geo.setAttribute("aM"+k,new THREE.BufferAttribute(a,4)));
     this.sculpt(geo,MW,tor,kind);
+    // torso profile (rest pose): front, back and side extent per height, so poses keep the arms outside the body
+    {const pv=pr.pelvis.p,ax=V().subVectors(pr.neck_01.p,pv),L=ax.length();ax.normalize();const N=48,lo=-.18,step=(L+.04-lo)/N;
+      const fr=new Float32Array(N),bk=new Float32Array(N),wd=new Float32Array(N),q=V(),tb=new Set(["pelvis","spine_01","spine_02","spine_03"].map(n=>bn.indexOf(n)));
+      let thR=0;const tl=new Set(["thigh_l","thigh_r"].map(n=>bn.indexOf(n)));
+      for(let i=0;i<nv;i++){let best=0,bw=-1;for(let k=0;k<4;k++){const w=SW.getComponent(i,k);if(w>bw){bw=w;best=SI.getComponent(i,k)}}
+        if(tb.has(best)){q.fromBufferAttribute(P,i).applyMatrix4(body.matrixWorld).sub(pv);const j=Math.floor((q.dot(ax)-lo)/step);if(j<0||j>=N)continue;
+          fr[j]=Math.max(fr[j],q.x);bk[j]=Math.max(bk[j],-q.x);wd[j]=Math.max(wd[j],Math.abs(q.z-0))}
+        else if(tl.has(best)){q.fromBufferAttribute(P,i).applyMatrix4(body.matrixWorld);const x=bn[best].endsWith("_l")?"_l":"_r",h=pr["thigh"+x].p,kn=pr["calf"+x].p,a2=V().subVectors(kn,h).normalize(),d=q.sub(h),t=d.dot(a2);
+          if(t>.05&&t<.2)thR=Math.max(thR,d.addScaledVector(a2,-t).length())}}
+      const sm=a=>{const o=Float32Array.from(a);for(let j=0;j<N;j++)for(const k of [j-1,j+1])if(k>=0&&k<N)o[j]=Math.max(o[j],a[k]*.97);return o};
+      this.prof={lo,step,N,fr:sm(fr),bk:sm(bk),wd:sm(wd)};this.thR=thR||.09}
     // hand rig: palm frame per hand (rest pose) so fingers curl toward the palm and close together
     this.hand={};
     for(const s of ["L","R"]){const x=this.sfx[s],P=n=>this.rest[n+x]?.p;if(!P("hand"))continue;
@@ -360,27 +371,35 @@ float hiK=hk*(1.-clothK);`)
     if(round){for(const n of ["spine_02","spine_03"]){b[n].updateWorldMatrix(true,false);const q=new THREE.Quaternion();b[n].getWorldQuaternion(q);this.setWorldQ(b[n],new THREE.Quaternion().setFromAxisAngle(lat,-round/2).multiply(q))}}
     if(p.head){b.head.updateWorldMatrix(true,false);const q=new THREE.Quaternion();b.head.getWorldQuaternion(q);this.setWorldQ(b.head,new THREE.Quaternion().setFromAxisAngle(lat,-deg(p.head)).multiply(q))}
     this.joints={up,fw,lat};
-    // simple body volume (torso ellipse + thigh capsules) so hands are kept in front of the body, never inside it
+    // body volume (torso profile measured from the mesh + thigh capsules): arms and hands stay outside the body, never inside it
     const pv=V(),nk=V();b.pelvis.updateWorldMatrix(true,false);b.pelvis.getWorldPosition(pv);b.neck_01.updateWorldMatrix(true,false);b.neck_01.getWorldPosition(nk);
     const thighs=[];for(const [s,sg] of [["R",-1],["L",1]]){const x=this.sfx[s],th=b["thigh"+x];th.updateWorldMatrix(true,false);const hp=V();th.getWorldPosition(hp);
       const ank=p["foot"+s]?V(...p["foot"+s]):V(p.foot[0],p.foot[1],p.foot[2]*sg),kp=(p["kPole"+s]?V(...p["kPole"+s]):V(...(p.kPole||[1,0,.2])).setZ((p.kPole||[1,0,.2])[2]*sg)).normalize();
       thighs.push([hp,ik(hp,ank,this.len["th"+s],this.len["sh"+s],kp).joint])}
-    const F=this.k==="F",fwH=V(fw.x,0,fw.z);if(fwH.lengthSq()<1e-4)fwH.set(1,0,0);fwH.normalize();
-    const clear=h=>{for(let it=0;it<6;it++){let moved=false;
-      {const ax=V().subVectors(nk,pv),L=ax.length();ax.normalize();const t=Math.max(0,Math.min(L,V().subVectors(h,pv).dot(ax))),c=pv.clone().addScaledVector(ax,t),d=V().subVectors(h,c);
-        const f=d.dot(fw),l=d.dot(lat),A=(F?.15:.16)+.035,Bw=(F?.2:.21)+.03,e=(f/A)**2+(l/Bw)**2;
-        if(e<1&&t>0&&t<L){const need=A*Math.sqrt(Math.max(0,1-(l/Bw)**2));h.addScaledVector(fw,need-f+.005);moved=true}}
-      for(const [a2,b2] of thighs){const ax=V().subVectors(b2,a2),L=ax.length();ax.normalize();const t=Math.max(0,Math.min(L,V().subVectors(h,a2).dot(ax))),c=a2.clone().addScaledVector(ax,t),d=V().subVectors(h,c),r=(F?.095:.09)+.03,dl=d.length();
-        if(dl<r&&t>.02){const dir=d.clone().addScaledVector(fwH,.6).normalize();h.copy(c).addScaledVector(dir,r+.005);moved=true}}
-      if(!moved)break}return h};
+    const PF=this.prof,tAx=V().subVectors(nk,pv).normalize(),fP=fw.clone().addScaledVector(tAx,-fw.dot(tAx)).normalize(),lP=V().crossVectors(tAx,fP).normalize(),thR=this.thR;
+    const pushOut=(h,r,front)=>{const out=V();
+      {const d=V().subVectors(h,pv),t=d.dot(tAx),j=Math.floor((t-PF.lo)/PF.step);
+        if(j>=0&&j<PF.N){const f=d.dot(fP),l=d.dot(lP),D=(f>0?PF.fr[j]:PF.bk[j])+r,W=PF.wd[j]+r,e=Math.pow(Math.abs(f/D)**2.5+Math.abs(l/W)**2.5,1/2.5);
+          if(e<1){const al=Math.min(.98,Math.abs(l/W));if(front||al<.7){const sg=f<-.02?-1:1,fs=(sg>0?D:(PF.bk[j]+r))*Math.pow(1-al**2.5,1/2.5);out.addScaledVector(fP,sg*fs-f)}else{const k=1/e-1;out.addScaledVector(fP,f*k).addScaledVector(lP,l*k)}}}}
+      const q=h.clone().add(out);
+      for(const [a2,b2] of thighs){const ax=V().subVectors(b2,a2),L=ax.length();ax.normalize();const t=Math.max(0,Math.min(L,V().subVectors(q,a2).dot(ax))),c=a2.clone().addScaledVector(ax,t),d=V().subVectors(q,c),rr=thR*(1-.3*t/L)+r,dl=d.length();
+        if(dl<rr&&t>-.01){const dir=front?fP.clone():(dl>1e-3?d.normalize():V()).addScaledVector(fP,.8).normalize();const m=V().copy(c).addScaledVector(dir,rr).sub(q);q.add(m);out.add(m)}}
+      return out};
+    const solveArm=(sh,hand,a,c,pole)=>{const tot=a+c,reach=tot*.995,h0=hand.clone();let res;const front=Math.abs(V().subVectors(hand,pv).dot(lP))<Math.abs(V().subVectors(sh,pv).dot(lP))*.75;
+      for(let it=0;it<10;it++){const d=V().subVectors(hand,sh);if(d.length()>reach)hand.copy(sh).addScaledVector(d.normalize(),reach);
+        res=ik(sh,hand,a,c,pole);let best=null,bs=.002;
+        const test=(pt,frac,r)=>{const m=pushOut(pt,r,front),sc=m.length()/frac;if(sc>bs){bs=sc;best=m.multiplyScalar(1/frac)}};
+        for(const u of [0,.35,.7,1])test(res.joint.clone().lerp(res.end,u),(a+u*c)/tot,u?.035:.04);
+        if(!best)break;hand.addScaledVector(best,1.05);const dv=V().subVectors(hand,h0);if(dv.length()>.3)hand.copy(h0).addScaledVector(dv.normalize(),.3)}
+      return res};
     for(const [s,sg] of [["R",-1],["L",1]]){
       const x=this.sfx[s];const ua=b["upperarm"+x],fa=b["lowerarm"+x],hd=b["hand"+x],th=b["thigh"+x],cf=b["calf"+x],ft=b["foot"+x];
       ua.updateWorldMatrix(true,false);th.updateWorldMatrix(true,false);
       const sh=V(),hp=V();ua.getWorldPosition(sh);th.getWorldPosition(hp);
       const mir=a=>V(a[0],a[1],a[2]*sg);
-      const hand=p["hand"+s]?V(...p["hand"+s]):mir(p.hand);if(this.handMode==="flat"&&hand.y<.6)hand.y-=.022;else clear(hand);const ank=p["foot"+s]?V(...p["foot"+s]):mir(p.foot);
+      const hand=p["hand"+s]?V(...p["hand"+s]):mir(p.hand);const flat=this.handMode==="flat";if(flat&&hand.y<.6)hand.y-=.022;const ank=p["foot"+s]?V(...p["foot"+s]):mir(p.foot);
       const ePole=(p["ePole"+s]?V(...p["ePole"+s]):mir(p.ePole||[-1,-.4,.4])).normalize(),kPole=(p["kPole"+s]?V(...p["kPole"+s]):mir(p.kPole||[1,0,.2])).normalize();
-      const arm=ik(sh,hand,this.len["ua"+s],this.len["fa"+s],ePole),leg=ik(hp,ank,this.len["th"+s],this.len["sh"+s],kPole);
+      const arm=flat?ik(sh,hand,this.len["ua"+s],this.len["fa"+s],ePole):solveArm(sh,hand,this.len["ua"+s],this.len["fa"+s],ePole),leg=ik(hp,ank,this.len["th"+s],this.len["sh"+s],kPole);
       const rd=(a,b)=>V().subVectors(R[b].p,R[a].p).normalize();
       const back=V(-1,0,0),fwd=V(1,0,0);
       const setLimb=(bone,from,to,restA,restB,s0,pole)=>{const d0=rd(restA,restB);const d=V().subVectors(to,from).normalize();this.setWorldQ(bone,basisQ(d0,s0.clone().addScaledVector(d0,-s0.dot(d0)).normalize(),d,pole).multiply(R[restA].q))};
@@ -576,7 +595,7 @@ function handMode(){if(!mv)return "relaxed";
   const e=EXAPP[exId]||{},dyn=mv.dyn;
   if(["db1","overhead","lat"].includes(mv.props)||(dyn&&!["pad","plate"].includes(dyn))||["db","gym"].includes(e.eq))return "grip";
   return "relaxed"}
-function buildMan(){if(man)scene.remove(man.g);man=new RealHuman(kind,skin,GLB[kind]);scene.add(man.g);man.setHands(handMode());if(exId)applyMuscles()}
+function buildMan(){if(man){scene.remove(man.g);man.geo?.dispose()}man=new RealHuman(kind,skin,GLB[kind]);scene.add(man.g);man.setHands(handMode());if(exId)applyMuscles()}
 function buildProps(){
   scene.remove(props);props=new THREE.Group();scene.add(props);if(!mv)return;
   const p=mv.props;
