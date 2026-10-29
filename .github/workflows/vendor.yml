@@ -1,0 +1,33 @@
+name: Vendor 3D library
+
+on:
+  push:
+    paths: [".github/workflows/vendor.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  vendor:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Fetch three.js
+        run: |
+          mkdir -p /tmp/t && cd /tmp/t && npm init -y >/dev/null && npm install three@0.160.0 --no-audit --no-fund
+          mkdir -p $GITHUB_WORKSPACE/vendor
+          cp node_modules/three/build/three.module.js $GITHUB_WORKSPACE/vendor/
+          cp node_modules/three/examples/jsm/controls/OrbitControls.js $GITHUB_WORKSPACE/vendor/
+          cp node_modules/three/examples/jsm/geometries/RoundedBoxGeometry.js $GITHUB_WORKSPACE/vendor/
+          cp node_modules/three/LICENSE $GITHUB_WORKSPACE/vendor/THREE-LICENSE.txt
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add vendor
+          git commit -m "Vendor three.js r160 for offline 3D" || echo "nothing to commit"
+          git push
