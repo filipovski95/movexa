@@ -10,7 +10,7 @@ for(const [fam,pkg,ws] of fonts)for(const w of ws){
   css+=`@font-face{font-family:"${fam}";font-style:normal;font-weight:${w};font-display:swap;src:url(fonts/${file}) format("woff2")}\n`;
 }
 fs.writeFileSync(path.join(out,"fonts.css"),css);
-for(const d of ["assets/ex","assets/ex3d","assets/steps","assets/human","vendor"])if(fs.existsSync(d))fs.cpSync(d,path.join(out,d),{recursive:true});
+for(const d of ["assets/steps","assets/human","vendor"])if(fs.existsSync(d))fs.cpSync(d,path.join(out,d),{recursive:true});
 let html=fs.readFileSync("index.html","utf8");
 html=html.replace(/<link rel="preconnect" href="https:\/\/fonts\.googleapis\.com">\s*/,"")
          .replace(/<link rel="stylesheet" href="https:\/\/fonts\.googleapis\.com[^>]*>/,'<link rel="stylesheet" href="fonts.css">');

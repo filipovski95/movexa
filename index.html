@@ -253,7 +253,7 @@ footer .row{gap:14px}
 @media (prefers-reduced-motion:reduce){.toast .ring{animation:none}.prog i{transition:none}}
 
 /* realistic 3D coach */
-.c3wrap{position:relative;min-height:400px;height:min(64vh,520px);background:radial-gradient(120% 90% at 50% 8%,#2B3546 0%,#151A23 58%,#0E1117 100%);overflow:hidden;color:#F1F3F7}
+.c3wrap{position:relative;min-height:480px;height:min(74vh,620px);background:radial-gradient(120% 90% at 50% 8%,#2B3546 0%,#151A23 58%,#0E1117 100%);overflow:hidden;color:#F1F3F7}
 .c3wrap canvas{display:block;width:100%!important;height:calc(100% - var(--c3ctl,84px))!important;touch-action:none}
 .c3load{position:absolute;inset:0;display:grid;place-items:center;color:#97A1B2;font-size:14px}
 .c3svg{position:absolute;left:0;top:0;width:100%;height:calc(100% - var(--c3ctl,84px));pointer-events:none}
@@ -263,7 +263,12 @@ footer .row{gap:14px}
 .c3top{display:flex;justify-content:space-between;gap:8px}
 .c3chip{display:inline-flex;align-items:center;gap:8px;border-radius:10px;padding:6px 10px;font-size:11px;font-weight:700;background:rgba(14,17,23,.78);border:1px solid rgba(255,255,255,.08)}
 .c3sep{width:1px;height:12px;background:rgba(255,255,255,.18)}.c3rep{font-size:12px;color:#fff;font-variant-numeric:tabular-nums}.c3bar{width:70px;height:5px;border-radius:3px;background:rgba(255,255,255,.14);overflow:hidden}.c3bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#FFC15A,#FF5E48)}
-.c3cue{align-self:center;max-width:94%;text-align:center;background:rgba(14,17,23,.72);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:5px 12px;font-size:12px}
+.c3cuep{position:absolute;left:0;right:0;bottom:var(--c3ctlOnly,84px);background:#141922;border-top:1px solid rgba(255,255,255,.08);padding:10px 14px 12px;display:grid;gap:6px}
+.c3steps{display:flex;gap:6px;flex-wrap:wrap}.c3steps span{display:inline-flex;gap:5px;align-items:center;font-size:11.5px;font-weight:700;color:#8C96A8;background:rgba(255,255,255,.05);border-radius:999px;padding:3px 9px 3px 4px}
+.c3steps span i{font-style:normal;width:18px;height:18px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.1);font-size:10.5px}
+.c3steps span.on{color:#fff;background:rgba(255,94,72,.18)}.c3steps span.on i{background:#FF5E48;color:#fff}
+.c3cue{display:grid;gap:2px;min-height:46px}.c3cue b{font-size:18px;line-height:1.25;font-weight:800;color:#fff}.c3cue span{font-size:14px;color:#C5CCD8}
+.c3cuep.bad .c3cue b{color:#FF8A7A}
 .c3cue b{display:block;font-size:14px}.c3cue span{font-size:12px;color:#97A1B2}
 .c3cue.bad{border-color:rgba(255,77,94,.6);background:rgba(60,12,20,.85)}.c3cue.bad b{color:#FF8C97}
 .c3tempo{height:3px;border-radius:2px;background:rgba(255,255,255,.12);overflow:hidden;margin-top:6px}.c3tempo i{display:block;height:100%;width:0;background:#FF5E48}
@@ -306,6 +311,13 @@ nav.tabs a{display:inline-flex;align-items:center;gap:7px}
 .mStage .ctrl .btn{background:#EEF1F5;color:#12161C;border:0}
 .credit{position:absolute;right:10px;bottom:6px;font-size:10px;color:#6B7280}
 .pl .stageP .demo{height:min(56vh,420px)}
+.stageP .c3wrap{width:100%;height:min(58vh,480px);min-height:380px}
+.c3compact .c3ctl{display:none!important}
+.vtTitle{color:#fff;font-weight:800;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wuList{display:grid;gap:8px}.wuList>div{display:flex;gap:12px;align-items:center;background:var(--sunk);border-radius:14px;padding:10px 12px}
+.wuList b{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:var(--coral);color:#fff;flex:none}.wuList span{display:grid}.wuList small{color:var(--muted)}
+.plK{display:inline-flex;gap:3px;align-items:center;color:var(--coral)}.plK svg{width:13px;height:13px}
+.demo.d3{background:radial-gradient(90% 70% at 50% 40%,#fff,#E9EDF3)}.demo.d3 img{left:4%;top:4%;width:92%;height:92%}
 .card .stage .demo,.exRow .thumb .demo,.mach .stage .demo{border-radius:0}
 .mapWrap svg{width:100%;max-width:380px;display:block;margin:0 auto}
 .legend2{display:flex;gap:14px;font-size:12px;color:var(--muted);justify-content:center}
@@ -706,8 +718,8 @@ const MACHINES=[
  {name:"Cable Station",for:"Rows, presses, curls, core work at any angle",ex:"seatedrow",set:["Move the pulley to the height you need.","Clip on the right handle (rope, V, single).","Select the pin weight; start light.","Step away until the stack lifts slightly before your first rep."]}
 ];
 
-/* ---- illustrations (Everkinetic, CC BY-SA 3.0) + muscle map data ---- */
-const ILL=new Set(["squat","pushup","row","superman","ohp","glutebridge","lunge","chairdip","latpd","legpress","chestpress","seatedrow","stepup","curl","legext","legcurl","pecfly","shoulderpress","pushdown","latraise","crunch","hyperext","overheadtri","deadlift"]);
+/* ---- exercise extras + muscle map data ---- */
+const ILL=new Set(); // drawings retired: every picture is the 3D coach
 Object.assign(EX.squat,{name:"Dumbbell Sumo Squat",equip:"One dumbbell",muscles:"Quads, glutes, inner thighs",
   steps:["Stand with your feet wider than your shoulders, toes turned out.","Hold one dumbbell with both hands, arms long between your legs.","Sit your hips down and back for 2 seconds, pushing your knees out over your toes.","Drive up through your heels and squeeze your glutes at the top."],
   cues:["Chest proud, back flat","Knees follow your toes","Breathe in on the way down, out on the way up"]});
@@ -715,8 +727,6 @@ Object.assign(EX.row,{name:"One-arm Dumbbell Row",equip:"Dumbbell and bench",
   steps:["Put one knee and the same-side hand on a bench, back flat like a table.","Hold a dumbbell in your other hand, arm hanging straight down.","Pull the dumbbell up to your hip, keeping your elbow close to your body.","Lower it slowly, finish all reps, then switch sides."]});
 Object.assign(EX.ohp,{name:"Seated Dumbbell Shoulder Press",equip:"Dumbbells and bench",
   steps:["Sit on a bench with back support, dumbbells at shoulder height.","Palms face forward, elbows slightly in front of your body.","Press straight up until your arms are fully extended.","Lower back to shoulder height with control."]});
-EX.lunge.cues=[...EX.lunge.cues,"The drawing shows a barbell; start with bodyweight or dumbbells"];
-EX.stepup.cues=[...EX.stepup.cues,"The drawing shows a barbell; start with bodyweight or dumbbells"];
 const newEx=(o)=>({cat:"strength",eq:"gym",frames:EX.legext.frames,props:EX.legext.props,dyn:EX.legext.dyn,...o});
 Object.assign(EX,{
  legcurl:newEx({name:"Seated Leg Curl",muscles:"Hamstrings",equip:"Leg curl machine",props:["floor","legext"],
@@ -764,6 +774,10 @@ FR("pushdown",[{h:[100,112],t:8,hd:[124,100],hz:.13,ep:[-1,-.3,.2],ft:[104,180]}
 FR("latraise",[{h:[100,112],t:0,hd:[103,160],hz:.24,ep:[-.3,0,1],ft:[104,180]},{h:[100,112],t:0,hd:[104,68],hz:.74,ep:[0,1,.4],ft:[104,180]}],{dyn:"db",props:["floor"]});
 FR("crunch",[{h:[100,174],t:-90,hd:[46,166],es:-1,ft:[140,179]},{h:[100,174],t:-62,hd:[52,144],es:-1,ft:[140,179]}],{props:["mat"]});
 FR("hyperext",[{h:[96,122],t:140,hd:[120,152],hz:.06,ft:[44,160],ks:1},{h:[96,122],t:88,hd:[132,128],hz:.06,ft:[44,160],ks:1}],{props:["floor","hyper"]});
+FR("row",[{h:[84,116],t:78,hd:[136,158],hd2:[134,138],hz:.2,ep:[-.4,.9,.15],ft:[102,180],ft2:[44,138],ks2:-1},{h:[84,116],t:78,hd:[110,116],hd2:[134,138],hz:.2,ep:[-.4,.9,.15],ft:[102,180],ft2:[44,138],ks2:-1}],{dyn:"db1",props:["floor","rowbench"]});
+FR("curl",[{h:[100,112],t:0,hd:[101,160],hz:.21,ep:[-.3,-1,.15],ft:[104,180]},{h:[100,112],t:0,hd:[114,76],hz:.21,ep:[-.25,-1,.12],ft:[104,180]}],{dyn:"db",props:["floor"]});
+FR("plank",[{h:[95,161],t:82,hd:[168,179],hz:.12,ep:[-.3,-1,.25],ft:[33,180],ft2:[30,180],ks:1},{h:[95,160],t:82,hd:[168,179],hz:.12,ep:[-.3,-1,.25],ft:[33,180],ft2:[30,180],ks:1}],{props:["mat"]});
+FR("ohp",[{h:[86,138],t:-6,hd:[92,90],hz:.3,ep:[0,-1,.6],ft:[126,180]},{h:[86,138],t:-6,hd:[84,38],hz:.2,ep:[0,-.2,1],ft:[126,180]}],{dyn:"db",props:["floor","seatBack"]});
 FR("deadlift",[{h:[100,112],t:0,hd:[103,161],ft:[104,180]},{h:[80,128],t:62,hd:[122,166],ft:[104,180]}],{dyn:"db",props:["floor"]});
 
 /* =============== coaches & plan engine =============== */
@@ -916,10 +930,7 @@ const streak=()=>{let n=0;const t=dayIndex();for(let i=t;i>=0;i--){if(state.done
 const KG2LB=2.20462, toU=kg=>state.unit==="kg"?kg:kg*KG2LB, fromU=v=>state.unit==="kg"?v:v/KG2LB;
 const fmtW=kg=>`${toU(kg).toFixed(1)} ${state.unit}`;
 const thumbs=new Set();
-const EX3D=new Set(["bwsquat","rdl","plank","treadmill","bike","rower","elliptical","rope","highknees","mtn","hamstretch","hipflexor","chestopen"]);
-function stageSVG(id){if(EX3D.has(id)&&!ILL.has(id)){const k=who3d();return `<span class="demo d3" role="img" aria-label="${esc(EX[id].name)}: start and finish position"><img class="f1" src="assets/ex3d/${id}-${k}-1.webp" alt="" loading="lazy"><img class="f2" src="assets/ex3d/${id}-${k}-2.webp" alt="" loading="lazy"></span>`}
-  if(ILL.has(id))return `<span class="demo" role="img" aria-label="${esc(EX[id].name)}: start and finish position"><img class="f1" src="assets/ex/${id}-1.png" alt="" loading="lazy"><img class="f2" src="assets/ex/${id}-2.png" alt="" loading="lazy"></span>`;
-  return `<svg viewBox="0 0 200 190" data-anim="${id}" role="img" aria-label="${esc(EX[id].name)} demo">${drawSVG(EX[id],0)}</svg>`}
+function stageSVG(id){const k=who3d();return `<span class="demo d3" role="img" aria-label="${esc(EX[id].name)}: start and finish position"><img class="f1" src="assets/steps/${id}-${k}-1.webp" alt="" loading="lazy"><img class="f2" src="assets/steps/${id}-${k}-2.webp" alt="" loading="lazy"></span>`}
 const musList=id=>{const m=MUS[id]||[[],[]];return `<div class="mtags">${m[0].map(x=>`<span class="mt p">${MNAME[x]}</span>`).join("")}${m[1].map(x=>`<span class="mt">${MNAME[x]}</span>`).join("")}</div>`};
 const catPill=c=>c==="cardio"?`<span class="pill car">Cardio</span>`:c==="mobility"?`<span class="pill mob">Stretch</span>`:`<span class="pill str">Muscle</span>`;
 const latestKg=()=>state.weights.length?state.weights[state.weights.length-1].kg:null;
@@ -1440,7 +1451,7 @@ function renderReminders(){
     <div class="rem">
       <input type="checkbox" class="switch" id="on-${r.id}" data-on="${r.id}" ${r.on?"checked":""} aria-label="Reminder on">
       <div style="min-width:0">
-        <div class="row" style="gap:8px;flex-wrap:nowrap"><input type="time" id="t-${r.id}" data-time="${r.id}" value="${r.time}" style="font-family:var(--f-mono);width:auto"><input type="text" id="l-${r.id}" data-label="${r.id}" value="${esc(r.label)}" aria-label="Reminder text"></div>
+        <div class="row" style="gap:8px;flex-wrap:nowrap"><input type="time" id="t-${r.id}" data-time="${r.id}" value="${r.time}" style="font-family:var(--f-mono);width:118px;min-width:118px;flex:none"><input type="text" id="l-${r.id}" data-label="${r.id}" value="${esc(r.label)}" aria-label="Reminder text"></div>
         <div class="days">${DN.map((n,k)=>`<button data-dayt="${r.id}:${k}" aria-pressed="${!!r.days[k]}">${n}</button>`).join("")}</div>
         <div class="small muted" id="cal-${r.id}" style="margin-top:4px">${r.cal?`In Google Calendar since ${fmtShort(r.cal)}`:""}</div>
       </div>
@@ -1526,7 +1537,7 @@ function renderProfile(){
     </div>
   </div>
   <div class="panel"><h3>Legal</h3><div class="row"><button class="btn small ghost" data-legal="terms">Terms of Use</button><button class="btn small ghost" data-legal="privacy">Privacy Policy</button><button class="btn small ghost" data-legal="health">Consumer Health Data Notice</button><button class="btn small ghost" data-legal="disclaimer">Health & Safety Disclaimer</button></div>
-  <p class="muted small">${APP} v${LEGAL.version} · © ${new Date().getFullYear()} ${esc(LEGAL.company)}. Exercise drawings by Everkinetic (CC BY-SA 3.0, adapted). 3D humans built with MakeHuman (CC0). Muscle map, animations and text are original to ${APP}. <button class="linkBtn" data-legal="credits">Credits</button></p></div>`;
+  <p class="muted small">${APP} v${LEGAL.version} · © ${new Date().getFullYear()} ${esc(LEGAL.company)}. 3D humans built with MakeHuman (CC0). Muscle map, animations and text are original to ${APP}. <button class="linkBtn" data-legal="credits">Credits</button></p></div>`;
   $("#pfSave").onclick=()=>{const p=readProfile("pf-");if(p.age&&p.age<LEGAL.minAge){$("#pfMsg").textContent=`${APP} is for people aged ${LEGAL.minAge} and over.`;return}state.profile=p;save();renderAll();$("#pfMsg").textContent="Saved. Your plan has been updated."};
   $("#prVoice").onchange=e=>{state.voice=e.target.checked;save()};
   $$("[data-unit2]").forEach(b=>b.onclick=()=>{state.unit=b.dataset.unit2;save();renderAll()});
@@ -1570,7 +1581,7 @@ function legalDocs(){
   <h3>2. Not medical advice</h3><p>The App provides general fitness and wellness information only. It is not medical advice and is not a medical device. It doesn't diagnose, treat, cure or prevent any disease. Always consult a qualified health professional before starting any exercise or nutrition program, especially if you are pregnant, have an injury, or have a medical condition. Read our <b>Health &amp; Safety Disclaimer</b>, which forms part of these Terms.</p>
   <h3>3. Assumption of risk</h3><p>Exercise involves a risk of injury. You choose whether, how and when to exercise, and you are responsible for using equipment safely, following gym rules, and stopping if you feel pain or discomfort. To the extent permitted by law, you voluntarily assume these risks.</p>
   <h3>4. Estimates and suggestions</h3><p>Calorie targets, calories burned during workouts, protein, water, hand portions, BMI, and suggested sets, reps, rest and frequency are general estimates calculated from published formulas (such as the Mifflin-St Jeor equation and MET values from the Compendium of Physical Activities) and the details you enter. They can differ from your real needs by a large margin. They are not a diet, meal plan, prescription or medical measurement, and you should not use them to restrict food, compensate for eating, or push through pain or exhaustion. For users under 18, we do not provide calorie-deficit targets.</p>
-  <h3>5. Demonstrations</h3><p>3D figures, step pictures, drawings and animations are simplified illustrations of typical movement. They can't see you, check your form, or account for your body, injuries or equipment. Machines differ between manufacturers and gyms; follow the instructions on the machine and from gym staff. If you are a beginner, we recommend asking a qualified trainer to check your technique.</p>
+  <h3>5. Demonstrations</h3><p>3D figures, step pictures and animations are simplified illustrations of typical movement. They can't see you, check your form, or account for your body, injuries or equipment. Machines differ between manufacturers and gyms; follow the instructions on the machine and from gym staff. If you are a beginner, we recommend asking a qualified trainer to check your technique.</p>
   <h3>6. Your responsibility</h3><p>You are responsible for choosing loads and intensity that are safe for you, warming up, using spotters or safety stops where appropriate, and stopping when something doesn't feel right. Results are not guaranteed and depend on many factors outside our control.</p>
   <h3>7. AI coach</h3><p>The "Ask Coach" feature uses artificial intelligence to generate answers. Answers may be incomplete or wrong and are general information only. Don't rely on them for medical decisions and don't enter sensitive medical information.</p>
   <h3>8. Your content and data</h3><p>You own the data you enter. You give us permission to store and process it only to provide the App to you, as described in our Privacy Policy and Consumer Health Data Notice.</p>
@@ -1609,9 +1620,8 @@ function legalDocs(){
   <h3>Consent</h3><p>We collect consumer health data only after you give consent during setup. Storing it in your account requires a separate opt-in. You can withdraw consent at any time in Profile &amp; data.</p>
   <h3>Sharing</h3><p>We share consumer health data only with processors that host the App for us under contract. We <b>do not sell</b> consumer health data. We do not use geofencing.</p>
   <h3>Your rights</h3><p>You can confirm whether we collect your consumer health data, access it, delete it, and withdraw consent, directly in the App or by emailing ${E}. If we deny a request, you can appeal by replying to our decision; if your appeal is denied, you can contact your state Attorney General.</p>`],
-  credits:["Credits",`<h3>Exercise drawings</h3><p>Exercise drawings by <b>Everkinetic</b>, licensed under <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank" rel="noopener">Creative Commons Attribution-ShareAlike 3.0</a>. Source: <a href="https://github.com/chaosbastler/opentraining-exercises" target="_blank" rel="noopener">opentraining-exercises</a>. ${APP} converted them to transparent line art, cropped and aligned them; these adapted drawings are shared under the same license.</p>
-  <h3>3D human models</h3><p>The realistic 3D man and woman are built with <a href="https://static.makehumancommunity.org/" target="_blank" rel="noopener">MakeHuman</a> / MPFB using the MakeHuman system assets, released under <a href="https://creativecommons.org/publicdomain/zero/1.0/" target="_blank" rel="noopener">CC0 1.0</a> (public domain). Gym clothing, animation, poses and equipment are original to ${APP}.</p>
-  <h3>Everything else</h3><p>The muscle map, icons, workout plans, coach answers and text are original to ${APP}.</p>
+  credits:["Credits",`<h3>3D human models</h3><p>The realistic 3D man and woman are built with <a href="https://static.makehumancommunity.org/" target="_blank" rel="noopener">MakeHuman</a> / MPFB using the MakeHuman system assets, released under <a href="https://creativecommons.org/publicdomain/zero/1.0/" target="_blank" rel="noopener">CC0 1.0</a> (public domain). Gym clothing, animation, poses and equipment are original to ${APP}.</p>
+  <h3>Everything else</h3><p>The exercise pictures and animations (rendered from the 3D models), muscle map, icons, workout plans, coach answers and text are original to ${APP}.</p>
   <h3>Software</h3><p>Built with open-source software including Capacitor (MIT) and three.js (MIT). Fonts: Unbounded, Figtree and JetBrains Mono (SIL Open Font License).</p>`],
   disclaimer:["Health & Safety Disclaimer",`<p><i>Last updated ${U}</i></p>
   <p><b>${APP} is not a substitute for professional medical advice, diagnosis or treatment.</b> Information in the App, including workouts, exercise demonstrations, nutrition estimates and AI coach answers, is general and for educational purposes for healthy adults.</p>
@@ -1810,7 +1820,7 @@ function fire(r,snoozed){
   $("#dis").onclick=()=>host.innerHTML="";
   $("#snz").onclick=()=>{host.innerHTML="";setTimeout(()=>fire(r,true),10*60e3)};
 }
-function toastMsg(m){const host=$("#toastHost");host.innerHTML=`<div class="toast" role="status"><div style="flex:1">${esc(m)}</div><button class="btn small" id="dis">OK</button></div>`;$("#dis").onclick=()=>host.innerHTML="";setTimeout(()=>{if(host.textContent.includes(m))host.innerHTML=""},6000)}
+function toastMsg(m){const host=$("#toastHost");host.innerHTML=`<div class="toast" role="status"><div style="flex:1">${esc(m)}</div><button class="btn small" id="dis">OK</button></div>`;$("#dis").onclick=()=>host.innerHTML="";setTimeout(()=>{if(host.textContent.includes(m))host.innerHTML=""},Math.max(6000,m.length*65))}
 setInterval(()=>{
   const n=new Date(),hm=`${String(n.getHours()).padStart(2,"0")}:${String(n.getMinutes()).padStart(2,"0")}`,dow=(n.getDay()+6)%7,t=todayISO();
   for(const r of state.reminders){if(!r.on||!r.days[dow]||r.time!==hm)continue;const key=r.id+t+hm;if(firedKey[key])continue;firedKey[key]=1;fire(r)}
@@ -1825,6 +1835,11 @@ function startTimer(s){unlockAudio();clearInterval(timerI);timerLeft=s;const el=
 
 /* =============== guided workout player =============== */
 let PL=null;
+function plStage(id){return window.MX3D&&window.MX3D.supported?`<div class="c3wrap c3compact" id="plHost"></div>`:stageSVG(id)}
+function plMount3D(){const h=$("#plHost");if(!h||!PL||!PL.id3||!window.MX3D)return;const go=()=>window.MX3D.mount(h,{id:PL.id3,EX,MUS,kind:who3d(),skin:state.skin3d??1,compact:true,onKind:k=>{state.view3d=k;save()}});
+  if(window.MX3D.ready)go();else window.addEventListener("mx3d-ready",go,{once:true})}
+function plTips(id){const e=EX[id];return `<div class="dodont">${e.cues.slice(0,2).map(c=>`<div class="do">${ICO.ok}<span>${esc(c)}</span></div>`).join("")}${(e.mistakes||[]).slice(0,2).map(c=>`<div class="dont">${ICO.no}<span>${esc(c)}</span></div>`).join("")}</div>`}
+function plKcalSoFar(end){if(!PL)return 0;const wk=workoutKcal(PL.d);if(!wk)return 0;const mins=(Date.now()-PL.t0)/6e4,rate=(wk.lo+wk.hi)/2/Math.max(1,wk.mins);const k=Math.round(rate*Math.min(mins,wk.mins*1.5)/5)*5;return end?Math.max(5,k):k}
 function buildSteps(d){
   const st=[{k:"warm",secs:300,name:"Warm-up",text:d.warm||"Easy movement"}];
   const items=[...d.list,...d.cool];
@@ -1851,35 +1866,37 @@ function startPlayer(i){
   try{navigator.wakeLock?.request("screen").then(w=>PL.wl=w).catch(()=>{})}catch(e){}
   say(`Let's go. ${d.title}. Start with a 5 minute warm-up.`);
 }
-$("#player").addEventListener("close",()=>{if(PL){clearInterval(PL.tick);try{PL.wl?.release()}catch(e){}try{speechSynthesis.cancel()}catch(e){}}});
+$("#player").addEventListener("close",()=>{try{window.MX3D?.unmount($("#player"))}catch(e){}if(PL){clearInterval(PL.tick);try{PL.wl?.release()}catch(e){}try{speechSynthesis.cancel()}catch(e){}}});
 function drawPlayer(){
   const dlg=$("#player"), s=PL.steps[PL.p], total=PL.steps.length-1, pct=Math.round(PL.p/total*100);
   clearInterval(PL.tick); PL.run=false;
-  const top=`<div class="spread"><span class="label">${esc(PL.d.title)} · step ${Math.min(PL.p+1,total)} of ${total}</span><div class="row"><button class="stopBtn" id="plPain">Pain or dizzy? Stop</button><button class="btn small ghost" id="plExit">Exit</button></div></div><div class="prog"><i style="width:${pct}%"></i></div>`;
+  const kSo=plKcalSoFar();
+  const top=`<div class="spread"><span class="label">${esc(PL.d.title)} · step ${Math.min(PL.p+1,total)} of ${total}${showCal()&&kSo?` · <span class="plK">${ICO.fire}≈${kSo} kcal</span>`:""}</span><div class="row"><button class="stopBtn" id="plPain">Pain or dizzy? Stop</button><button class="btn small ghost" id="plExit">Exit</button></div></div><div class="prog"><i style="width:${pct}%"></i></div>`;
   let stage="",ctl="";
   if(s.k==="warm"){
-    stage=stageSVG("highknees");
-    ctl=`${top}<h2>Warm-up</h2><p class="muted">${esc(s.text)}. Raise your heart rate gently and loosen up.</p><div class="count" id="plCount">${fmtT(s.secs)}</div>
+    stage=plStage("bwsquat");
+    ctl=`${top}<h2>Warm-up · 5 min</h2><div class="wuList"><div><b>1</b><span>3 min easy cardio<small>walk, bike or march on the spot</small></span></div><div><b>2</b><span>10 bodyweight squats<small>slow and controlled, like the coach</small></span></div><div><b>3</b><span>10 arm circles each way<small>small to big circles</small></span></div></div><div class="count" id="plCount">${fmtT(s.secs)}</div>
      <div class="row"><button class="btn primary big" id="plGo">Start timer</button><button class="btn ghost" id="plSkip">Skip warm-up</button></div>`;
   }else if(s.k==="set"){
     const e=EX[s.id], sg=suggest(s.id,s.hi), prev=(PL.sets[s.id]||[]).slice(-1)[0];
     const wv=prev?.w??sg.w; const wDisp=wv!=null?toU(wv).toFixed(1):"";
-    stage=stageSVG(s.id);
+    stage=plStage(s.id);
     ctl=`${top}<div><span class="label">Set ${s.set} of ${s.of}</span><h2>${esc(e.name)}</h2><p class="muted">Target: <b class="mono">${s.lo===s.hi?s.lo:s.lo+"–"+s.hi} reps${s.each?" each leg":""}</b></p></div>
      ${e.eq!=="bw"?`<p class="small">${esc(sg.msg)}</p>`:""}
      <div class="setInputs">${e.eq!=="bw"||s.id==="lunge"?`<div class="field"><label for="plW">Weight (${state.unit})</label><input type="number" id="plW" step="0.5" min="0" inputmode="decimal" value="${wDisp}" placeholder="0"></div>`:""}
       <div class="field"><label for="plR">Reps done</label><input type="number" id="plR" min="0" max="100" inputmode="numeric" value="${prev?.r??s.hi}"></div></div>
-     <ul class="small" style="margin:0;padding-left:18px">${e.cues.map(c=>`<li>${esc(c)}</li>`).join("")}</ul>
+     ${plTips(s.id)}
      <div class="row"><button class="btn primary big" id="plDone">Done set ✓</button><button class="btn ghost" id="plSkip">Skip</button><button class="btn ghost" data-open="${s.id}">Form tips</button></div>`;
   }else if(s.k==="time"){
     const e=EX[s.id];
-    stage=stageSVG(s.id);
+    stage=plStage(s.id);
     ctl=`${top}<div><span class="label">${s.of?`Round ${s.set} of ${s.of}`:"Timed"}</span><h2>${esc(e.name)}</h2><p class="muted mono">${esc(s.label)}</p></div>
      <div class="count" id="plCount">${fmtT(s.secs)}</div>
+     ${plTips(s.id)}
      <div class="row"><button class="btn primary big" id="plGo">Start</button><button class="btn ghost" id="plSkip">Skip</button><button class="btn ghost" data-open="${s.id}">Form tips</button></div>`;
   }else if(s.k==="rest"){
     const n=EX[s.next];
-    stage=stageSVG(s.next);
+    stage=plStage(s.next);
     ctl=`${top}<div><span class="label">Rest</span><h2>Breathe</h2><p class="muted">Next: <b>${esc(n.name)}</b></p></div>
      <div class="count" id="plCount">${fmtT(s.secs)}</div>
      <div class="row"><button class="btn ghost" id="plAdd">+15 s</button><button class="btn primary big" id="plSkip">Skip rest</button></div>`;
@@ -1890,13 +1907,14 @@ function drawPlayer(){
     const now=prs(), newPR=Object.keys(now).filter(id=>!PL.prsBefore[id]||now[id].e1>PL.prsBefore[id].e1+0.01);
     stage=`<svg viewBox="0 0 120 120" style="width:55%;max-width:220px"><use href="#mxIcon"/></svg>`;
     ctl=`<h2>Workout complete!</h2><p class="muted">${esc(PL.d.title)} · Day ${PL.i+1} of 30</p>
-     <div class="sumGrid"><div class="stat"><b class="mono">${mins}</b><span>minutes</span></div><div class="stat"><b class="mono">${all.length}</b><span>sets logged</span></div><div class="stat"><b class="mono">${Math.round(toU(vol))}</b><span>${state.unit} lifted</span></div></div>
+     <div class="sumGrid"><div class="stat"><b class="mono">${mins}</b><span>minutes</span></div>${showCal()?`<div class="stat"><b class="mono">≈${plKcalSoFar(true)}</b><span>kcal burned*</span></div>`:""}<div class="stat"><b class="mono">${all.length}</b><span>sets logged</span></div><div class="stat"><b class="mono">${Math.round(toU(vol))}</b><span>${state.unit} lifted</span></div></div>
      ${newPR.length?`<div class="notice ok"><b>New personal record${newPR.length>1?"s":""}:</b> ${newPR.map(id=>esc(EX[id].name)).join(", ")}</div>`:""}
      ${PL.fresh&&PL.fresh.length?`<div class="notice ok"><b>Badge unlocked:</b> ${PL.fresh.map(b=>esc(b.name)).join(", ")}</div>`:""}
      <p class="small">Coach ${COACH[state.coach].name}: ${esc(COACH[state.coach].hello[(PL.i+1)%4])}</p>
      <div class="row"><button class="btn primary big" id="plFinish">Finish</button><button class="btn ghost" id="plCard">Make progress card</button></div>`;
   }
   dlg.innerHTML=`<div class="pl"><div class="stageP">${stage}</div><div class="ctl">${ctl}</div></div>`;
+  PL.id3=s.k==="warm"?"bwsquat":s.k==="rest"?s.next:s.k==="end"?null:s.id;plMount3D();
   const next=()=>{PL.p=Math.min(PL.p+1,PL.steps.length-1);announce();drawPlayer()};
   const bind=(id,fn)=>{const b=$("#"+id);if(b)b.onclick=fn};
   bind("plExit",()=>dlg.close());
@@ -1938,7 +1956,7 @@ function openEx(id){
   const alts=(ALT[id]||[]).filter(a=>EQOK[state.profile.equip].includes(EX[a].eq));
   const mm=MUS[id]||[[],[]];
   const use3d=window.MX3D?window.MX3D.supported:true;
-  dlgHTML(`<div class="mGrid"><div class="mLeft">${use3d?`<div class="viewTabs"><div class="seg2" role="group" aria-label="View"><button data-view="3d" aria-pressed="true">3D coach</button>${ILL.has(id)?`<button data-view="2d" aria-pressed="false">Drawing</button>`:""}</div></div><div class="c3wrap" id="c3host"></div>`:""}<div class="mStage ${ILL.has(id)?"ill":""}" id="m2d" ${use3d?"hidden":""}>${ILL.has(id)?stageSVG(id).replace('class="demo"','class="demo big" id="bigDemo"'):`<svg viewBox="0 0 200 190" data-big="1" role="img" aria-label="${esc(e.name)} demo">${drawSVG(e,0)}</svg>`}<div class="ctrl"><button class="btn small" id="pp">Pause</button><button class="btn small" id="slow">Slow</button></div>${ILL.has(id)?`<span class="credit">Illustration: Everkinetic, CC BY-SA 3.0</span>`:""}</div></div>
+  dlgHTML(`<div class="mGrid"><div class="mLeft"><div class="viewTabs"><span class="vtTitle">${esc(e.name)}</span></div>${use3d?`<div class="c3wrap" id="c3host"></div>`:`<div class="mStage">${stageSVG(id).replace('class="demo d3"','class="demo d3 big"')}</div>`}</div>
   <div class="mBody">
     <div>${catPill(e.cat)}<h2 id="dlgTitle" style="margin-top:8px">${esc(e.name)}</h2></div>
     ${doseBlock(id)}
@@ -1957,13 +1975,10 @@ function openEx(id){
   $$("[data-kcalinfo]",dlg).forEach(b=>b.onclick=()=>toastMsg(KCAL_NOTE()));
   dlgId=id;paused=false;
   if(use3d){const mount=()=>window.MX3D.mount($("#c3host"),{id,EX,MUS,kind:who3d(),skin:state.skin3d??1,onKind:k=>{state.view3d=k;save()}});
-    if(window.MX3D&&window.MX3D.ready)mount();else window.addEventListener("mx3d-ready",mount,{once:true});
-    $$("[data-view]",dlg).forEach(b=>b.onclick=()=>{const v=b.dataset.view;$$("[data-view]",dlg).forEach(x=>x.setAttribute("aria-pressed",String(x===b)));$("#c3host").hidden=v!=="3d";$("#m2d").hidden=v!=="2d";if(v==="3d")mount();else window.MX3D?.unmount()})}
-  $("#pp").onclick=()=>{paused=!paused;$("#pp").textContent=paused?"Play":"Pause";$("#bigDemo")?.classList.toggle("paused",paused)};
-  $("#slow").onclick=()=>{slowMo=!slowMo;$("#slow").textContent=slowMo?"Normal":"Slow";$("#bigDemo")?.classList.toggle("slow",slowMo)};
+    if(window.MX3D&&window.MX3D.ready)mount();else window.addEventListener("mx3d-ready",mount,{once:true});}
 }
 dlg.addEventListener("click",e=>{if(e.target===dlg)dlg.close()});
-dlg.addEventListener("close",()=>{try{window.MX3D?.unmount()}catch(e){}});
+dlg.addEventListener("close",()=>{try{window.MX3D?.unmount(dlg)}catch(e){}if($("#player").open&&PL)setTimeout(plMount3D,50)});
 function who3d(){if(state.view3d)return state.view3d;const s=state.profile.sex;return s==="male"?"M":s==="female"?"F":(state.coach==="leo"?"M":"F")}
 
 /* =============== animation loop =============== */
