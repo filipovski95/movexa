@@ -360,12 +360,25 @@ float hiK=hk*(1.-clothK);`)
     if(round){for(const n of ["spine_02","spine_03"]){b[n].updateWorldMatrix(true,false);const q=new THREE.Quaternion();b[n].getWorldQuaternion(q);this.setWorldQ(b[n],new THREE.Quaternion().setFromAxisAngle(lat,-round/2).multiply(q))}}
     if(p.head){b.head.updateWorldMatrix(true,false);const q=new THREE.Quaternion();b.head.getWorldQuaternion(q);this.setWorldQ(b.head,new THREE.Quaternion().setFromAxisAngle(lat,-deg(p.head)).multiply(q))}
     this.joints={up,fw,lat};
+    // simple body volume (torso ellipse + thigh capsules) so hands are kept in front of the body, never inside it
+    const pv=V(),nk=V();b.pelvis.updateWorldMatrix(true,false);b.pelvis.getWorldPosition(pv);b.neck_01.updateWorldMatrix(true,false);b.neck_01.getWorldPosition(nk);
+    const thighs=[];for(const [s,sg] of [["R",-1],["L",1]]){const x=this.sfx[s],th=b["thigh"+x];th.updateWorldMatrix(true,false);const hp=V();th.getWorldPosition(hp);
+      const ank=p["foot"+s]?V(...p["foot"+s]):V(p.foot[0],p.foot[1],p.foot[2]*sg),kp=(p["kPole"+s]?V(...p["kPole"+s]):V(...(p.kPole||[1,0,.2])).setZ((p.kPole||[1,0,.2])[2]*sg)).normalize();
+      thighs.push([hp,ik(hp,ank,this.len["th"+s],this.len["sh"+s],kp).joint])}
+    const F=this.k==="F",fwH=V(fw.x,0,fw.z);if(fwH.lengthSq()<1e-4)fwH.set(1,0,0);fwH.normalize();
+    const clear=h=>{for(let it=0;it<6;it++){let moved=false;
+      {const ax=V().subVectors(nk,pv),L=ax.length();ax.normalize();const t=Math.max(0,Math.min(L,V().subVectors(h,pv).dot(ax))),c=pv.clone().addScaledVector(ax,t),d=V().subVectors(h,c);
+        const f=d.dot(fw),l=d.dot(lat),A=(F?.15:.16)+.035,Bw=(F?.2:.21)+.03,e=(f/A)**2+(l/Bw)**2;
+        if(e<1&&t>0&&t<L){const need=A*Math.sqrt(Math.max(0,1-(l/Bw)**2));h.addScaledVector(fw,need-f+.005);moved=true}}
+      for(const [a2,b2] of thighs){const ax=V().subVectors(b2,a2),L=ax.length();ax.normalize();const t=Math.max(0,Math.min(L,V().subVectors(h,a2).dot(ax))),c=a2.clone().addScaledVector(ax,t),d=V().subVectors(h,c),r=(F?.095:.09)+.03,dl=d.length();
+        if(dl<r&&t>.02){const dir=d.clone().addScaledVector(fwH,.6).normalize();h.copy(c).addScaledVector(dir,r+.005);moved=true}}
+      if(!moved)break}return h};
     for(const [s,sg] of [["R",-1],["L",1]]){
       const x=this.sfx[s];const ua=b["upperarm"+x],fa=b["lowerarm"+x],hd=b["hand"+x],th=b["thigh"+x],cf=b["calf"+x],ft=b["foot"+x];
       ua.updateWorldMatrix(true,false);th.updateWorldMatrix(true,false);
       const sh=V(),hp=V();ua.getWorldPosition(sh);th.getWorldPosition(hp);
       const mir=a=>V(a[0],a[1],a[2]*sg);
-      const hand=p["hand"+s]?V(...p["hand"+s]):mir(p.hand);if(this.handMode==="flat"&&hand.y<.6)hand.y-=.022;const ank=p["foot"+s]?V(...p["foot"+s]):mir(p.foot);
+      const hand=p["hand"+s]?V(...p["hand"+s]):mir(p.hand);if(this.handMode==="flat"&&hand.y<.6)hand.y-=.022;else clear(hand);const ank=p["foot"+s]?V(...p["foot"+s]):mir(p.foot);
       const ePole=(p["ePole"+s]?V(...p["ePole"+s]):mir(p.ePole||[-1,-.4,.4])).normalize(),kPole=(p["kPole"+s]?V(...p["kPole"+s]):mir(p.kPole||[1,0,.2])).normalize();
       const arm=ik(sh,hand,this.len["ua"+s],this.len["fa"+s],ePole),leg=ik(hp,ank,this.len["th"+s],this.len["sh"+s],kPole);
       const rd=(a,b)=>V().subVectors(R[b].p,R[a].p).normalize();
