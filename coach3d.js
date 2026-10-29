@@ -195,7 +195,7 @@ class RealHuman{
       if(m.p==="L"&&m.x<(kind==="F"?this.B.th+.22:.2))c=C.bottom;
       if(kind==="M"&&m.p==="A"&&m.x<.09)c=C.top;
       if(m.p==="F")c=new THREE.Color(kind==="F"?0xf2f2f2:0x2d3340);
-      col[i*3]=c.r;col[i*3+1]=c.g;col[i*3+2]=c.b;
+      m.cl=c===C.top||c===C.bottom;col[i*3]=c.r;col[i*3+1]=c.g;col[i*3+2]=c.b;
     }
     geo.setAttribute("color",new THREE.BufferAttribute(col,3));
     this.nv=nv;this.meta=meta;this.geo=geo;
@@ -205,7 +205,7 @@ class RealHuman{
   }
   setMuscles(hi,bad){
     const H=this.aHi.array,Bd=this.aBad.array,mh=hi.map(([n,f])=>[MUSCLES[n],f]).filter(x=>x[0]),mb=bad.map(n=>MUSCLES[n]).filter(Boolean);
-    for(let i=0;i<this.nv;i++){const v=this.meta[i];let a=0,b=0;for(const [m,f] of mh)a=Math.max(a,m.w(v)*f);for(const m of mb)b=Math.max(b,m.w(v));H[i]=a;Bd[i]=b}
+    for(let i=0;i<this.nv;i++){const v=this.meta[i];let a=0,b=0;for(const [m,f] of mh)a=Math.max(a,m.w(v)*(f<1&&v.cl?0:f));for(const m of mb)b=Math.max(b,m.w(v));H[i]=a;Bd[i]=b}
     this.aHi.needsUpdate=true;this.aBad.needsUpdate=true;
     this.anchors={};const P=this.geo.attributes.position,pv=V();
     for(const n of hi.filter(x=>x[1]>=1).map(x=>x[0])){const m=MUSCLES[n];if(!m)continue;const c=V();let cnt=0;
@@ -463,12 +463,15 @@ function update(dt){
   ui.tempo.style.width=`${Math.round(s.k*100)}%`;
 }
 function drawCallouts(){
-  const m=MUSAPP[exId]||[[],[]],w=host.clientWidth,h=host.clientHeight-(host.querySelector(".c3ctl")?.offsetHeight||0);let html="";const used=[];
-  if(labelsOn)m[0].slice(0,3).forEach((n,k)=>{if(!man.anchorWorld(n,tmpV))return;const p=tmpV.clone().project(camera);if(p.z>1)return;
-    const x=(p.x+1)/2*w,y=(1-p.y)/2*h,left=x>w/2;let lx=left?Math.min(w-12,x+70):Math.max(12,x-70),ly=Math.max(60,Math.min(h-110,y-40+k*60));
-    for(const u of used)if(Math.abs(u-ly)<40)ly=u+42;used.push(ly);const M_=MUSCLES[n];
-    html+=`<line x1="${x}" y1="${y}" x2="${lx}" y2="${ly}" stroke="#FFD6CC" stroke-width="1.5"/><circle cx="${x}" cy="${y}" r="5" fill="#FF5E48" stroke="#fff" stroke-width="2"/>
-    <foreignObject x="${left?lx:lx-150}" y="${ly-18}" width="150" height="42"><div xmlns="http://www.w3.org/1999/xhtml" class="m3label ${left?"":"r"}"><b>${M_.name}</b><span>${M_.latin.split(" · ")[0]}</span></div></foreignObject>`});
+  const m=MUSAPP[exId]||[[],[]],w=host.clientWidth,h=host.clientHeight-(host.querySelector(".c3ctl")?.offsetHeight||0);let html="";
+  if(labelsOn){const BW=Math.min(122,w*.3),BH=36,top=52,bot=h-92,pts=[];
+    m[0].slice(0,3).forEach(n=>{if(!man.anchorWorld(n,tmpV))return;const p=tmpV.clone().project(camera);if(p.z>1)return;pts.push({n,x:(p.x+1)/2*w,y:(1-p.y)/2*h})});
+    for(const side of ["L","R"]){const g=pts.filter(q=>(q.x<w/2)===(side==="L")).sort((a,b)=>a.y-b.y);let last=-1e9;
+      g.forEach(q=>{let ly=Math.max(top,Math.min(bot,q.y-BH/2));if(ly<last+BH+6)ly=last+BH+6;last=ly;q.ly=ly;q.side=side});
+      const over=last-bot;if(over>0)g.forEach(q=>q.ly-=over)}
+    for(const q of pts){const L=q.side==="L",bx=L?8:w-8-BW,ex=L?bx+BW:bx,ey=q.ly+BH/2,M_=MUSCLES[q.n];
+      html+=`<line x1="${q.x}" y1="${q.y}" x2="${ex}" y2="${ey}" stroke="#FFD6CC" stroke-opacity=".85" stroke-width="1.3"/><circle cx="${q.x}" cy="${q.y}" r="4.5" fill="#FF5E48" stroke="#fff" stroke-width="2"/>
+      <foreignObject x="${bx}" y="${q.ly}" width="${BW}" height="${BH+4}"><div xmlns="http://www.w3.org/1999/xhtml" class="m3label ${L?"":"r"}"><b>${M_.name}</b><span>${M_.latin.split(" · ")[0]}</span></div></foreignObject>`}}
   ui.svg.setAttribute("viewBox",`0 0 ${w} ${h}`);ui.svg.innerHTML=html;
 }
 const CAMS={front:[3.2,0,0],side:[.1,0,3.3],diag:[2.4,.35,2.4],top:[1,2.6,.7]};
@@ -491,7 +494,7 @@ window.MX3D={
   async mount(el,opts){
     EXAPP=opts.EX||{};MUSAPP=opts.MUS||{};kind=opts.kind||"F";skin=opts.skin??1;exId=opts.id;mistake=null;t=0;rep=0;lastIdx=-1;playing=true;speed=1;
     host=el;el.innerHTML=`<div class="c3load">Loading 3D coach…</div><svg class="c3svg" aria-hidden="true"></svg>
-      <div class="c3hud"><div class="c3top"><span class="c3chip"><span>Muscle growth</span><span class="c3bar"><i></i></span></span><span class="c3chip c3rep">Rep 1</span></div>
+      <div class="c3hud"><div class="c3top"><span class="c3chip"><b class="c3rep">Rep 1</b><span class="c3sep"></span><span>Growth</span><span class="c3bar"><i></i></span></span></div>
       <div class="c3cue"><b></b><span></span><div class="c3tempo"><i></i></div></div></div>
       <div class="c3ctl"><div class="c3seg">${[["front","Front"],["side","Side"],["diag","45°"],["top","Top"]].map(([k,l])=>`<button data-c3cam="${k}">${l}</button>`).join("")}</div>
       <div class="c3seg"><button data-c3="play">Pause</button><button data-c3="slow">Slow</button><button data-c3="labels" aria-pressed="true">Labels</button><button data-c3="who">${kind==="F"?"Show man":"Show woman"}</button></div></div>`;
