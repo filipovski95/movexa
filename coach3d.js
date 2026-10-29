@@ -625,10 +625,10 @@ function update(dt){
     const bad=!!(mk&&s.frame.phase);
     ui.num.textContent=steps?s.idx+1:"●";
     ui.of.textContent=bad?"Common mistake":steps?`Step ${s.idx+1} of ${n}`:"Keep a steady rhythm";
-    ui.cueB.textContent=bad?`✕ ${mk.name}`:clean(s.frame.cue?.[0]||"");ui.cueS.textContent=bad?`Fix: ${mk.fix}`:(s.frame.cue?.[1]||"");ui.card.classList.toggle("bad",bad);
+    ui.cueB.textContent=bad?`✕ ${mk.name}`:clean(s.frame.cue?.[0]||"");ui.cueS.textContent=bad?`Fix: ${mk.fix}`:level>=2?"":(s.frame.cue?.[1]||"");ui.card.classList.toggle("bad",bad);
     if(ui.steps){ui.steps.innerHTML=steps?fr.map((f,j)=>`<button data-step="${j}" class="${j===s.idx?"on":j<s.idx?"done":""}" aria-label="Step ${j+1}: ${clean(f.cue?.[0]||"")}"><i>${j+1}</i><span>${clean(f.cue?.[0]||"")}</span></button>`).join(""):"";
       ui.steps.querySelectorAll("[data-step]").forEach(b=>b.onclick=()=>goStep(+b.dataset.step))}
-    if(voiceOn&&learn&&rep<=2)say(bad?`Careful. ${mk.name}. ${mk.fix}`:coachLine(s.idx,n,s.frame));}
+    if(voiceOn&&rep<=(level===0?2:1))say(bad?`Careful. ${mk.name}. ${mk.fix}`:coachLine(s.idx,n,s.frame));}
   ui.tempo.style.width=`${Math.round((s.kk??s.k)*100)}%`;
 }
 const clean=x=>String(x).replace(/\s*·\s*\d+\s*s\b/g,"").trim();
@@ -644,7 +644,10 @@ try{pickVoice();speechSynthesis.addEventListener("voiceschanged",pickVoice)}catc
 function say(text){if(!window.speechSynthesis)return;try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text.replace(/\s+/g," ").replace(/\.\./g,"."));if(bestVoice)u.voice=bestVoice;u.lang=bestVoice?.lang||"en-US";u.rate=.92;u.pitch=1.02;speechSynthesis.speak(u)}catch(e){}}
 // tap a step: show that step's finished position and pause there
 function goStep(j){const T=total(),r=Math.floor(t/T);let a=0;for(let i=0;i<=j;i++)a+=dur(mv.frames[i]);t=r*T+a-.001;lastIdx=-1;playing=false;const b=host?.querySelector('[data-c3="play"]');if(b)b.textContent="Play"}
-let voiceOn=(()=>{try{return localStorage.getItem("mx3d.voice")!=="0"}catch(e){return true}})();
+// guidance by level: 0 beginner (slow, voice, every step), 1 intermediate (real speed, short cues), 2 advanced (just the basics)
+let level=0;
+const voicePref=()=>{try{const v=localStorage.getItem("mx3d.voice");return v===null?null:v==="1"}catch(e){return null}};
+let voiceOn=true;
 function drawCallouts(){
   const m=MUSAPP[exId]||[[],[]],w=host.clientWidth,h=host.clientHeight-(host.querySelector(".c3ctl")?.offsetHeight||0)-(host.querySelector(".c3cuep")?.offsetHeight||0);let html="";
   if(labelsOn){const BW=Math.min(122,w*.3),BH=36,top=52,bot=h-(ui.card?.offsetHeight||0)-60,pts=[];
@@ -687,7 +690,7 @@ function load(base){if(loading)return loading;const loader=new GLTFLoader();
 window.MX3D={
   supported:(()=>{try{const c=document.createElement("canvas");return !!(c.getContext("webgl2")||c.getContext("webgl"))}catch(e){return false}})(),
   async mount(el,opts){
-    EXAPP=opts.EX||{};MUSAPP=opts.MUS||{};kind=opts.kind||"F";learn=opts.learn??true;skin=opts.skin??1;exId=opts.id;mistake=null;t=0;rep=0;lastIdx=-1;playing=true;speed=1;
+    EXAPP=opts.EX||{};MUSAPP=opts.MUS||{};kind=opts.kind||"F";level=opts.level??0;learn=opts.learn??(level===0);skin=opts.skin??1;exId=opts.id;mistake=null;t=0;rep=0;lastIdx=-1;playing=true;speed=1;
     host=el;el.classList.toggle("c3compact",!!opts.compact);el.innerHTML=`<div class="c3load">Loading 3D coach…</div><svg class="c3svg" aria-hidden="true"></svg>
       <div class="c3hud"><div class="c3top"><span class="c3chip"><b class="c3rep">Rep 1</b><span class="c3sep"></span><span>Growth</span><span class="c3bar"><i></i></span></span>
         <button class="c3voice" data-c3="voice" aria-pressed="${voiceOn}" aria-label="Voice coach">${voiceOn?"🔊":"🔇"}</button></div>
@@ -698,7 +701,11 @@ window.MX3D={
     ui={svg:el.querySelector(".c3svg"),rep:el.querySelector(".c3rep"),growFill:el.querySelector(".c3bar i"),card:el.querySelector(".c3card"),num:el.querySelector(".c3num"),of:el.querySelector(".c3of"),cueB:el.querySelector(".c3txt b"),cueS:el.querySelector(".c3txt>span"),tempo:el.querySelector(".c3tempo i"),steps:opts.compact?null:el.querySelector(".c3steps")};
     {const m=MUSAPP[exId]||[[],[]],nm=n=>MUSCLES[n]?.name||n;el.querySelector(".c3work").innerHTML=m[0].length?`<span>Working</span>${m[0].map(n=>`<b class="p">${nm(n)}</b>`).join("")}${m[1].map(n=>`<b>${nm(n)}</b>`).join("")}`:""}
     if(opts.compact)el.querySelectorAll(".c3steps,.c3work").forEach(x=>x.remove());
-    voiceOn=opts.voice??voiceOn;
+    voiceOn=opts.voice??voicePref()??(level===0);
+    if(level>=2)el.querySelector(".c3steps")?.remove();
+    el.querySelector('[data-c3="voice"]').textContent=voiceOn?"🔊":"🔇";el.querySelector('[data-c3="voice"]').setAttribute("aria-pressed",String(voiceOn));
+    el.querySelector('[data-c3="slow"]').textContent=learn?"Real tempo":"Learn slowly";
+    ui.steps=el.querySelector(".c3steps");
     el.prepend(renderer.domElement);
     await load(opts.base||"");
     if(host!==el)return;
@@ -713,6 +720,14 @@ window.MX3D={
     el.querySelector('[data-c3="who"]').onclick=e=>{kind=kind==="F"?"M":"F";e.target.textContent=kind==="F"?"Show man":"Show woman";mv=movement(exId,kind);buildMan();buildProps();fit=null;setCam(camKey);opts.onKind&&opts.onKind(kind)};
     if(!running){running=true;clock.getDelta();renderer.setAnimationLoop(frame)}
   },
+  // from the step photos: 0 = start position, 1 = the move, 2 = where you feel it (muscle view)
+  focus(n){if(!mv)return;const fr=mv.frames;lastIdx=-1;
+    if(n===0){goStep(0);playing=true}
+    else if(n===1){let k=fr.findIndex(f=>f.phase==="hold");if(k<0)k=Math.min(1,fr.length-1);goStep(Math.max(0,k-1));playing=true}
+    else{let k=fr.findIndex(f=>f.phase==="hold");if(k<0)k=Math.min(1,fr.length-1);goStep(k);
+      const BACK=["lats","rhomboids","traps","hams","glutes","lowerback","reardelt","triceps","calves"],p=(MUSAPP[exId]||[[]])[0];
+      labelsOn=true;host?.querySelector('[data-c3="labels"]')?.setAttribute("aria-pressed","true");userCam=false;setCam(p.filter(m=>BACK.includes(m)).length>p.length/2?"bdiag":"front")}
+    const b=host?.querySelector('[data-c3="play"]');if(b)b.textContent=playing?"Pause":"Play"},
   setMistake(m){mistake=m;lastIdx=-1;if(man)applyMuscles()},
   mistakes(id){const m=HAND3D[id];return m&&m.mistakes?m.mistakes.map(x=>({id:x.id,name:x.name,fix:x.fix})):[]},
   unmount(scope){if(scope&&host&&!scope.contains(host))return;stop();host=null}

@@ -391,7 +391,8 @@ body.wlOpen{overflow:hidden}
 .dose .hot{background:color-mix(in srgb,var(--coral) 12%,transparent)}.dose .hot b{color:var(--coral)}
 .steps3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:6px}
 .steps3 figure{margin:0;background:var(--sunk);border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
-.steps3 .si{aspect-ratio:1/1.05;background:radial-gradient(90% 70% at 50% 40%,#fff,#E9EDF3)}
+.steps3 .si{aspect-ratio:1/1.05;background:radial-gradient(90% 70% at 50% 40%,#fff,#E9EDF3);border:0;padding:0;position:relative;display:block;width:100%;cursor:pointer}
+.steps3 .si em{position:absolute;left:6px;bottom:6px;font-style:normal;font-size:11px;font-weight:800;color:#fff;background:#FF5E48;border-radius:999px;padding:3px 8px;box-shadow:0 2px 8px rgba(0,0,0,.2)}
 .steps3 .si img{width:100%;height:100%;object-fit:contain}.steps3 .si.none{display:none}
 .steps3 figcaption{padding:8px;display:grid;gap:2px;font-size:12px;line-height:1.3}
 .steps3 figcaption i{font-style:normal;width:20px;height:20px;border-radius:50%;background:var(--coral);color:#fff;display:grid;place-items:center;font-weight:800;font-size:11px}
@@ -981,7 +982,7 @@ const ICO={fire:'<svg viewBox="0 0 24 24" width="16" height="16" fill="none" str
  no:'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>'};
 function stepsStrip(id){const G=(window.MX_GUIDE||{})[id],k=who3d(),m=(MUS[id]||[[]])[0];if(!G)return "";
   const caps=[G[0],G[1],`Feel it here: ${m.slice(0,2).map(x=>MNAME[x]).join(" & ")||EX[id].muscles}`],tit=["Get in position","Do the move","Where you feel it"];
-  return `<div class="steps3">${caps.map((c,n)=>`<figure><div class="si"><img src="assets/steps/${id}-${k}-${n+1}.webp" alt="Step ${n+1}: ${esc(c)}" loading="lazy" onerror="this.parentNode.classList.add('none')"></div><figcaption><i>${n+1}</i><b>${tit[n]}</b><span>${esc(c)}</span></figcaption></figure>`).join("")}</div>`}
+  return `<div class="steps3">${caps.map((c,n)=>`<figure><button class="si" data-focus="${n}" aria-label="Watch step ${n+1} in the big 3D animation"><img src="assets/steps/${id}-${k}-${n+1}.webp" alt="Step ${n+1}: ${esc(c)}" loading="lazy" onerror="this.parentNode.classList.add('none')"><em>▶ Watch</em></button><figcaption><i>${n+1}</i><b>${tit[n]}</b><span>${esc(c)}</span></figcaption></figure>`).join("")}</div>`}
 function doseBlock(id){const d=dose(id),[lo,hi]=kcalOf(metFor(id),d.mins);
   return `<div class="dose"><div><b>${d.sets}</b><span>${d.sets>1?"sets":"set"}</span></div><div><b>${d.work}</b><span>${esc(d.unit)}</span></div>${d.rest?`<div><b>${d.rest} s</b><span>rest</span></div>`:""}${showCal()?`<div class="hot"><b>${lo}–${hi}</b><span>kcal*</span></div>`:""}</div>
   <p class="muted small" style="margin:0">Suggested for ${LVNAME()} · ${esc(d.freq)}. Start lighter if it feels hard; good form first.${showCal()?` <button class="linkBtn" data-kcalinfo>*How we estimate calories</button>`:""}</p>`}
@@ -1855,7 +1856,7 @@ function startTimer(s){unlockAudio();clearInterval(timerI);timerLeft=s;const el=
 /* =============== guided workout player =============== */
 let PL=null;
 function plStage(id){return window.MX3D&&window.MX3D.supported?`<div class="c3wrap c3compact" id="plHost"></div>`:stageSVG(id)}
-function plMount3D(){const h=$("#plHost");if(!h||!PL||!PL.id3||!window.MX3D)return;const go=()=>window.MX3D.mount(h,{id:PL.id3,EX,MUS,kind:who3d(),skin:state.skin3d??1,compact:true,onKind:k=>{state.view3d=k;save()}});
+function plMount3D(){const h=$("#plHost");if(!h||!PL||!PL.id3||!window.MX3D)return;const go=()=>window.MX3D.mount(h,{id:PL.id3,EX,MUS,kind:who3d(),skin:state.skin3d??1,compact:true,level:LV(),onKind:k=>{state.view3d=k;save()}});
   if(window.MX3D.ready)go();else window.addEventListener("mx3d-ready",go,{once:true})}
 function plTips(id){const e=EX[id];return `<div class="dodont">${e.cues.slice(0,2).map(c=>`<div class="do">${ICO.ok}<span>${esc(c)}</span></div>`).join("")}${(e.mistakes||[]).slice(0,2).map(c=>`<div class="dont">${ICO.no}<span>${esc(c)}</span></div>`).join("")}</div>`}
 function plKcalSoFar(end){if(!PL)return 0;const wk=workoutKcal(PL.d);if(!wk)return 0;const mins=(Date.now()-PL.t0)/6e4,rate=(wk.lo+wk.hi)/2/Math.max(1,wk.mins);const k=Math.round(rate*Math.min(mins,wk.mins*1.5)/5)*5;return end?Math.max(5,k):k}
@@ -1993,7 +1994,9 @@ function openEx(id){
   </div></div>`);
   $$("[data-kcalinfo]",dlg).forEach(b=>b.onclick=()=>toastMsg(KCAL_NOTE()));
   dlgId=id;paused=false;
-  if(use3d){const mount=()=>window.MX3D.mount($("#c3host"),{id,EX,MUS,kind:who3d(),skin:state.skin3d??1,onKind:k=>{state.view3d=k;save()}});
+  // tap a step photo: jump up to the big 3D coach and show that step
+  $$("[data-focus]",dlg).forEach(b=>b.onclick=()=>{const h=$("#c3host");if(h&&window.MX3D?.focus){h.scrollIntoView({behavior:"smooth",block:"start"});window.MX3D.focus(+b.dataset.focus)}});
+  if(use3d){const mount=()=>window.MX3D.mount($("#c3host"),{id,EX,MUS,kind:who3d(),skin:state.skin3d??1,level:LV(),onKind:k=>{state.view3d=k;save()}});
     if(window.MX3D&&window.MX3D.ready)mount();else window.addEventListener("mx3d-ready",mount,{once:true});}
 }
 dlg.addEventListener("click",e=>{if(e.target===dlg)dlg.close()});
