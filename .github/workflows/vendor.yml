@@ -24,6 +24,8 @@ jobs:
           cp node_modules/three/examples/jsm/controls/OrbitControls.js $GITHUB_WORKSPACE/vendor/
           cp node_modules/three/examples/jsm/geometries/RoundedBoxGeometry.js $GITHUB_WORKSPACE/vendor/
           cp node_modules/three/LICENSE $GITHUB_WORKSPACE/vendor/THREE-LICENSE.txt
+          cp node_modules/three/examples/jsm/loaders/GLTFLoader.js $GITHUB_WORKSPACE/vendor/
+          mkdir -p $GITHUB_WORKSPACE/vendor/utils && cp node_modules/three/examples/jsm/utils/BufferGeometryUtils.js node_modules/three/examples/jsm/utils/SkeletonUtils.js $GITHUB_WORKSPACE/vendor/utils/
       - name: Commit
         run: |
           git config user.name "github-actions[bot]"
