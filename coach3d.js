@@ -552,7 +552,7 @@ function movement(id,kind){
 
 /* ================= app runtime ================= */
 let EXAPP={},MUSAPP={};
-let kind="F",skin=1,man=null,exId=null,mv=null,props=new THREE.Group(),mistake=null,playing=true,speed=1,t=0,rep=0,growthOn=true,labelsOn=true,running=false;
+let kind="F",skin=1,man=null,exId=null,mv=null,props=new THREE.Group(),mistake=null,playing=true,speed=1,t=0,rep=0,growthOn=true,labelsOn=false,running=false;
 scene.add(props);
 const GLB={};
 let host=null,ui=null,onCue=null;
@@ -587,9 +587,9 @@ function framesFor(){if(!mistake||!mv.mistakes)return mv.frames;const m=mv.mista
 // Learn mode (default): every step moves slowly and then holds still for ~2 s so the cue can be read.
 // Real tempo: the rep speed you train at (at least ~5 s per rep).
 let learn=true;
-const SLOWREP=5.2,LEARNREP=11;
-const tScale=()=>{const sum=mv.frames.reduce((s,f)=>s+f.t,0);return learn?Math.max(2,LEARNREP/sum):Math.max(1,SLOWREP/sum)};
-const holdT=()=>{const n=mv.frames.length;return learn?(n<=4?3.2:0):(n<=2?.7:n<=4?.15:0)};
+const SLOWREP=5.2,LEARNREP=7;
+const tScale=()=>{const sum=mv.frames.reduce((s,f)=>s+f.t,0);return learn?Math.max(1.5,LEARNREP/sum):Math.max(1,SLOWREP/sum)};
+const holdT=()=>{const n=mv.frames.length;return learn?(n<=4?1.9:0):(n<=2?.7:n<=4?.15:0)};
 const dur=f=>f.t*tScale()+holdT();
 const total=()=>mv.frames.reduce((s,f)=>s+dur(f),0);
 function sampleAt(time){const fr=framesFor(),T=total(),sc=tScale();let tt=time%T,i=0;while(i<fr.length&&tt>dur(fr[i])){tt-=dur(fr[i]);i++}i=Math.min(i,fr.length-1);
@@ -624,13 +624,24 @@ function update(dt){
   if(s.idx!==lastIdx){lastIdx=s.idx;const fr=mv.frames,n=fr.length,steps=n<=4;
     const bad=!!(mk&&s.frame.phase);
     ui.num.textContent=steps?s.idx+1:"●";
-    ui.of.textContent=bad?"Common mistake":steps?`Step ${s.idx+1} of ${n}${learn?" · hold and read":""}`:"Keep a steady rhythm";
-    ui.cueB.textContent=bad?`✕ ${mk.name}`:(s.frame.cue?.[0]||"");ui.cueS.textContent=bad?`Fix: ${mk.fix}`:(s.frame.cue?.[1]||"");ui.card.classList.toggle("bad",bad);
-    if(ui.steps){ui.steps.innerHTML=steps?fr.map((f,j)=>`<button data-step="${j}" class="${j===s.idx?"on":j<s.idx?"done":""}"><i>${j+1}</i><span>${f.cue?.[0]||"Step "+(j+1)}</span></button>`).join(""):"";
+    ui.of.textContent=bad?"Common mistake":steps?`Step ${s.idx+1} of ${n}`:"Keep a steady rhythm";
+    ui.cueB.textContent=bad?`✕ ${mk.name}`:clean(s.frame.cue?.[0]||"");ui.cueS.textContent=bad?`Fix: ${mk.fix}`:(s.frame.cue?.[1]||"");ui.card.classList.toggle("bad",bad);
+    if(ui.steps){ui.steps.innerHTML=steps?fr.map((f,j)=>`<button data-step="${j}" class="${j===s.idx?"on":j<s.idx?"done":""}" aria-label="Step ${j+1}: ${clean(f.cue?.[0]||"")}"><i>${j+1}</i><span>${clean(f.cue?.[0]||"")}</span></button>`).join(""):"";
       ui.steps.querySelectorAll("[data-step]").forEach(b=>b.onclick=()=>goStep(+b.dataset.step))}
-    if(voiceOn&&learn&&rep<=2&&window.speechSynthesis){try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(bad?`${mk.name}. ${mk.fix}`:`${steps?"Step "+(s.idx+1)+". ":""}${s.frame.cue?.[0]||""}. ${s.frame.cue?.[1]||""}`);u.rate=.95;speechSynthesis.speak(u)}catch(e){}}}
+    if(voiceOn&&learn&&rep<=2)say(bad?`Careful. ${mk.name}. ${mk.fix}`:coachLine(s.idx,n,s.frame));}
   ui.tempo.style.width=`${Math.round((s.kk??s.k)*100)}%`;
 }
+const clean=x=>String(x).replace(/\s*·\s*\d+\s*s\b/g,"").trim();
+// friendly coach lines: "Let's begin. Step 1..." … "Nice work, and again."
+function coachLine(i,n,f){const a=clean(f.cue?.[0]||""),b=f.cue?.[1]||"";if(n>4)return `${a}. ${b}. Keep a steady rhythm.`;
+  const lead=i===0?(rep<=1?"Let's begin. Step one.":"And again. Step one."):["","Step two.","Step three.","Step four."][i]||"";
+  const slow=f.phase==="down"?" Nice and slow.":f.phase==="hold"?" Hold it there.":f.phase==="up"?" Good.":"";
+  return `${lead} ${a}.${slow} ${b}.${i===n-1?" Great work.":""}`}
+let bestVoice=null;
+function pickVoice(){try{const vs=speechSynthesis.getVoices().filter(v=>/^en/i.test(v.lang));const score=v=>(/natural|neural|enhanced|premium/i.test(v.name)?4:0)+(/google/i.test(v.name)?3:0)+(/en[-_]US|en[-_]GB/i.test(v.lang)?1:0)+(v.localService?0:1);
+  bestVoice=vs.sort((x,y)=>score(y)-score(x))[0]||null}catch(e){}}
+try{pickVoice();speechSynthesis.addEventListener("voiceschanged",pickVoice)}catch(e){}
+function say(text){if(!window.speechSynthesis)return;try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text.replace(/\s+/g," ").replace(/\.\./g,"."));if(bestVoice)u.voice=bestVoice;u.lang=bestVoice?.lang||"en-US";u.rate=.92;u.pitch=1.02;speechSynthesis.speak(u)}catch(e){}}
 // tap a step: show that step's finished position and pause there
 function goStep(j){const T=total(),r=Math.floor(t/T);let a=0;for(let i=0;i<=j;i++)a+=dur(mv.frames[i]);t=r*T+a-.001;lastIdx=-1;playing=false;const b=host?.querySelector('[data-c3="play"]');if(b)b.textContent="Play"}
 let voiceOn=(()=>{try{return localStorage.getItem("mx3d.voice")!=="0"}catch(e){return true}})();
@@ -662,7 +673,8 @@ function setCam(k,instant){if(!host)return;camKey=k;const c=camFor(k);if(instant
   host.querySelectorAll("[data-c3cam]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.c3cam===k)))}
 function resize(){if(!host)return;const c1=host.querySelector(".c3ctl")?.offsetHeight||0,c2=host.querySelector(".c3cuep")?.offsetHeight||0,ch=c1+c2;host.style.setProperty("--c3ctlOnly",c1+"px");host.style.setProperty("--c3ctl",ch+"px");const w=host.clientWidth,h=host.clientHeight-ch;if(!w||!h)return;renderer.setSize(w,h,false);camera.aspect=w/h;
   // keep the body above the step card that floats over the bottom of the video
-  const off=Math.min(h*.4,(host.querySelector(".c3card")?.offsetHeight||0)*.9);if(off>0)camera.setViewOffset(w,h+off,0,off,w,h);else camera.clearViewOffset();camera.updateProjectionMatrix()}
+  camera.clearViewOffset();camera.updateProjectionMatrix();if(mv&&!userCam&&camK>=1)setCam(camKey,true)}
+let userCam=false;controls.addEventListener("start",()=>{userCam=true});
 const ro=new ResizeObserver(resize);
 const clock=new THREE.Clock();
 function frame(){const dt=Math.min(.05,clock.getDelta());if(!host||!host.isConnected){stop();return}
@@ -679,20 +691,21 @@ window.MX3D={
     host=el;el.classList.toggle("c3compact",!!opts.compact);el.innerHTML=`<div class="c3load">Loading 3D coach…</div><svg class="c3svg" aria-hidden="true"></svg>
       <div class="c3hud"><div class="c3top"><span class="c3chip"><b class="c3rep">Rep 1</b><span class="c3sep"></span><span>Growth</span><span class="c3bar"><i></i></span></span>
         <button class="c3voice" data-c3="voice" aria-pressed="${voiceOn}" aria-label="Voice coach">${voiceOn?"🔊":"🔇"}</button></div>
-        <div class="c3card"><span class="c3num">1</span><div class="c3txt"><small class="c3of"></small><b></b><span></span><div class="c3tempo"><i></i></div></div></div>
-      </div><div class="c3cuep"><div class="c3steps"></div></div>
+      </div><div class="c3cuep"><div class="c3card"><span class="c3num">1</span><div class="c3txt"><small class="c3of"></small><b></b><span></span><div class="c3tempo"><i></i></div></div></div>
+        <div class="c3steps"></div><div class="c3work"></div></div>
       <div class="c3ctl"><div class="c3seg">${[["front","Front"],["side","Side"],["diag","45°"],["top","Top"]].map(([k,l])=>`<button data-c3cam="${k}">${l}</button>`).join("")}</div>
-      <div class="c3seg"><button data-c3="play">Pause</button><button data-c3="slow">Real tempo</button><button data-c3="labels" aria-pressed="true">Labels</button><button data-c3="who">${kind==="F"?"Show man":"Show woman"}</button></div></div>`;
+      <div class="c3seg"><button data-c3="play">Pause</button><button data-c3="slow">Real tempo</button><button data-c3="labels" aria-pressed="false">Labels</button><button data-c3="who">${kind==="F"?"Show man":"Show woman"}</button></div></div>`;
     ui={svg:el.querySelector(".c3svg"),rep:el.querySelector(".c3rep"),growFill:el.querySelector(".c3bar i"),card:el.querySelector(".c3card"),num:el.querySelector(".c3num"),of:el.querySelector(".c3of"),cueB:el.querySelector(".c3txt b"),cueS:el.querySelector(".c3txt>span"),tempo:el.querySelector(".c3tempo i"),steps:opts.compact?null:el.querySelector(".c3steps")};
-    if(opts.compact)el.querySelector(".c3cuep").remove();
+    {const m=MUSAPP[exId]||[[],[]],nm=n=>MUSCLES[n]?.name||n;el.querySelector(".c3work").innerHTML=m[0].length?`<span>Working</span>${m[0].map(n=>`<b class="p">${nm(n)}</b>`).join("")}${m[1].map(n=>`<b>${nm(n)}</b>`).join("")}`:""}
+    if(opts.compact)el.querySelectorAll(".c3steps,.c3work").forEach(x=>x.remove());
     voiceOn=opts.voice??voiceOn;
     el.prepend(renderer.domElement);
     await load(opts.base||"");
     if(host!==el)return;
     el.querySelector(".c3load")?.remove();
-    mv=movement(exId,kind);buildMan();buildProps();fit=null;ro.observe(el);resize();setCam("diag",true);
+    mv=movement(exId,kind);buildMan();buildProps();fit=null;userCam=false;camKey="diag";ro.observe(el);resize();setCam("diag",true);
     t=mv.frames[0].t*tScale(); // open already standing in the start position (step 1), not mid-move
-    el.querySelectorAll("[data-c3cam]").forEach(b=>b.onclick=()=>setCam(b.dataset.c3cam));
+    el.querySelectorAll("[data-c3cam]").forEach(b=>b.onclick=()=>{userCam=false;setCam(b.dataset.c3cam)});
     el.querySelector('[data-c3="play"]').onclick=e=>{playing=!playing;e.target.textContent=playing?"Pause":"Play";if(!playing)try{speechSynthesis.cancel()}catch(_){}};
     el.querySelector('[data-c3="slow"]').onclick=e=>{const T0=total(),k=(t%T0)/T0,r=Math.floor(t/T0);learn=!learn;t=(r+k)*total();lastIdx=-1;e.target.textContent=learn?"Real tempo":"Learn slowly"};
     el.querySelector('[data-c3="voice"]').onclick=e=>{voiceOn=!voiceOn;try{localStorage.setItem("mx3d.voice",voiceOn?"1":"0")}catch(_){}e.currentTarget.textContent=voiceOn?"🔊":"🔇";e.currentTarget.setAttribute("aria-pressed",String(voiceOn));if(!voiceOn)try{speechSynthesis.cancel()}catch(_){}else lastIdx=-1};
