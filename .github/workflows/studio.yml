@@ -28,14 +28,14 @@ jobs:
           mkdir -p $EXT && cp -r /tmp/mpfb2/src/mpfb $EXT/mpfb
           curl -sSL -o /tmp/sys.zip https://files.makehumancommunity.org/asset_packs/makehuman_system_assets/makehuman_system_assets_cc0.zip || curl -sSL -o /tmp/sys.zip https://files2.makehumancommunity.org/asset_packs/makehuman_system_assets/makehuman_system_assets_cc0.zip
           ls -la /tmp/sys.zip && unzip -l /tmp/sys.zip | head -30
-          mkdir -p studio/ref && cp -r /tmp/mpfb2/docs studio/ref/mpfb-docs || true
-          ls /tmp/mpfb2/src/mpfb/services > studio/ref/services.txt
-      - name: Run
+          UD=$HOME/.config/blender/4.2/extensions/.user/user_default/mpfb/data
+          mkdir -p $UD && unzip -q -o /tmp/sys.zip -d $UD && ls $UD
+      - name: Generate humans
         env:
-          LOG: ${{ github.workspace }}/studio/ref/explore.txt
+          OUT: ${{ github.workspace }}/studio/out
         run: |
-          /opt/blender/blender -b --factory-startup -noaudio --python-exit-code 1 --python studio/scripts/explore.py 2>&1 | tail -80 || true
-          unzip -l /tmp/sys.zip | awk '{print $4}' | sed -n '1,4000p' > studio/ref/sysassets_list.txt
+          /opt/blender/blender -b --factory-startup -noaudio --python studio/scripts/gen.py 2>&1 | tail -60 || true
+          ls -la studio/out
       - name: Commit results
         run: |
           git config user.name "github-actions[bot]"
