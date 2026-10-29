@@ -303,6 +303,7 @@ footer .row{gap:14px}
 <dialog id="obDlg" class="ob" aria-label="Welcome to MOVEXA"></dialog>
 <div id="toastHost"></div>
 
+<script src="coach-kb.js"></script>
 <script>
 (()=>{
 /* =============== CONFIG — fill these in before public launch =============== */
@@ -310,6 +311,20 @@ const APP="MOVEXA";
 const CAP=window.Capacitor;
 const NATIVE=!!(CAP&&CAP.isNativePlatform&&CAP.isNativePlatform());
 const LN=NATIVE?CAP.Plugins.LocalNotifications:null;
+const CAL=NATIVE?CAP.Plugins.CapacitorCalendar:null;
+async function nativeShare(name,data,isBase64){
+  const FS=CAP.Plugins.Filesystem,SH=CAP.Plugins.Share;
+  const r=await FS.writeFile({path:name,data,directory:"CACHE",...(isBase64?{}:{encoding:"utf8"})});
+  await SH.share({title:name,files:[r.uri],dialogTitle:"Save or share"});
+}
+async function phoneCalendar({title,start,mins,weekdays,until,description}){
+  try{await CAL.requestFullCalendarAccess()}catch(e){}
+  const opt={title,startDate:start.getTime(),endDate:start.getTime()+mins*6e4,description};
+  if(weekdays&&weekdays.length)opt.recurrence={frequency:"weekly",byWeekDay:weekdays,...(until?{end:until.getTime()}:{})};
+  await CAL.createEventWithPrompt(opt);
+}
+function nextOccurrence(r){const now=new Date(),[hh,mm]=r.time.split(":").map(Number);
+  for(let k=0;k<8;k++){const t=new Date(now);t.setDate(now.getDate()+k);t.setHours(hh,mm,0,0);if(r.days[(t.getDay()+6)%7]&&t>now)return t}return null}
 const LEGAL={
   company:"[Your company legal name]",
   address:"[Company postal address]",
@@ -685,6 +700,7 @@ async function deleteCloud(){try{if(dbRef)await dbRef.delete();syncState="local"
 let downloads=null,sample=null,mcp=null;
 const STANDALONE=!window.claude;
 async function saveFile(filename,data){
+  if(NATIVE){try{if(data instanceof Blob){const b64=await new Promise((ok,no)=>{const fr=new FileReader();fr.onload=()=>ok(String(fr.result).split(",")[1]);fr.onerror=no;fr.readAsDataURL(data)});await nativeShare(filename,b64,true)}else await nativeShare(filename,data);return "saved"}catch(e){return "declined"}}
   if(downloads){try{await downloads.save({filename,data});return "saved"}catch(e){return e.code==="declined"?"declined":"unavailable"}}
   if(STANDALONE){try{const blob=data instanceof Blob?data:new Blob([data],{type:filename.endsWith(".json")?"application/json":"application/octet-stream"});const u=URL.createObjectURL(blob);const a=document.createElement("a");a.href=u;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000);return "saved"}catch(e){return "unavailable"}}
   return "unavailable";
@@ -845,7 +861,8 @@ function renderPlan(){
   const pr=state.profile;
   $("#v-plan").innerHTML=`
   <div class="spread"><div style="max-width:640px"><h2>Your 30-day full-body plan</h2><p class="muted">Coach ${COACH[state.coach].name}'s track (${esc(COACH[state.coach].style)}), built for <b>${esc(GOALS[pr.goal])}</b>, <b>${esc(pr.level)}</b> level, <b>${esc(EQUIP[pr.equip])}</b>, <b>${pr.days} days a week</b>, <b>${pr.mins} min</b> sessions. <button class="linkBtn" data-goto="profile">Change</button></p></div>
-   <div class="field" style="width:180px"><label for="startDate">Plan start date</label><input type="date" id="startDate" value="${state.start}"></div></div>
+   <div class="row" style="align-items:end"><div class="field" style="width:180px"><label for="startDate">Plan start date</label><input type="date" id="startDate" value="${state.start}"></div>${CAL?`<button class="btn teal" id="planCal">Add workouts to phone calendar</button>`:""}</div></div>
+  <p class="muted small" id="planCalMsg"></p>
   <div class="panel">
     <div class="spread"><div class="row"><span class="pill ${pc}">${pl}</span><h3>Day ${selDay+1}: ${esc(d.title)}</h3></div><div class="row"><span class="muted small">${fmtDay(dateOf(selDay))}</span>${d.list.length?`<button class="btn small primary" id="startSel">Start this workout</button>`:""}</div></div>
     ${d.list.length?`<div class="workout">${d.list.map((x,k)=>exRow(x,k,selDay)).join("")}</div>`:`<p class="muted">${esc(d.note||"")}</p>`}
@@ -856,6 +873,14 @@ function renderPlan(){
   $$("[data-day]",$("#v-plan")).forEach(b=>b.onclick=()=>{selDay=+b.dataset.day;renderPlan()});
   $$("[data-goto]",$("#v-plan")).forEach(b=>b.onclick=()=>location.hash=b.dataset.goto);
   const ss=$("#startSel");if(ss)ss.onclick=()=>startPlayer(selDay);
+  const pcb=$("#planCal");if(pcb)pcb.onclick=async()=>{
+    const wd=new Set(),now=new Date();let first=null;const tm=(state.reminders.find(r=>r.id==="r1")||{time:"18:00"}).time.split(":").map(Number);
+    for(let k=0;k<30;k++){const p=dayPlan(k);if(p.type==="rest")continue;const d=dateOf(k);d.setHours(tm[0],tm[1],0,0);if(k<7)wd.add(((d.getDay()+6)%7)+1);if(!first&&d>now)first=d}
+    if(!first){$("#planCalMsg").textContent="No upcoming workouts in this plan.";return}
+    const until=dateOf(29);until.setHours(23,59,0,0);
+    try{await phoneCalendar({title:`${APP} workout`,start:first,mins:state.profile.mins,weekdays:[...wd].sort(),until,description:`Your ${APP} 30-day plan with Coach ${COACH[state.coach].name}. Open the app for today's workout.`});
+      $("#planCalMsg").textContent="Opened your calendar. Tap Save there to add your workout days."}
+    catch(e){$("#planCalMsg").textContent="Your calendar app couldn't be opened. Check that MOVEXA has calendar permission in Settings → Apps."}};
   bindRows($("#v-plan"),selDay,renderPlan); scanThumbs();
 }
 
@@ -985,7 +1010,7 @@ function progressCard(){
   dlgHTML(`<div class="mBody" style="padding:24px"><h2>Progress card</h2><p class="muted">A shareable image for social media. Your weight is left off unless you add it.</p>
    <label class="agree"><input type="checkbox" id="pcW"> <span>Include my weight change</span></label>
    <canvas id="pc" width="1080" height="1350" style="width:100%;max-width:360px;border-radius:16px;justify-self:center"></canvas>
-   <div class="row"><button class="btn primary" id="pcSave">Save image</button><span class="muted small" id="pcMsg"></span></div></div>`);
+   <div class="row"><button class="btn primary" id="pcSave">${NATIVE?"Save or share":"Save image"}</button><span class="muted small" id="pcMsg"></span></div></div>`);
   const draw=()=>{
     const c=$("#pc"),x=c.getContext("2d"),W=1080,H=1350;
     const g=x.createLinearGradient(0,0,W,H);g.addColorStop(0,"#FF7A45");g.addColorStop(.55,"#EE4136");g.addColorStop(1,"#D42A5E");x.fillStyle=g;x.fillRect(0,0,W,H);
@@ -1056,55 +1081,105 @@ function renderNutrition(){
   $("#wPlus").onclick=()=>setW(wn+1); $("#wMinus").onclick=()=>setW(wn-1);
 }
 
-/* ---- ask coach ---- */
-let chatCtl=null;
-function coachRules(){
-  const p=state.profile,i=dayIndex(),d=dayPlan(i),c=COACH[state.coach];
-  return `You are Coach ${c.name}, the in-app fitness coach of ${APP}, a gym and home workout app. Your style: ${c.style}; warm, direct, motivating.
-Reply in the same language the user writes in. Keep replies under 160 words, practical, with short steps or bullets when useful. Plain text only, no markdown headings.
-Safety rules you must always follow:
-- You are not a doctor, physiotherapist or dietitian. Do not diagnose or treat injuries or conditions.
-- For pain, injury, dizziness, pregnancy, heart, blood pressure or other medical conditions, tell the user to stop the exercise and see a qualified professional. For chest pain, fainting or trouble breathing, tell them to call their local emergency number now.
-- Never recommend eating under 1,200 kcal a day, extended fasting for weight loss, dehydration, purging, steroids or other performance-enhancing drugs, or prescription medicines. Only mention basic supplements (protein powder, creatine, vitamin D) with a note to check with a doctor.
-- If the user shows signs of disordered eating or self-harm, respond with care, don't give numbers, and encourage them to talk to a doctor or a trusted person.
-- Do not claim guaranteed results.
-User context: goal ${GOALS[p.goal]}; level ${p.level}; equipment ${EQUIP[p.equip]}; trains ${p.days} days/week, ${p.mins} min sessions. Today is day ${i+1} of 30: ${d.title}${d.list.length?" ("+d.list.map(x=>EX[x.id].name+" "+x.text).join("; ")+")":""}. Exercises available in the app: ${Object.values(EX).map(e=>e.name).join(", ")}.`;
+/* ---- ask coach: offline knowledge base + optional live AI ---- */
+let chatCtl=null, liveAI=false;
+const KB=window.COACH_KB||[];
+const STOPW=new Set("a an the i im i'm my me to do does did is are am was what whats how can could should would for of in on it its and or be with when much many why your you at this that from get got any some about there have has will just really very so if".split(" "));
+const stem=w=>w.length>4?w.replace(/(ing|ed|es|s)$/,""):w;
+const toks=t=>String(t).toLowerCase().replace(/[^a-z0-9\s]/g," ").split(/\s+/).filter(w=>w&&!STOPW.has(w)).map(stem);
+const KBI=KB.map(e=>({e,k:new Set(e.k.flatMap(toks)),q:new Set(toks(e.q)),ph:e.k.filter(x=>x.includes(" "))}));
+function safety(q){
+  const t=q.toLowerCase();
+  if(/chest pain|chest pressure|heart attack|can'?t breathe|cannot breathe|fainted|passed out|collapsed|arm (is )?numb|jaw pain/.test(t))
+    return "Stop exercising now. If you have chest pain or pressure, pain spreading to your arm, neck or jaw, severe shortness of breath, or you fainted, call your local emergency number immediately. Don't drive yourself.";
+  if(/suicid|kill myself|self.?harm|hurt myself on purpose|want to die/.test(t))
+    return "I'm really sorry you're feeling this way. You deserve support right now. Please contact your local emergency number or a crisis line in your country, or reach out to someone you trust and tell them how you feel.";
+  if(/starv|purg|throw(ing)? up after|binge|not eating|stop eating|eat nothing|laxative|eating disorder/.test(t))
+    return "Thank you for sharing that. How you eat and feel about food matters more than any number. Please talk to a doctor or someone you trust about it. I'd rather help you train in a way that feels good than focus on food targets.";
+  return null;
 }
+function exAnswer(q){
+  const t=q.toLowerCase(); let best=null,bs=0;
+  for(const [id,e] of Object.entries(EX)){
+    const words=e.name.toLowerCase().replace(/[^a-z\s-]/g," ").split(/[\s/-]+/).filter(w=>w.length>3&&!["dumbbell","machine","seated","standing","bodyweight","box","cable"].includes(w));
+    const hit=words.filter(w=>t.includes(w.replace(/s$/,""))).length; if(hit>bs){bs=hit;best=id}
+  }
+  if(!best)return null;
+  const e=EX[best]; const m=MACHINES.find(x=>x.ex===best&&t.includes(x.name.toLowerCase().split(" ")[0]));
+  return {score:2+bs,ex:best,text:`${e.name} (${e.muscles}):\n${e.steps.map((s,i)=>`${i+1}. ${s}`).join("\n")}\nTips: ${e.cues.join("; ")}.\nAvoid: ${e.mistakes.join("; ")}.${m?`\nSetting up the ${m.name}: ${m.set.join(" ")}`:""}`};
+}
+function dynAnswer(q){
+  const t=q.toLowerCase();
+  if(/today|tonight|this morning/.test(t)&&/workout|plan|train|do|exercise/.test(t)){const i=dayIndex(),d=dayPlan(i);
+    return {score:6,text:d.list.length?`Day ${i+1}: ${d.title}.\n${d.list.map(x=>`• ${EX[x.id].name}: ${x.text}`).join("\n")}\nWarm up first: ${d.warm}. Tap "Start guided workout" on Today when you're ready.`:`Day ${i+1} is a rest day. ${d.note}`}}
+  if(/(my|how many) (calorie|kcal)|calories should i|calorie target/.test(t)){const n=nutri();
+    return {score:6,text:n?`Your estimate is about ${Math.round(n.target).toLocaleString()} kcal a day for ${GOALS[state.profile.goal]}, with ${n.prot[0]}–${n.prot[1]} g of protein. See the Nutrition tab for how it's worked out. It's an estimate, not a prescription.`:"Add your age and height in Profile & data and log one weigh-in, then the Nutrition tab will show your estimate."}}
+  if(/streak|how am i doing|my progress/.test(t))return {score:5,text:`You've completed ${Object.keys(state.done).length} of 30 days, your current streak is ${streak()} days, and you've earned ${Object.keys(state.badges).length} badges. Keep going!`};
+  return null;
+}
+function answer(q){
+  const sf=safety(q); if(sf)return {text:sf,safety:true};
+  const qt=toks(q), ql=q.toLowerCase(); let best=null,bs=0;
+  for(const x of KBI){let sc=0;for(const w of qt){if(x.k.has(w))sc+=2;else if(x.q.has(w))sc+=1}for(const ph of x.ph)if(ql.includes(ph))sc+=3;if(sc>bs){bs=sc;best=x.e}}
+  const cands=[dynAnswer(q),exAnswer(q),best?{score:bs,text:best.a,kb:best}:null].filter(Boolean).sort((a,b)=>b.score-a.score);
+  const top=cands[0]; if(!top||top.score<2)return null;
+  if(top.kb&&/pain|hurt|injur/.test(ql)===false&&top.kb.t==="Pain")return top;
+  return top;
+}
+function related(entry){if(!entry)return KB.filter(e=>["Start","Training"].includes(e.t)).slice(0,3);return KB.filter(e=>e.t===entry.t&&e!==entry).sort(()=>Math.random()-.5).slice(0,3)}
+const TOPICS=[...new Set(KB.map(e=>e.t))];
+let coachTopic=null;
 function renderCoach(){
-  const c=COACH[state.coach];
-  const chips=["What should I eat before a workout?","My knees hurt when I squat. What should I do?","How do I use the cable machine?","I only have 20 minutes today. What should I do?","¿Cómo puedo mejorar mis sentadillas?"];
+  const c=COACH[state.coach], online=navigator.onLine!==false;
+  const sugg=coachTopic?KB.filter(e=>e.t===coachTopic):KB.filter(e=>["I'm a complete beginner. Where do I start?","How heavy should my weights be?","How do I lose fat?","How do I build muscle?","What should I eat before a workout?"].includes(e.q));
   $("#v-coach").innerHTML=`
-  <div class="spread"><div><h2>Ask Coach ${c.name}</h2><p class="muted">Ask about form, workouts, machines or recovery, in any language.</p></div>${state.chat.length?`<button class="btn small ghost" id="clearChat">Clear chat</button>`:""}</div>
+  <div class="spread"><div><h2>Ask Coach ${c.name}</h2><p class="muted">Ask about workouts, form, machines, food, recovery or the app.</p></div>${state.chat.length?`<button class="btn small ghost" id="clearChat">Clear chat</button>`:""}</div>
   <div class="panel">
-    ${sample?"":`<div class="notice">Ask Coach is available when ${APP} is opened in Claude by a signed-in user. Everything else in the app works without it.</div>`}
-    <div class="chat" id="chatBox">${state.chat.length?state.chat.map(m=>`<div class="msg ${m.role==="user"?"u":"a"}">${esc(m.content)}</div>`).join(""):`<div class="msg a">Hi! I'm Coach ${c.name}. Ask me anything about today's workout, form, machines or recovery.</div>`}</div>
-    <div class="filters">${chips.map(q=>`<button class="chip" data-q="${esc(q)}">${esc(q)}</button>`).join("")}</div>
-    <form id="chatForm" class="row" style="flex-wrap:nowrap"><input type="text" id="chatIn" placeholder="Type your question…" autocomplete="off" ${sample?"":"disabled"} style="flex:1"><button class="btn primary" type="submit" id="chatSend" ${sample?"":"disabled"}>Send</button><button class="btn ghost" type="button" id="chatStop" hidden>Stop</button></form>
-    <p class="muted small">Answers are generated by AI and can be wrong. They are general information, not medical advice. Don't share sensitive medical details.</p>
+    <div class="row"><span class="pill mob">Offline coach · ${KB.length} answers · works without internet</span>${sample?`<label class="row small" style="gap:6px;font-weight:600"><input type="checkbox" class="switch" id="liveT" ${liveAI?"checked":""}> Live AI answers (online only)</label>`:`<span class="pill rec">Live AI coach: online only, coming soon</span>`}</div>
+    ${liveAI&&!online?`<div class="notice">You're offline. Live AI answers need internet, so the offline coach will answer instead.</div>`:""}
+    <div class="chat" id="chatBox">${state.chat.length?state.chat.map(m=>`<div class="msg ${m.role==="user"?"u":"a"}">${esc(m.content)}</div>`).join(""):`<div class="msg a">Hi! I'm Coach ${c.name}. Ask me anything, or tap a question below. I work offline and learn more answers with every update.</div>`}</div>
+    <div class="filters" role="group" aria-label="Topics"><button class="chip" data-topic="" aria-pressed="${!coachTopic}">Popular</button>${TOPICS.map(t=>`<button class="chip" data-topic="${esc(t)}" aria-pressed="${coachTopic===t}">${esc(t)}</button>`).join("")}</div>
+    <div class="filters">${sugg.map(e=>`<button class="chip" data-q="${esc(e.q)}">${esc(e.q)}</button>`).join("")}</div>
+    <form id="chatForm" class="row" style="flex-wrap:nowrap"><input type="text" id="chatIn" placeholder="Type your question…" autocomplete="off" style="flex:1"><button class="btn primary" type="submit" id="chatSend">Send</button><button class="btn ghost" type="button" id="chatStop" hidden>Stop</button></form>
+    <p class="muted small">Coach answers are general fitness information, not medical advice. For pain, injury or health conditions, see a doctor or physiotherapist.${liveAI?" Live answers are generated by AI and can be wrong.":""}</p>
   </div>`;
   const box=$("#chatBox"); box.scrollTop=box.scrollHeight;
   const cc=$("#clearChat");if(cc)cc.onclick=()=>{state.chat=[];save();renderCoach()};
-  $$("[data-q]",$("#v-coach")).forEach(b=>b.onclick=()=>{if(!sample)return;$("#chatIn").value=b.dataset.q;ask()});
+  const lt=$("#liveT");if(lt)lt.onchange=()=>{liveAI=lt.checked;renderCoach()};
+  $$("[data-topic]",$("#v-coach")).forEach(b=>b.onclick=()=>{coachTopic=b.dataset.topic||null;renderCoach()});
+  $$("[data-q]",$("#v-coach")).forEach(b=>b.onclick=()=>{$("#chatIn").value=b.dataset.q;ask()});
   $("#chatForm").onsubmit=e=>{e.preventDefault();ask()};
   $("#chatStop").onclick=()=>chatCtl?.abort();
 }
+window.addEventListener("online",()=>{if(!$("#v-coach").hidden)renderCoach()});
+window.addEventListener("offline",()=>{if(!$("#v-coach").hidden)renderCoach()});
+function offlineReply(q){
+  const r=answer(q);
+  if(r){const rel=r.kb?related(r.kb):[];return r.text+(rel.length?`\n\nRelated: ${rel.map(e=>e.q).join(" · ")}`:"")}
+  return `I don't have an answer for that one yet. Try different words, or pick a topic below. New answers are added with every update.${sample?" You can also turn on Live AI answers when you're online.":""}`;
+}
 async function ask(){
-  const q=$("#chatIn").value.trim(); if(!q||!sample)return;
-  state.chat.push({role:"user",content:q}); state.chat=state.chat.slice(-20);
+  const q=$("#chatIn").value.trim(); if(!q)return;
+  state.chat.push({role:"user",content:q}); state.chat=state.chat.slice(-30); $("#chatIn").value="";
+  const useAI=liveAI&&sample&&navigator.onLine!==false&&!safety(q);
+  if(!useAI){state.chat.push({role:"assistant",content:offlineReply(q)});save();renderCoach();return}
   const box=$("#chatBox"); box.insertAdjacentHTML("beforeend",`<div class="msg u">${esc(q)}</div><div class="msg a" id="pending">Thinking…</div>`); box.scrollTop=box.scrollHeight;
-  $("#chatIn").value=""; $("#chatSend").disabled=true; $("#chatStop").hidden=false;
-  chatCtl=new AbortController();
-  const turns=[{role:"user",content:coachRules()},...state.chat.slice(-12)];
+  $("#chatSend").disabled=true; $("#chatStop").hidden=false; chatCtl=new AbortController();
   try{
-    const {text}=await sample(turns,{cache:false,modelTier:"default",signal:chatCtl.signal,onText:({text})=>{const p=$("#pending");if(p){p.textContent=text;box.scrollTop=box.scrollHeight}}});
+    const {text}=await sample([{role:"user",content:coachRules()},...state.chat.slice(-12)],{cache:false,signal:chatCtl.signal,onText:({text})=>{const p=$("#pending");if(p){p.textContent=text;box.scrollTop=box.scrollHeight}}});
     state.chat.push({role:"assistant",content:text});
   }catch(e){
-    const msg={not_granted:"Ask Coach needs your permission to use Claude. You can allow it next time you ask.",rate_limited:"Too many questions at once. Please wait a moment and try again.",refused:"I can't help with that one. Try asking another way.",session_expired:"Please sign in again to use Ask Coach.",sampling_disabled:"Ask Coach isn't available on this account."}[e.code];
     if(e.code==="cancelled"){if(e.text)state.chat.push({role:"assistant",content:e.text})}
-    else{state.chat.push({role:"assistant",content:(e.text?e.text+"\n\n":"")+(msg||"Something interrupted the answer. Please try again.")})}
-    if(["not_granted","sampling_disabled"].includes(e.code))sample=null;
+    else state.chat.push({role:"assistant",content:(e.text?e.text+"\n\n":"")+"The live AI coach couldn't answer right now, so here's my offline answer:\n\n"+offlineReply(q)});
+    if(["not_granted","sampling_disabled"].includes(e.code)){sample=null;liveAI=false}
   }
-  save(); $("#chatStop").hidden=true; renderCoach();
+  save(); renderCoach();
+}
+function coachRules(){
+  const p=state.profile,i=dayIndex(),d=dayPlan(i),c=COACH[state.coach];
+  return `You are Coach ${c.name}, the in-app fitness coach of ${APP}. Style: ${c.style}; warm, direct, motivating. Reply in the user's language, under 160 words, plain text.
+Safety rules: you are not a doctor; don't diagnose; for pain, injury, dizziness, pregnancy or medical conditions advise stopping and seeing a professional; for chest pain, fainting or trouble breathing tell them to call emergency services. Never recommend under 1,200 kcal/day, extended fasting, purging, PEDs or prescription drugs. If disordered eating or self-harm signs appear, respond with care and encourage professional help. No guaranteed results.
+User: goal ${GOALS[p.goal]}, ${p.level}, ${EQUIP[p.equip]}, ${p.days} days/week, ${p.mins} min. Today: day ${i+1}, ${d.title}${d.list.length?" ("+d.list.map(x=>EX[x.id].name+" "+x.text).join("; ")+")":""}.`;
 }
 
 /* ---- reminders ---- */
@@ -1128,7 +1203,7 @@ function renderReminders(){
         <div class="days">${DN.map((n,k)=>`<button data-dayt="${r.id}:${k}" aria-pressed="${!!r.days[k]}">${n}</button>`).join("")}</div>
         <div class="small muted" id="cal-${r.id}" style="margin-top:4px">${r.cal?`In Google Calendar since ${fmtShort(r.cal)}`:""}</div>
       </div>
-      <div class="row ra" style="flex-direction:column;gap:6px;align-items:stretch"><button class="btn small" data-test="${r.id}">Test</button>${mcp?`<button class="btn small teal" data-gcal="${r.id}">Add to Google Calendar</button>`:""}<button class="btn small ghost" data-rm="${r.id}">Delete</button></div>
+      <div class="row ra" style="flex-direction:column;gap:6px;align-items:stretch"><button class="btn small" data-test="${r.id}">Test</button>${CAL?`<button class="btn small teal" data-pcal="${r.id}">Save to phone calendar</button>`:mcp?`<button class="btn small teal" data-gcal="${r.id}">Add to Google Calendar</button>`:""}<button class="btn small ghost" data-rm="${r.id}">Delete</button></div>
     </div>`).join("")}</div>
   <div class="row"><button class="btn teal" id="addRem">Add reminder</button><span class="muted small">Tip: set one 30 minutes before your usual gym time.</span></div>`;
   const V=$("#v-reminders"), find=id=>state.reminders.find(r=>r.id===id);
@@ -1140,6 +1215,11 @@ function renderReminders(){
   $$("[data-test]",V).forEach(b=>b.onclick=()=>fire(find(b.dataset.test)));
   $$("[data-rm]",V).forEach(b=>b.onclick=()=>{state.reminders=state.reminders.filter(r=>r.id!==b.dataset.rm);save();renderReminders()});
   $$("[data-gcal]",V).forEach(b=>b.onclick=()=>addToCalendar(find(b.dataset.gcal),b));
+  $$("[data-pcal]",V).forEach(b=>b.onclick=async()=>{const r=find(b.dataset.pcal),out=$("#cal-"+r.id),st=nextOccurrence(r);
+    if(!st){out.textContent="Pick at least one day first.";return}
+    try{await phoneCalendar({title:`${APP}: ${r.label}`,start:st,mins:15,weekdays:r.days.map((v,k)=>v?k+1:0).filter(Boolean),description:`Reminder from ${APP}, your gym coach.`});
+      r.cal=todayISO();save();out.textContent="Opened your calendar. Tap Save there to add it."}
+    catch(e){out.textContent="Your calendar app couldn't be opened. Check that MOVEXA has calendar permission in Settings → Apps."}});
   const nb=$("#notifBtn");if(nb)nb.onclick=async()=>{try{const r=await Notification.requestPermission();if(r==="granted")notify("Notifications are on","You'll get your MOVEXA reminders here.");renderReminders()}catch(e){}};
   const an=$("#allowN");if(an)an.onclick=()=>syncNative(true);
   $("#addRem").onclick=()=>{state.reminders.push({id:"r"+Date.now().toString(36),label:"New reminder",time:"09:00",days:[1,1,1,1,1,1,1],on:true});save();renderReminders();unlockAudio()};
@@ -1199,7 +1279,7 @@ function renderProfile(){
       <dt>Health data</dt><dd>${c&&c.healthData?"Saved to your private account":"Kept on this device only"}</dd>
       <dt>Sync</dt><dd>${syncState==="cloud"?"Up to date":syncState==="error"?"Couldn't save to your account. Your data is still on this device.":"This device"}</dd></dl>
       <label class="agree"><input type="checkbox" id="hdToggle" ${c&&c.healthData?"checked":""}><span>Save my health and fitness data (weight, measurements, workouts, health-check result) to my private account so it's available on my other devices. Only I can see it. I can turn this off at any time, and the account copy is deleted.</span></label>
-      <div class="row"><button class="btn small" id="exportBtn">Download my data (JSON)</button><label class="btn small ghost" for="importIn">Import data</label><input type="file" id="importIn" accept="application/json,.json" hidden></div>
+      <div class="row"><button class="btn small" id="exportBtn">${NATIVE?"Save a copy of my data":"Download my data (JSON)"}</button><label class="btn small ghost" for="importIn">Import data</label><input type="file" id="importIn" accept="application/json,.json" hidden></div>
       <div class="row"><button class="btn small danger" id="delBtn">${delStep?"Tap again to permanently delete everything":"Delete all my data"}</button>${delStep?`<button class="btn small ghost" id="delCancel">Cancel</button>`:""}</div>
       <p class="muted small" id="dataMsg"></p>
     </div>

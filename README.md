@@ -11,7 +11,7 @@ On your Android phone: tap the link, open the downloaded file, and allow "Instal
 1. Open the app link (GitHub Pages) in Safari (iPhone) or Chrome (Android).
 2. iPhone: tap **Share → Add to Home Screen**. Android: tap **⋮ → Install app / Add to Home screen**.
 
-Data is stored on your device (browser storage). Ask Coach (AI), account sync, Google Calendar and file downloads work only when the app is opened inside Claude.
+The offline coach answers common questions from `coach-kb.js`; add entries there to teach it more. Data is stored on your device (browser storage). Ask Coach (AI), account sync, Google Calendar and file downloads work only when the app is opened inside Claude.
 
 ## Before public launch
 - Fill in the `LEGAL` settings at the top of the script in `index.html` (company name, address, email, governing law).

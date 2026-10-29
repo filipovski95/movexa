@@ -1,7 +1,7 @@
 // Builds the offline app bundle in www/: copies the web app and replaces Google Fonts with local font files.
 import fs from "node:fs"; import path from "node:path";
 const out="www"; fs.rmSync(out,{recursive:true,force:true}); fs.mkdirSync(path.join(out,"fonts"),{recursive:true});
-for(const f of ["manifest.webmanifest","icon.svg","icon-192.png","icon-512.png"])fs.copyFileSync(f,path.join(out,f));
+for(const f of ["manifest.webmanifest","icon.svg","icon-192.png","icon-512.png","coach-kb.js"])fs.copyFileSync(f,path.join(out,f));
 const fonts=[["Unbounded","unbounded",[500,700,800]],["Figtree","figtree",[400,500,600,700]],["JetBrains Mono","jetbrains-mono",[500]]];
 let css="";
 for(const [fam,pkg,ws] of fonts)for(const w of ws){
