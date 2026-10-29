@@ -307,6 +307,9 @@ footer .row{gap:14px}
 (()=>{
 /* =============== CONFIG — fill these in before public launch =============== */
 const APP="MOVEXA";
+const CAP=window.Capacitor;
+const NATIVE=!!(CAP&&CAP.isNativePlatform&&CAP.isNativePlatform());
+const LN=NATIVE?CAP.Plugins.LocalNotifications:null;
 const LEGAL={
   company:"[Your company legal name]",
   address:"[Company postal address]",
@@ -636,7 +639,30 @@ const cloudAllowed=()=>!!(state.consent&&state.consent.healthData);
 function save(){
   try{localStorage.setItem(LSKEY,JSON.stringify(state))}catch(e){}
   clearTimeout(saveT);saveT=setTimeout(flush,700);
+  syncNativeSoon();
 }
+let nativeT=null,lastNative="";
+function syncNativeSoon(){if(!LN)return;clearTimeout(nativeT);nativeT=setTimeout(syncNative,1200)}
+async function syncNative(force){
+  if(!LN)return;
+  const sig=JSON.stringify([state.reminders,state.coach]);
+  if(!force&&sig===lastNative)return;
+  try{
+    let perm=await LN.checkPermissions();
+    if(perm.display!=="granted")perm=await LN.requestPermissions();
+    nativePerm=perm.display;
+    if(perm.display!=="granted"){renderReminders();return}
+    const pend=await LN.getPending();
+    if(pend.notifications&&pend.notifications.length)await LN.cancel({notifications:pend.notifications.map(n=>({id:n.id}))});
+    const list=[];let id=1;
+    for(const r of state.reminders){if(!r.on)continue;const [h,m]=r.time.split(":").map(Number);
+      r.days.forEach((on,k)=>{if(on)list.push({id:id++,title:APP,body:`${r.label} · Coach ${COACH[state.coach].name}`,schedule:{on:{weekday:k===6?1:k+2,hour:h,minute:m},allowWhileIdle:true}})})}
+    if(list.length)await LN.schedule({notifications:list});
+    lastNative=sig;
+  }catch(e){nativePerm="error"}
+  renderReminders();
+}
+let nativePerm=null;
 async function flush(){
   if(!dbRef||!cloudAllowed())return; if(saving){again=true;return}
   saving=true;
@@ -1115,6 +1141,7 @@ function renderReminders(){
   $$("[data-rm]",V).forEach(b=>b.onclick=()=>{state.reminders=state.reminders.filter(r=>r.id!==b.dataset.rm);save();renderReminders()});
   $$("[data-gcal]",V).forEach(b=>b.onclick=()=>addToCalendar(find(b.dataset.gcal),b));
   const nb=$("#notifBtn");if(nb)nb.onclick=async()=>{try{const r=await Notification.requestPermission();if(r==="granted")notify("Notifications are on","You'll get your MOVEXA reminders here.");renderReminders()}catch(e){}};
+  const an=$("#allowN");if(an)an.onclick=()=>syncNative(true);
   $("#addRem").onclick=()=>{state.reminders.push({id:"r"+Date.now().toString(36),label:"New reminder",time:"09:00",days:[1,1,1,1,1,1,1],on:true});save();renderReminders();unlockAudio()};
   $("#wakeT").onchange=async e=>{if(e.target.checked){try{wake=await navigator.wakeLock.request("screen");wake.addEventListener("release",()=>{wake=null})}catch(err){wake=null;e.target.checked=false;toastMsg("Your browser didn't allow keeping the screen on.")}}else{try{await wake?.release()}catch(err){}wake=null}};
 }
@@ -1517,6 +1544,8 @@ function boot(){renderAll();if(!state.consent)openOnboarding(0);else if($("#obDl
 $("#copy").textContent=`© ${new Date().getFullYear()} ${APP}`;
 boot();
 connectCloud();
+if(NATIVE)syncNative(true);
+else if("serviceWorker" in navigator&&location.protocol==="https:"){try{navigator.serviceWorker.register("sw.js").catch(()=>{})}catch(e){}}
 })();
 </script>
 

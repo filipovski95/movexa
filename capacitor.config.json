@@ -1,0 +1,9 @@
+{
+  "appId": "com.movexa.coach",
+  "appName": "MOVEXA",
+  "webDir": "www",
+  "android": { "backgroundColor": "#EE4136" },
+  "plugins": {
+    "LocalNotifications": { "iconColor": "#EE4136" }
+  }
+}

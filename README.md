@@ -2,7 +2,12 @@
 
 A single-page web app: 30-day full-body plans (gym, dumbbells or no equipment), guided workout player with voice cues, animated form demos, gym machine guide, weight and measurement tracking, personal records, badges, nutrition estimates, water tracker and reminders with sound.
 
-## Install on your phone
+## Download the Android app
+**[⬇ Download MOVEXA.apk](https://github.com/filipovski95/movexa/releases/latest/download/MOVEXA.apk)** — works offline, reminders arrive as phone notifications.
+
+On your Android phone: tap the link, open the downloaded file, and allow "Install unknown apps" for your browser when asked.
+
+## Or use it in the browser
 1. Open the app link (GitHub Pages) in Safari (iPhone) or Chrome (Android).
 2. iPhone: tap **Share → Add to Home Screen**. Android: tap **⋮ → Install app / Add to Home screen**.
 
@@ -14,3 +19,6 @@ Data is stored on your device (browser storage). Ask Coach (AI), account sync, G
 - Run a full trademark search for the name MOVEXA.
 
 MOVEXA provides general fitness information, not medical advice.
+
+## How the APK is built
+Every push to `main` runs `.github/workflows/android.yml`, which wraps the app with Capacitor, bundles fonts for offline use, and publishes `MOVEXA.apk` to Releases. The included `android-res/debug.keystore` is a development key so updates install over earlier versions. Before publishing on Google Play, create a private release key and keep it out of the repository.
