@@ -1,0 +1,170 @@
+{
+ "squat": {
+  "source": "Pile-squat",
+  "files": [
+   "Pile-squat-1.gif",
+   "Pile-squat-2.gif"
+  ]
+ },
+ "pushup": {
+  "source": "Push-ups",
+  "files": [
+   "Push-ups-1.png",
+   "Push-ups-2.png"
+  ]
+ },
+ "row": {
+  "source": "Rear-deltoid-row",
+  "files": [
+   "Rear-deltoid-row-1.png",
+   "Rear-deltoid-row-2.png"
+  ]
+ },
+ "superman": {
+  "source": "Supermans",
+  "files": [
+   "Supermans-1.png",
+   "Supermans-2.png"
+  ]
+ },
+ "ohp": {
+  "source": "Dumbbell-shoulder-press",
+  "files": [
+   "Dumbbell-shoulder-press-1.png",
+   "Dumbbell-shoulder-press-2.png"
+  ]
+ },
+ "glutebridge": {
+  "source": "Bridge",
+  "files": [
+   "Bridge-1.png",
+   "Bridge-2.png"
+  ]
+ },
+ "lunge": {
+  "source": "Rear-lunges",
+  "files": [
+   "Rear-lunges-1-1024x1015.png",
+   "Rear-lunges-2-1-611x1024.png"
+  ]
+ },
+ "chairdip": {
+  "source": "Bench-dips",
+  "files": [
+   "Bench-dips-1.png",
+   "Bench-dips-2.png"
+  ]
+ },
+ "latpd": {
+  "source": "Wide-grip-lat-pull-down",
+  "files": [
+   "Wide-grip-lat-pull-down-1.gif",
+   "Wide-grip-lat-pull-down-2.gif"
+  ]
+ },
+ "legpress": {
+  "source": "Leg-press",
+  "files": [
+   "Leg-press-1-1024x670.png",
+   "Leg-press-2-1024x670.png"
+  ]
+ },
+ "chestpress": {
+  "source": "Incline-chest-press",
+  "files": [
+   "Incline-chest-press-1.png",
+   "Incline-chest-press-2.png"
+  ]
+ },
+ "seatedrow": {
+  "source": "Cable-seated-rows",
+  "files": [
+   "Cable-seated-rows-1.png",
+   "Cable-seated-rows-2.png"
+  ]
+ },
+ "stepup": {
+  "source": "Step-ups",
+  "files": [
+   "Step-ups-1-801x1024.png",
+   "Step-ups-2-1-553x1024.png"
+  ]
+ },
+ "curl": {
+  "source": "Biceps-curl",
+  "files": [
+   "Biceps-curl-1.png",
+   "Biceps-curl-2.png"
+  ]
+ },
+ "legext": {
+  "source": "Leg-extensions",
+  "files": [
+   "Leg-extensions-1-672x1024.png",
+   "Leg-extensions-2-672x1024.png"
+  ]
+ },
+ "legcurl": {
+  "source": "Seated-leg-curl",
+  "files": [
+   "Seated-leg-curl-1.png",
+   "Seated-leg-curl-2.png"
+  ]
+ },
+ "pecfly": {
+  "source": "Butterfly-machine",
+  "files": [
+   "Butterfly-machine-1.png",
+   "Butterfly-machine-2.png"
+  ]
+ },
+ "shoulderpress": {
+  "source": "Shoulder-press-machine",
+  "files": [
+   "Shoulder-press-machine-1.png",
+   "Shoulder-press-machine-2.png"
+  ]
+ },
+ "pushdown": {
+  "source": "Triceps-pushdown",
+  "files": [
+   "Triceps-pushdown-1.gif",
+   "Triceps-pushdown-2.gif"
+  ]
+ },
+ "latraise": {
+  "source": "Dumbbell-lateral-raises",
+  "files": [
+   "Dumbbell-lateral-raises-1.png",
+   "Dumbbell-lateral-raises-2.png"
+  ]
+ },
+ "crunch": {
+  "source": "Crunches",
+  "files": [
+   "Crunches-1.png",
+   "Crunches-2.png"
+  ]
+ },
+ "hyperext": {
+  "source": "Hyperextensions",
+  "files": [
+   "Hyperextensions-1.png",
+   "Hyperextensions-2.png"
+  ]
+ },
+ "overheadtri": {
+  "source": "Seated-overhead-triceps-extension",
+  "files": [
+   "Seated-overhead-triceps-extension-1.gif",
+   "Seated-overhead-triceps-extension-2.gif"
+  ]
+ },
+ "deadlift": {
+  "source": "Dead-lifts",
+  "files": [
+   "Dead-lifts-1.png",
+   "Dead-lifts-2.png"
+  ]
+ }
+}

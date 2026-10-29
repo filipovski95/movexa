@@ -19,7 +19,7 @@
 :root{
   --bg:#F1F3F6; --surface:#FFFFFF; --sunk:#E7EBF0; --ink:#12161C; --muted:#5A6472; --line:#D9DEE5;
   --coral:#E8473A; --amber:#F5A524; --teal:#0C9A8A; --onAccent:#FFFFFF; --figure:#12161C; --figureFar:#9AA3AF;
-  --good:#12925A; --warn:#B7791F; --bad:#C53030; --shadow:0 1px 2px rgba(18,22,28,.06),0 8px 24px rgba(18,22,28,.06);
+  --good:#12925A; --warn:#B7791F; --bad:#C53030; --mm-body:#E9ECF1; --mm-muscle:#CDD3DC; --mm-text:#7A8494; --shadow:0 1px 2px rgba(18,22,28,.06),0 8px 24px rgba(18,22,28,.06);
   --f-display:"Unbounded","Arial Black",system-ui,sans-serif;
   --f-body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
   --f-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
@@ -27,11 +27,11 @@
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#0D1015; --surface:#161A21; --sunk:#1E232B; --ink:#EDF0F4; --muted:#9AA4B1; --line:#2A3039;
   --coral:#FF6650; --amber:#FFB43F; --teal:#2BC2AE; --onAccent:#0D1015; --figure:#EDF0F4; --figureFar:#5C6573;
-  --good:#3CCB87; --warn:#F6C453; --bad:#FF7A7A; --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25); color-scheme:dark}}
+  --good:#3CCB87; --warn:#F6C453; --bad:#FF7A7A; --mm-body:#2A3039; --mm-muscle:#3D4757; --mm-text:#9AA4B1; --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25); color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#0D1015; --surface:#161A21; --sunk:#1E232B; --ink:#EDF0F4; --muted:#9AA4B1; --line:#2A3039;
   --coral:#FF6650; --amber:#FFB43F; --teal:#2BC2AE; --onAccent:#0D1015; --figure:#EDF0F4; --figureFar:#5C6573;
-  --good:#3CCB87; --warn:#F6C453; --bad:#FF7A7A; --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25); color-scheme:dark}
+  --good:#3CCB87; --warn:#F6C453; --bad:#FF7A7A; --mm-body:#2A3039; --mm-muscle:#3D4757; --mm-text:#9AA4B1; --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25); color-scheme:dark}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 html,body{background:var(--bg);color:var(--ink)}
@@ -251,6 +251,41 @@ table.t td.n{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
 footer{font-size:12px;color:var(--muted);padding-block:10px 30px;display:grid;gap:6px}
 footer .row{gap:14px}
 @media (prefers-reduced-motion:reduce){.toast .ring{animation:none}.prog i{transition:none}}
+/* tab bar with icons; bottom bar on phones */
+.ni{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+nav.tabs a{display:inline-flex;align-items:center;gap:7px}
+@media (max-width:720px){
+  nav.tabs{position:fixed;top:auto;bottom:0;left:0;right:0;border-bottom:0;border-top:1px solid var(--line);z-index:30;padding-bottom:env(safe-area-inset-bottom,0px);background:color-mix(in srgb,var(--surface) 92%,transparent);backdrop-filter:blur(12px)}
+  nav.tabs .wrap{justify-content:space-around;overflow:visible;gap:0;padding-block:4px}
+  nav.tabs a{flex-direction:column;gap:2px;font-size:11px;padding:6px 6px;min-width:58px;box-shadow:none!important;background:none!important}
+  nav.tabs a[aria-current="page"]{color:var(--coral)}
+  main{padding-bottom:110px}
+  footer{padding-bottom:100px}
+}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.tile{display:flex;gap:14px;align-items:center;text-decoration:none;color:inherit;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px;text-align:left;font:inherit}
+.tile .tic{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;background:color-mix(in srgb,var(--coral) 14%,transparent);color:var(--coral);flex:none}
+.tile b{display:block}.tile small{color:var(--muted)}
+/* animated exercise drawings */
+.demo{display:block;position:relative;width:100%;height:100%;min-height:inherit;background:#fff;overflow:hidden;border-radius:inherit}
+.demo img{position:absolute;left:5%;top:5%;width:90%;height:90%;object-fit:contain}
+.demo .f1{animation:mxA 3.2s ease-in-out infinite}.demo .f2{animation:mxB 3.2s ease-in-out infinite}
+@keyframes mxA{0%,32%{opacity:1}48%,84%{opacity:0}100%{opacity:1}}
+@keyframes mxB{0%,32%{opacity:0}48%,84%{opacity:1}100%{opacity:0}}
+.demo.slow img{animation-duration:6.4s}.demo.paused img{animation-play-state:paused}
+@media (prefers-reduced-motion:reduce){.demo .f1{animation:none}.demo .f2{animation:none;opacity:0}}
+.mStage.ill{background:#fff}.mStage .demo.big{height:min(52vh,380px)}
+.mStage .ctrl .btn{background:#EEF1F5;color:#12161C;border:0}
+.credit{position:absolute;right:10px;bottom:6px;font-size:10px;color:#6B7280}
+.pl .stageP .demo{height:min(56vh,420px)}
+.card .stage .demo,.exRow .thumb .demo,.mach .stage .demo{border-radius:0}
+.mapWrap svg{width:100%;max-width:380px;display:block;margin:0 auto}
+.legend2{display:flex;gap:14px;font-size:12px;color:var(--muted);justify-content:center}
+.legend2 i{display:inline-block;width:11px;height:11px;border-radius:3px;background:#FFA08A;margin-right:5px;vertical-align:-1px}.legend2 i.p{background:#FF4A2E}
+.mtags{display:flex;flex-wrap:wrap;gap:6px}
+.mt{font-size:12px;font-weight:600;border-radius:999px;padding:3px 10px;background:color-mix(in srgb,#FFA08A 32%,transparent)}
+.mt.p{background:#FF4A2E;color:#fff}
+
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -291,6 +326,7 @@ footer .row{gap:14px}
   <section class="view" id="v-coach" hidden></section>
   <section class="view" id="v-reminders" hidden></section>
   <section class="view" id="v-profile" hidden></section>
+  <section class="view" id="v-more" hidden></section>
 </main>
 <footer class="wrap">
   <p><b>Health disclaimer:</b> MOVEXA provides general fitness information for healthy adults. It is not medical advice, is not a medical device and does not diagnose or treat any condition. Talk to a doctor before starting a new exercise or nutrition program. Stop exercising if you feel pain, dizziness, chest pain or shortness of breath.</p>
@@ -304,6 +340,7 @@ footer .row{gap:14px}
 <div id="toastHost"></div>
 
 <script src="coach-kb.js"></script>
+<script src="musclemap.js"></script>
 <script>
 (()=>{
 /* =============== CONFIG — fill these in before public launch =============== */
@@ -569,6 +606,56 @@ const MACHINES=[
  {name:"Cable Station",for:"Rows, presses, curls, core work at any angle",ex:"seatedrow",set:["Move the pulley to the height you need.","Clip on the right handle (rope, V, single).","Select the pin weight; start light.","Step away until the stack lifts slightly before your first rep."]}
 ];
 
+/* ---- illustrations (Everkinetic, CC BY-SA 3.0) + muscle map data ---- */
+const ILL=new Set(["squat","pushup","row","superman","ohp","glutebridge","lunge","chairdip","latpd","legpress","chestpress","seatedrow","stepup","curl","legext","legcurl","pecfly","shoulderpress","pushdown","latraise","crunch","hyperext","overheadtri","deadlift"]);
+Object.assign(EX.squat,{name:"Dumbbell Sumo Squat",equip:"One dumbbell",muscles:"Quads, glutes, inner thighs",
+  steps:["Stand with your feet wider than your shoulders, toes turned out.","Hold one dumbbell with both hands, arms long between your legs.","Sit your hips down and back for 2 seconds, pushing your knees out over your toes.","Drive up through your heels and squeeze your glutes at the top."],
+  cues:["Chest proud, back flat","Knees follow your toes","Breathe in on the way down, out on the way up"]});
+Object.assign(EX.row,{name:"One-arm Dumbbell Row",equip:"Dumbbell and bench",
+  steps:["Put one knee and the same-side hand on a bench, back flat like a table.","Hold a dumbbell in your other hand, arm hanging straight down.","Pull the dumbbell up to your hip, keeping your elbow close to your body.","Lower it slowly, finish all reps, then switch sides."]});
+Object.assign(EX.ohp,{name:"Seated Dumbbell Shoulder Press",equip:"Dumbbells and bench",
+  steps:["Sit on a bench with back support, dumbbells at shoulder height.","Palms face forward, elbows slightly in front of your body.","Press straight up until your arms are fully extended.","Lower back to shoulder height with control."]});
+EX.lunge.cues=[...EX.lunge.cues,"The drawing shows a barbell; start with bodyweight or dumbbells"];
+EX.stepup.cues=[...EX.stepup.cues,"The drawing shows a barbell; start with bodyweight or dumbbells"];
+const newEx=(o)=>({cat:"strength",eq:"gym",frames:EX.legext.frames,props:EX.legext.props,dyn:EX.legext.dyn,...o});
+Object.assign(EX,{
+ legcurl:newEx({name:"Seated Leg Curl",muscles:"Hamstrings",equip:"Leg curl machine",props:["floor","legext"],
+  steps:["Sit with the back of your knees at the edge of the seat, knees lined up with the machine's pivot.","Rest the pad on the back of your lower legs, just above your heels; lower the thigh pad onto your thighs.","Curl your heels down and back as far as you can, squeezing the backs of your thighs.","Let the pad return slowly for 2–3 seconds."],
+  cues:["Hold the handles","Keep your hips on the seat","Control the way back up"],mistakes:["Lifting hips off the seat","Swinging the weight","Knees not lined up with the pivot"]}),
+ pecfly:newEx({name:"Pec Deck (Chest Fly Machine)",muscles:"Chest, front shoulders",equip:"Pec deck machine",
+  steps:["Set the seat so the handles are at chest height.","Sit tall with your back flat on the pad, elbows slightly bent.","Bring the handles together in front of your chest in a wide hugging motion.","Open your arms slowly until you feel a light stretch across your chest."],
+  cues:["Keep a soft bend in your elbows","Squeeze your chest, not your hands","Don't let the stack touch between reps"],mistakes:["Seat too high or low","Shoulders rolling forward","Opening too far back"]}),
+ shoulderpress:newEx({name:"Machine Shoulder Press",muscles:"Shoulders, triceps",equip:"Shoulder press machine",
+  steps:["Adjust the seat so the handles start at shoulder height.","Sit with your back against the pad and feet flat.","Press the handles up until your arms are almost straight.","Lower slowly back to shoulder height."],
+  cues:["Ribs down, back on the pad","Don't lock your elbows hard","Exhale as you press"],mistakes:["Arching your back off the pad","Seat set too low","Shrugging your shoulders"]}),
+ pushdown:newEx({name:"Cable Triceps Pushdown",muscles:"Triceps",equip:"Cable station with bar or rope",props:["floor"],
+  steps:["Attach a straight bar or rope to the high pulley.","Stand tall, grip the bar, elbows tucked to your sides.","Push the bar down until your arms are straight, squeezing the backs of your arms.","Let the bar rise slowly to chest height without moving your elbows."],
+  cues:["Elbows stay glued to your sides","Only your forearms move","Stand tall, slight lean is fine"],mistakes:["Elbows drifting forward","Leaning over the bar to push","Letting the weight yank your arms up"]}),
+ latraise:newEx({name:"Dumbbell Lateral Raise",eq:"db",muscles:"Side shoulders",equip:"Dumbbells",props:["floor"],
+  steps:["Stand tall with a light dumbbell in each hand at your sides.","Keep a slight bend in your elbows.","Raise your arms out to the sides until they're level with your shoulders.","Lower slowly for 2–3 seconds."],
+  cues:["Lead with your elbows","Light weight, strict form","Don't shrug"],mistakes:["Swinging the body","Lifting above shoulder height","Using weights that are too heavy"]}),
+ crunch:newEx({name:"Crunch",eq:"bw",muscles:"Abs",equip:"None (bench optional)",props:["mat"],
+  steps:["Lie on your back with your knees bent or your feet up on a bench.","Place your hands lightly beside your head or crossed on your chest.","Curl your shoulders off the floor by squeezing your abs.","Lower slowly without fully relaxing."],
+  cues:["Ribs toward your hips","Don't pull on your neck","Exhale as you curl up"],mistakes:["Yanking your head forward","Using momentum","Holding your breath"]}),
+ hyperext:newEx({name:"Back Extension",muscles:"Lower back, glutes, hamstrings",equip:"Back extension bench",props:["floor"],
+  steps:["Set the pad just below your hip bones and hook your heels under the foot pads.","Cross your arms on your chest and lower your upper body forward.","Raise your torso until your body forms a straight line.","Lower slowly and repeat."],
+  cues:["Squeeze your glutes to come up","Stop at a straight line","Keep your neck neutral"],mistakes:["Arching too far back at the top","Jerking up fast","Pad set too high"]}),
+ overheadtri:newEx({name:"Seated Overhead Triceps Extension",eq:"db",muscles:"Triceps",equip:"Barbell, EZ bar or dumbbell, bench",props:["floor"],
+  steps:["Sit tall on a bench with back support, weight held overhead.","Keep your elbows pointing up and close to your head.","Lower the weight behind your head for 2 seconds.","Straighten your arms and squeeze the backs of your arms."],
+  cues:["Elbows stay narrow","Only your forearms move","Ribs down, back on the pad"],mistakes:["Elbows flaring out","Arching your lower back","Going too heavy too soon"]}),
+ deadlift:newEx({name:"Smith Machine Deadlift",muscles:"Glutes, hamstrings, lower back",equip:"Smith machine",props:["floor"],
+  steps:["Stand with your feet hip-width under the bar, bar close to your shins.","Hinge at your hips and grip the bar just outside your legs, back flat.","Stand up by driving your hips forward, keeping the bar close to your body.","Lower it by pushing your hips back, then bending your knees."],
+  cues:["Flat back the whole time","Bar stays close to your legs","Squeeze your glutes at the top"],mistakes:["Rounding your back","Bar drifting away from your body","Leaning back at the top"]})
+});
+const MUS={squat:[["quads","glutes","adductors"],["hams","abs"]],bwsquat:[["quads","glutes"],["hams","abs"]],pushup:[["chest","triceps"],["frontdelt","abs"]],row:[["lats","rhomboids"],["biceps","reardelt"]],superman:[["lowerback","glutes"],["hams","traps"]],rdl:[["hams","glutes"],["lowerback","forearms"]],ohp:[["frontdelt","sidedelt"],["triceps","traps"]],glutebridge:[["glutes","hams"],["lowerback"]],lunge:[["quads","glutes"],["hams","adductors","calves"]],chairdip:[["triceps"],["chest","frontdelt"]],latpd:[["lats"],["biceps","rhomboids","reardelt"]],legpress:[["quads","glutes"],["hams","adductors"]],chestpress:[["chest"],["frontdelt","triceps"]],seatedrow:[["lats","rhomboids"],["biceps","reardelt"]],stepup:[["quads","glutes"],["hams","calves"]],curl:[["biceps"],["forearms"]],plank:[["abs","obliques"],["frontdelt","glutes"]],legext:[["quads"],[]],treadmill:[["quads","calves"],["glutes","hams"]],bike:[["quads"],["hams","calves","glutes"]],rower:[["lats","quads"],["hams","biceps","glutes","rhomboids"]],elliptical:[["quads","glutes"],["calves","hams"]],rope:[["calves"],["quads","frontdelt"]],highknees:[["quads","abs"],["calves"]],mtn:[["abs"],["frontdelt","quads"]],hamstretch:[["hams"],["lowerback"]],hipflexor:[["quads"],["abs"]],chestopen:[["chest","frontdelt"],[]],legcurl:[["hams"],["calves"]],pecfly:[["chest"],["frontdelt"]],shoulderpress:[["frontdelt","sidedelt"],["triceps"]],pushdown:[["triceps"],[]],latraise:[["sidedelt"],["traps"]],crunch:[["abs"],["obliques"]],hyperext:[["lowerback","glutes"],["hams"]],overheadtri:[["triceps"],[]],deadlift:[["glutes","hams","lowerback"],["traps","quads","forearms"]]};
+const MNAME={chest:"Chest",abs:"Abs",obliques:"Obliques",frontdelt:"Front shoulders",sidedelt:"Side shoulders",reardelt:"Rear shoulders",biceps:"Biceps",triceps:"Triceps",forearms:"Forearms",traps:"Traps",lats:"Lats",rhomboids:"Upper back",lowerback:"Lower back",glutes:"Glutes",quads:"Quadriceps",hams:"Hamstrings",adductors:"Inner thighs",calves:"Calves"};
+Object.assign(ALT,{chestpress:["pecfly","pushup"],pecfly:["chestpress","pushup"],legext:["legcurl","lunge","bwsquat"],legcurl:["legext","glutebridge"],ohp:["shoulderpress","pushup"],shoulderpress:["ohp","pushup"],curl:["chairdip"],chairdip:["pushdown","pushup"],pushdown:["chairdip","overheadtri"],overheadtri:["pushdown","chairdip"],rdl:["deadlift","glutebridge","hyperext"],deadlift:["rdl","glutebridge"],hyperext:["superman"],plank:["crunch"],crunch:["plank"],latraise:["ohp"]});
+MACHINES.push(
+ {name:"Leg Curl Machine",for:"Hamstrings, the backs of your thighs",ex:"legcurl",set:["Line your knees up with the pivot point.","Set the lower pad just above your heels.","Lower the thigh pad so you're held in place.","Curl down, then return slowly."]},
+ {name:"Pec Deck",for:"Chest fly with a guided path",ex:"pecfly",set:["Set the seat so handles are at chest height.","Back flat on the pad.","Keep a soft bend in your elbows.","Squeeze together, open slowly."]},
+ {name:"Shoulder Press Machine",for:"Pressing overhead with back support",ex:"shoulderpress",set:["Handles start at shoulder height.","Back flat on the pad, feet down.","Press up without locking out hard.","Lower slowly."]});
+MACHINES.forEach(m=>{if(m.name==="Smith Machine")m.ex="deadlift";if(m.name==="Cable Station")m.ex="pushdown"});
+
 /* =============== coaches & plan engine =============== */
 const COACH={
  maya:{name:"Maya",style:"strength, glutes and mobility",hello:["Good form beats heavy weight. Own every rep today.","Lower body is your engine. Squeeze those glutes!","Consistency is the secret. You showed up, that's the win.","Breathe, brace, move. Let's go."],
@@ -597,7 +684,7 @@ function item(id,o){ // normalized workout item
   const e=EX[id]; const it={id,...o};
   if(it.mins)it.text=`${it.mins} min${it.note?" · "+it.note:""}`;
   else if(it.secs)it.text=`${it.sets} × ${it.secs} s${it.off?` on / ${it.off} s off`:" hold"}${it.side?" each side":""}`;
-  else it.text=`${it.sets} × ${it.lo===it.hi?it.lo:it.lo+"–"+it.hi}${it.each?" each leg":""}`;
+  else it.text=`${it.sets} × ${it.lo===it.hi?it.lo:it.lo+"–"+it.hi}${it.each?(id==="row"?" each side":" each leg"):""}`;
   return it;
 }
 function dayPlan(i){
@@ -611,7 +698,7 @@ function dayPlan(i){
     if(x==="plank")return item(x,{sets:setsFor(3),secs:20+w*10});
     if(x==="mtn")return item(x,{sets:setsFor(3),secs:20+w*5,off:30});
     if(x==="superman")return item(x,{sets:setsFor(W.sets),lo:10,hi:12});
-    return item(x,{sets:setsFor(W.sets),lo,hi,each:(x==="lunge"||x==="stepup"),strength:true,rest:W.rest});};
+    return item(x,{sets:setsFor(W.sets),lo,hi,each:(x==="lunge"||x==="stepup"||x==="row"),strength:true,rest:W.rest});};
   const cool=STRETCH.map(id=>item(id,{sets:1,secs:30,side:id==="hipflexor"}));
   const fin=()=>item(pickEx(W.cEx),{mins:goalFat?12+w*2:8+w*2,note:"steady, easy pace"});
   let d;
@@ -719,7 +806,9 @@ const streak=()=>{let n=0;const t=dayIndex();for(let i=t;i>=0;i--){if(state.done
 const KG2LB=2.20462, toU=kg=>state.unit==="kg"?kg:kg*KG2LB, fromU=v=>state.unit==="kg"?v:v/KG2LB;
 const fmtW=kg=>`${toU(kg).toFixed(1)} ${state.unit}`;
 const thumbs=new Set();
-function stageSVG(id){return `<svg viewBox="0 0 200 190" data-anim="${id}" role="img" aria-label="${esc(EX[id].name)} demo">${drawSVG(EX[id],0)}</svg>`}
+function stageSVG(id){if(ILL.has(id))return `<span class="demo" role="img" aria-label="${esc(EX[id].name)}: start and finish position"><img class="f1" src="assets/ex/${id}-1.png" alt="" loading="lazy"><img class="f2" src="assets/ex/${id}-2.png" alt="" loading="lazy"></span>`;
+  return `<svg viewBox="0 0 200 190" data-anim="${id}" role="img" aria-label="${esc(EX[id].name)} demo">${drawSVG(EX[id],0)}</svg>`}
+const musList=id=>{const m=MUS[id]||[[],[]];return `<div class="mtags">${m[0].map(x=>`<span class="mt p">${MNAME[x]}</span>`).join("")}${m[1].map(x=>`<span class="mt">${MNAME[x]}</span>`).join("")}</div>`};
 const catPill=c=>c==="cardio"?`<span class="pill car">Cardio</span>`:c==="mobility"?`<span class="pill mob">Stretch</span>`:`<span class="pill str">Muscle</span>`;
 const latestKg=()=>state.weights.length?state.weights[state.weights.length-1].kg:null;
 
@@ -759,8 +848,10 @@ const badgeInit=(n)=>n.split(" ").map(w=>w[0]).join("").slice(0,2);
 function checkBadges(){const fresh=[];for(const b of BADGES)if(!state.badges[b.id]&&b.ok()){state.badges[b.id]=todayISO();fresh.push(b)}if(fresh.length){save();toastMsg(`Badge unlocked: ${fresh.map(b=>b.name).join(", ")}`);playSound("bell")}return fresh}
 
 /* =============== views =============== */
-const TABS=[["today","Today"],["plan","30-day plan"],["exercises","Exercises"],["machines","Machines"],["progress","Progress"],["nutrition","Nutrition"],["coach","Ask Coach"],["reminders","Reminders"],["profile","Profile & data"]];
-$("#tabRail").innerHTML=TABS.map(([k,l])=>`<a href="#${k}" data-tab="${k}">${l}</a>`).join("");
+const NI=d=>`<svg viewBox="0 0 24 24" aria-hidden="true" class="ni">${d}</svg>`;
+const TABS=[["today","Today",NI('<path d="M4 11l8-7 8 7v9h-5v-6H9v6H4z"/>')],["plan","Plan",NI('<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/>')],["exercises","Exercises",NI('<path d="M6.5 6.5v11M17.5 6.5v11M3.5 9v6M20.5 9v6M6.5 12h11"/>')],["progress","Progress",NI('<path d="M4 19h16"/><path d="M6 15l4-4 3 3 5-6"/>')],["more","More",NI('<circle cx="6" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="18" cy="12" r="1.6"/>')]];
+const SUBVIEWS={machines:"exercises",nutrition:"more",coach:"more",reminders:"more",profile:"more"};
+$("#tabRail").innerHTML=TABS.map(([k,l,ic])=>`<a href="#${k}" data-tab="${k}">${ic}<span>${l}</span></a>`).join("");
 let selDay=null, libFilter="all";
 
 function exRow(x,k,i,opts={}){
@@ -792,7 +883,7 @@ function renderToday(){
   const checked=d.list.filter((x,k)=>state.checks[`${i}-${k}`]).length;
   const pct=d.list.length?Math.round(checked/d.list.length*100):(state.done[i]?100:0);
   const [pc,pl]=TYPE[d.type]; const lastW=latestKg(); const wg=waterGoal(), wn=state.water[todayISO()]||0;
-  $("#v-today").innerHTML=`
+  $("#v-today").innerHTML=`${!state.consent?`<div class="notice ok">Welcome to ${APP}! Your plan is ready below. Tap <b>Start guided workout</b>; we'll do a 20-second safety check first. You can personalise your plan any time in <a href="#profile">Profile</a>.</div>`:""}
   ${state.parq&&state.parq.flag?`<div class="notice bad">Your health check suggested talking to a doctor before training hard. Keep the effort light until you have medical clearance. <button class="linkBtn" data-goto="profile">Redo health check</button></div>`:""}
   <div class="today">
     <div class="dayHead" style="--pct:${pct}%">
@@ -913,7 +1004,7 @@ function renderProgress(){
   const avg=(arr,end)=>{const t=new Date(arr[end].d);const win=arr.filter(x=>{const dd=(t-new Date(x.d))/864e5;return dd>=0&&dd<7});return win.reduce((s,x)=>s+x.kg,0)/win.length};
   const avgNow=avg(sorted,sorted.length-1), change=last.kg-first.kg;
   const P=prs(), lenU=state.unit==="kg"?"cm":"in", toL=v=>state.unit==="kg"?v:v/2.54, fromL=v=>state.unit==="kg"?v:v*2.54;
-  const healthOK=!!state.consent;
+  const healthOK=true;
   const vol=state.logs.reduce((s,l)=>s+Object.values(l.sets||{}).flat().reduce((a,x)=>a+(x.w||0)*(x.r||0),0),0);
   $("#v-progress").innerHTML=`
   <div class="spread"><div><h2>Progress</h2><p class="muted">Weight trend, measurements, records, history and badges.</p></div>
@@ -1285,7 +1376,7 @@ function renderProfile(){
     </div>
   </div>
   <div class="panel"><h3>Legal</h3><div class="row"><button class="btn small ghost" data-legal="terms">Terms of Use</button><button class="btn small ghost" data-legal="privacy">Privacy Policy</button><button class="btn small ghost" data-legal="health">Consumer Health Data Notice</button><button class="btn small ghost" data-legal="disclaimer">Health & Safety Disclaimer</button></div>
-  <p class="muted small">${APP} v${LEGAL.version} · © ${new Date().getFullYear()} ${esc(LEGAL.company)}. Exercise illustrations and text are original to ${APP}.</p></div>`;
+  <p class="muted small">${APP} v${LEGAL.version} · © ${new Date().getFullYear()} ${esc(LEGAL.company)}. Exercise drawings by Everkinetic (CC BY-SA 3.0, adapted). Muscle map, 3D figures and text are original to ${APP}. <button class="linkBtn" data-legal="credits">Credits</button></p></div>`;
   $("#pfSave").onclick=()=>{const p=readProfile("pf-");if(p.age&&p.age<LEGAL.minAge){$("#pfMsg").textContent=`${APP} is for people aged ${LEGAL.minAge} and over.`;return}state.profile=p;save();renderAll();$("#pfMsg").textContent="Saved. Your plan has been updated."};
   $("#prVoice").onchange=e=>{state.voice=e.target.checked;save()};
   $$("[data-unit2]").forEach(b=>b.onclick=()=>{state.unit=b.dataset.unit2;save();renderAll()});
@@ -1303,6 +1394,20 @@ function renderProfile(){
   $$("[data-legal]",$("#v-profile")).forEach(b=>b.onclick=()=>openLegal(b.dataset.legal));
 }
 
+
+function renderMore(){
+  const T=(href,title,desc,ic,legal)=>`<${legal?'button class="tile" data-legal="'+legal+'"':'a class="tile" href="#'+href+'"'}><span class="tic">${ic}</span><span><b>${title}</b><small>${desc}</small></span></${legal?"button":"a"}>`;
+  $("#v-more").innerHTML=`<div><h2>More</h2><p class="muted">Coach, food, reminders, machines and your settings.</p></div>
+  <div class="tiles">
+   ${T("coach","Ask Coach",`${(window.COACH_KB||[]).length} answers, works offline`,NI('<path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12h5"/>'))}
+   ${T("nutrition","Nutrition","Calories, protein and water",NI('<path d="M12 21c-4 0-7-3-7-7 0-5 4-7 7-11 3 4 7 6 7 11 0 4-3 7-7 7z"/>'))}
+   ${T("reminders","Reminders","Workout, water and weigh-in alerts",NI('<path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10 21h4"/>'))}
+   ${T("machines","Gym machine guide","How to set up every machine",NI('<path d="M5 21V3M5 4h12v4M17 8v6"/><rect x="14" y="14" width="6" height="7" rx="1"/><path d="M9 21v-5h4"/>'))}
+   ${T("profile","Profile & data","Your plan settings, backup and privacy",NI('<circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/>'))}
+   ${T("","Legal & credits","Terms, privacy, health disclaimer",NI('<path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M10 13h6M10 17h6"/>'),"terms")}
+  </div>`;
+  $$("[data-legal]",$("#v-more")).forEach(b=>b.onclick=()=>openLegal(b.dataset.legal));
+}
 /* =============== legal =============== */
 const ph=s=>`<span class="ph">${esc(s)}</span>`;
 function legalDocs(){
@@ -1350,6 +1455,9 @@ function legalDocs(){
   <h3>Consent</h3><p>We collect consumer health data only after you give consent during setup. Storing it in your account requires a separate opt-in. You can withdraw consent at any time in Profile &amp; data.</p>
   <h3>Sharing</h3><p>We share consumer health data only with processors that host the App for us under contract. We <b>do not sell</b> consumer health data. We do not use geofencing.</p>
   <h3>Your rights</h3><p>You can confirm whether we collect your consumer health data, access it, delete it, and withdraw consent, directly in the App or by emailing ${E}. If we deny a request, you can appeal by replying to our decision; if your appeal is denied, you can contact your state Attorney General.</p>`],
+  credits:["Credits",`<h3>Exercise drawings</h3><p>Exercise drawings by <b>Everkinetic</b>, licensed under <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank" rel="noopener">Creative Commons Attribution-ShareAlike 3.0</a>. Source: <a href="https://github.com/chaosbastler/opentraining-exercises" target="_blank" rel="noopener">opentraining-exercises</a>. ${APP} converted them to transparent line art, cropped and aligned them; these adapted drawings are shared under the same license.</p>
+  <h3>Everything else</h3><p>The muscle map, 3D figures, icons, workout plans, coach answers and text are original to ${APP}.</p>
+  <h3>Software</h3><p>Built with open-source software including Capacitor (MIT) and three.js (MIT). Fonts: Unbounded, Figtree and JetBrains Mono (SIL Open Font License).</p>`],
   disclaimer:["Health & Safety Disclaimer",`<p><i>Last updated ${U}</i></p>
   <p><b>${APP} is not a substitute for professional medical advice, diagnosis or treatment.</b> Information in the App, including workouts, exercise demonstrations, nutrition estimates and AI coach answers, is general and for educational purposes for healthy adults.</p>
   <ul><li>Consult your doctor before starting any new exercise or diet program, particularly if you are pregnant or postpartum, over 40 and new to exercise, or have heart disease, high blood pressure, diabetes, joint problems, or any other condition.</li>
@@ -1376,14 +1484,14 @@ document.addEventListener("click",e=>{const b=e.target.closest("footer [data-leg
 /* =============== onboarding / consent gate =============== */
 const PARQ=["Has a doctor ever said you have a heart condition or high blood pressure?","Do you feel pain in your chest at rest, during daily activities, or when you exercise?","Do you lose balance because of dizziness, or have you lost consciousness in the last 12 months?","Have you been diagnosed with another chronic medical condition (for example diabetes, asthma, epilepsy)?","Are you currently taking medicine for a chronic medical condition?","Do you have a bone, joint or soft-tissue problem that could get worse with more activity?","Are you pregnant, or have you given birth in the last 6 months?","Has a doctor ever said you should only do medically supervised physical activity?"];
 let ob={step:0,ans:{},agree:false,hd:true,age:null,redo:false};
-function openOnboarding(step=0,redo=false){ob={...ob,step,redo,ans:{}};drawOb();const d=$("#obDlg");if(!d.open)d.showModal()}
-$("#obDlg").addEventListener("cancel",e=>{if(!state.consent)e.preventDefault()});
+function openOnboarding(step=0,redo=false,after=null){ob={...ob,step,redo,after,ans:{}};drawOb();const d=$("#obDlg");if(!d.open)d.showModal()}
+
 function drawOb(){
   const d=$("#obDlg"), S=ob.step;
   const bar=`<div class="obSteps">${[0,1,2,3].map(k=>`<i class="${k<=S?"on":""}"></i>`).join("")}</div>`;
   let h="";
   if(S===0)h=`${bar}<div class="row"><svg width="56" height="56" role="img" aria-label="${APP} icon"><use href="#mxIcon"/></svg><div><h2>Welcome to ${APP}</h2><p class="muted">Your pocket gym coach.</p></div></div>
-    <p>Personal 30-day plans, guided workouts with form demos, progress tracking and reminders. Setup takes about a minute.</p>
+    <p>Before your first workout, a quick 20-second safety check. You only do this once.</p>
     <div class="field" style="max-width:220px"><label for="obAge">How old are you?</label><input type="number" id="obAge" min="1" max="110" inputmode="numeric" value="${ob.age??""}"></div>
     <p class="muted small" id="obErr"></p><div class="row"><button class="btn primary big" id="obNext">Continue</button></div>`;
   if(S===1)h=`${bar}<h2>Quick health check</h2><p class="muted">Answer honestly. This helps keep you safe. We only save whether any answer was yes, not your answers.</p>
@@ -1411,12 +1519,12 @@ function drawOb(){
     unlockAudio();
     if(S===0){const a=Number($("#obAge").value);if(!a){err("Please enter your age.");return}
       if(a<LEGAL.minAge){d.innerHTML=`<div class="in"><h2>Sorry, ${APP} isn't for you yet</h2><p>${APP} is designed for people aged ${LEGAL.minAge} and over. Staying active is great at any age; ask a parent, PE teacher or coach about activities that suit you.</p></div>`;return}
-      ob.age=a;ob.step=1;drawOb();return}
+      ob.age=a;if(!state.profile.age)state.profile.age=a;ob.step=1;drawOb();return}
     if(S===1){if(Object.keys(ob.ans).length<PARQ.length){err("Please answer every question.");return}
       state.parq={flag:Object.values(ob.ans).includes(1),at:todayISO()};
       if(ob.redo){save();d.close();renderAll();return} ob.step=2;drawOb();return}
     if(S===2){if(!ob.agree){err("Please tick the first box to continue.");return}
-      state.consent={v:LEGAL.version,at:new Date().toISOString(),healthData:!!ob.hd,ageConfirmed:true};ob.step=3;drawOb();return}
+      state.consent={v:LEGAL.version,at:new Date().toISOString(),healthData:!!ob.hd,ageConfirmed:true};save();flush();if(ob.after){const f=ob.after;ob.after=null;d.close();renderAll();f();return}ob.step=3;drawOb();return}
     if(S===3){state.profile=readProfile("ob-");if(!state.profile.age)state.profile.age=ob.age;state.start=todayISO();save();flush();d.close();renderAll();toastMsg(`Your plan is ready. Day 1 starts today with Coach ${COACH[state.coach].name}.`)}
   };
 }
@@ -1489,6 +1597,7 @@ function buildSteps(d){
 }
 function startPlayer(i){
   const d=dayPlan(i); if(!d.list.length)return; unlockAudio();
+  if(!state.consent){openOnboarding(0,false,()=>startPlayer(i));return}
   PL={i,d,steps:buildSteps(d),p:0,t0:Date.now(),sets:{},left:0,run:false,tick:null,prsBefore:prs()};
   const dlg=$("#player"); drawPlayer(); if(!dlg.open)dlg.showModal();
   try{navigator.wakeLock?.request("screen").then(w=>PL.wl=w).catch(()=>{})}catch(e){}
@@ -1579,9 +1688,13 @@ function openEx(id){
   const e=EX[id];
   const mach=MACHINES.filter(m=>m.ex===id).map(m=>m.name);
   const alts=(ALT[id]||[]).filter(a=>EQOK[state.profile.equip].includes(EX[a].eq));
-  dlgHTML(`<div class="mGrid"><div class="mStage"><svg viewBox="0 0 200 190" data-big="1" role="img" aria-label="${esc(e.name)} demo">${drawSVG(e,0)}</svg><div class="ctrl"><button class="btn small" id="pp">Pause</button><button class="btn small" id="slow">Slow</button></div></div>
+  const mm=MUS[id]||[[],[]];
+  dlgHTML(`<div class="mGrid"><div class="mStage ${ILL.has(id)?"ill":""}">${ILL.has(id)?stageSVG(id).replace('class="demo"','class="demo big" id="bigDemo"'):`<svg viewBox="0 0 200 190" data-big="1" role="img" aria-label="${esc(e.name)} demo">${drawSVG(e,0)}</svg>`}<div class="ctrl"><button class="btn small" id="pp">Pause</button><button class="btn small" id="slow">Slow</button></div>${ILL.has(id)?`<span class="credit">Illustration: Everkinetic, CC BY-SA 3.0</span>`:""}</div>
   <div class="mBody">
     <div>${catPill(e.cat)}<h2 id="dlgTitle" style="margin-top:8px">${esc(e.name)}</h2></div>
+    <div class="mapWrap">${window.muscleMap?muscleMap(mm[0],mm[1]):""}</div>
+    <div class="legend2"><span><i class="p"></i>Main muscles</span><span><i></i>Helper muscles</span></div>
+    ${musList(id)}
     <dl class="dl"><dt>Works</dt><dd>${esc(e.muscles)}</dd><dt>Equipment</dt><dd>${esc(e.equip)}</dd>${mach.length?`<dt>Machine</dt><dd>${esc(mach.join(", "))}</dd>`:""}${alts.length?`<dt>Alternatives</dt><dd>${alts.map(a=>esc(EX[a].name)).join(", ")}</dd>`:""}</dl>
     <div><span class="label">How to do it</span><ol>${e.steps.map(s=>`<li>${esc(s)}</li>`).join("")}</ol></div>
     <div><span class="label">Coach ${COACH[state.coach].name}'s cues</span><ul>${e.cues.map(s=>`<li>${esc(s)}</li>`).join("")}</ul></div>
@@ -1589,8 +1702,8 @@ function openEx(id){
     <p class="muted small">Simplified illustration. Stop if you feel pain.</p>
   </div></div>`);
   dlgId=id;paused=false;
-  $("#pp").onclick=()=>{paused=!paused;$("#pp").textContent=paused?"Play":"Pause"};
-  $("#slow").onclick=()=>{slowMo=!slowMo;$("#slow").textContent=slowMo?"Normal":"Slow"};
+  $("#pp").onclick=()=>{paused=!paused;$("#pp").textContent=paused?"Play":"Pause";$("#bigDemo")?.classList.toggle("paused",paused)};
+  $("#slow").onclick=()=>{slowMo=!slowMo;$("#slow").textContent=slowMo?"Normal":"Slow";$("#bigDemo")?.classList.toggle("slow",slowMo)};
 }
 dlg.addEventListener("click",e=>{if(e.target===dlg)dlg.close()});
 
@@ -1610,17 +1723,17 @@ requestAnimationFrame(loop);
 setInterval(scanThumbs,1500);
 
 /* =============== router & boot =============== */
-const TAB_IDS=TABS.map(t=>t[0]);
+const TAB_IDS=[...TABS.map(t=>t[0]),...Object.keys(SUBVIEWS)];
 function route(){const h=location.hash.slice(1);const tab=TAB_IDS.includes(h)?h:"today";
   TAB_IDS.forEach(t=>{$("#v-"+t).hidden=t!==tab});$$("nav.tabs a").forEach(a=>a.removeAttribute("aria-current"));
-  const a=$(`nav.tabs a[data-tab="${tab}"]`);a.setAttribute("aria-current","page");try{a.scrollIntoView({block:"nearest",inline:"nearest"})}catch(e){}scanThumbs()}
+  const a=$(`nav.tabs a[data-tab="${SUBVIEWS[tab]||tab}"]`);a.setAttribute("aria-current","page");window.scrollTo(0,0);try{a.scrollIntoView({block:"nearest",inline:"nearest"})}catch(e){}scanThumbs()}
 window.addEventListener("hashchange",route);
 $$("[data-coach]").forEach(b=>b.onclick=()=>{state.coach=b.dataset.coach;save();renderAll()});
 function renderAll(){
   $$("header [data-coach]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.coach===state.coach)));
-  renderToday();renderPlan();renderExercises();renderMachines();renderProgress();renderNutrition();renderCoach();renderReminders();renderProfile();route();
+  renderToday();renderPlan();renderExercises();renderMachines();renderProgress();renderNutrition();renderCoach();renderReminders();renderProfile();renderMore();route();
 }
-function boot(){renderAll();if(!state.consent)openOnboarding(0);else if($("#obDlg").open&&!ob.redo)$("#obDlg").close()}
+function boot(){renderAll();if(state.consent&&$("#obDlg").open&&!ob.redo)$("#obDlg").close()}
 $("#copy").textContent=`© ${new Date().getFullYear()} ${APP}`;
 boot();
 connectCloud();
