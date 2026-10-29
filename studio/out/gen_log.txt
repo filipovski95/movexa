@@ -1,0 +1,34 @@
+male basemesh 19158
+male rig Human.rig 53
+asset proxymeshes male_muscle_13290 ['/home/runner/.config/blender/4.2/extensions/.user/user_default/mpfb/data/proxymeshes/male_muscle_13290/male_muscle_13290.proxy']
+male added Proxymeshes Human.male_muscle_13290 13290
+asset eyes low-poly ['/home/runner/.config/blender/4.2/extensions/.user/user_default/mpfb/data/eyes/low-poly/low-poly.mhclo']
+male added Eyes Human.low-poly 96
+asset eyebrows eyebrow001 ['/home/runner/.config/blender/4.2/extensions/.user/user_default/mpfb/data/eyebrows/eyebrow001/eyebrow001.mhclo']
+male added Eyebrows Human.eyebrow001 124
+asset hair short02 ['/home/runner/.config/blender/4.2/extensions/.user/user_default/mpfb/data/hair/short02/short02.mhclo']
+male added Hair Human.short02 1755
+male export obj Human.rig ARMATURE []
+male export obj Human.male_muscle_13290 MESH ['ARMATURE']
+male export obj Human.low-poly MESH ['ARMATURE']
+male export obj Human.eyebrow001 MESH ['ARMATURE']
+male export obj Human.short02 MESH ['ARMATURE']
+male exported 1056836
+male rendered
+female basemesh 19158
+female rig Human.rig 53
+asset proxymeshes female_muscle_13442 ['/home/runner/.config/blender/4.2/extensions/.user/user_default/mpfb/data/proxymeshes/female_muscle_13442/female_muscle_13442.proxy']
+female added Proxymeshes Human.female_muscle_13442 13514
+asset eyes low-poly ['/home/runner/.config/blender/4.2/extensions/.user/user_default/mpfb/data/eyes/low-poly/low-poly.mhclo']
+female added Eyes Human.low-poly 96
+asset eyebrows eyebrow010 ['/home/runner/.config/blender/4.2/extensions/.user/user_default/mpfb/data/eyebrows/eyebrow010/eyebrow010.mhclo']
+female added Eyebrows Human.eyebrow010 124
+asset hair ponytail01 ['/home/runner/.config/blender/4.2/extensions/.user/user_default/mpfb/data/hair/ponytail01/ponytail01.mhclo']
+female added Hair Human.ponytail01 3718
+female export obj Human.rig ARMATURE []
+female export obj Human.female_muscle_13442 MESH ['ARMATURE']
+female export obj Human.low-poly MESH ['ARMATURE']
+female export obj Human.eyebrow010 MESH ['ARMATURE']
+female export obj Human.ponytail01 MESH ['ARMATURE']
+female exported 1192828
+female rendered
