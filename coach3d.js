@@ -278,15 +278,35 @@ float hiK=hk*(1.-clothK);`)
     }
     geo.setAttribute("aCloth",new THREE.BufferAttribute(cloth,4));geo.setAttribute("aTor",new THREE.BufferAttribute(tor,4));
     MW.forEach((a,k)=>geo.setAttribute("aM"+k,new THREE.BufferAttribute(a,4)));
-    // relaxed hands: gently curl the fingers (thumb less)
-    const curl=window.MX_CURL||{ax:"z",a:.45};
-    for(const [n,bn2] of Object.entries(bones)){const mm=/^(index|middle|ring|pinky|thumb)_0([123])_/.exec(n);if(!mm)continue;
-      const k=(mm[1]==="thumb"?.35:1)*(mm[2]==="1"?.8:1.1)*curl.a,axis=V(curl.ax==="x"?1:0,curl.ax==="y"?1:0,curl.ax==="z"?1:0);
-      bn2.quaternion.copy(this.rest[n].lq).multiply(new THREE.Quaternion().setFromAxisAngle(axis,k*(curl.s??1)))}
+    // hand rig: palm frame per hand (rest pose) so fingers curl toward the palm and close together
+    this.hand={};
+    for(const s of ["L","R"]){const x=this.sfx[s],P=n=>this.rest[n+x]?.p;if(!P("hand"))continue;
+      const H=P("hand"),F=V().subVectors(P("middle_01"),H).normalize(),A=V().subVectors(P("index_01"),P("pinky_01")).normalize();
+      const N=V().crossVectors(F,A).normalize();let sgn=1;if(N.z*(pr.pelvis.p.z-H.z)<0){N.negate();sgn=-1} // palm faces the body in the rest pose
+      this.hand[s]={F,N,x,sgn}}
+    this.setHands("relaxed");
     this.nv=nv;this.meta=meta;this.geo=geo;
     this.aHi=new THREE.BufferAttribute(new Float32Array(nv),1);this.aBad=new THREE.BufferAttribute(new Float32Array(nv),1);
     geo.setAttribute("aHi",this.aHi);geo.setAttribute("aBad",this.aBad);
     this.joints={};
+  }
+  // finger poses: relaxed (soft natural curl), grip (wrapped round a handle), flat (palm on the floor or a bench)
+  setHands(mode){this.handMode=mode;
+    const P={relaxed:{f:[[.38,.5,.32],[.42,.55,.34],[.48,.6,.36],[.55,.64,.38]],t:[.2,.25,.25],sp:.8},
+             grip:{f:[[1.15,1.35,.85],[1.2,1.4,.9],[1.25,1.42,.9],[1.3,1.45,.9]],t:[.75,.7,.6],sp:.9},
+             flat:{f:[[-.12,.02,.02],[-.12,.02,.02],[-.1,.04,.03],[-.08,.05,.04]],t:[0,.05,.05],sp:.3}}[mode];
+    const q=new THREE.Quaternion(),qi=new THREE.Quaternion(),k=V(),d=V();
+    for(const s of ["L","R"]){const h=this.hand[s];if(!h)continue;
+      ["index","middle","ring","pinky"].forEach((fn,fi)=>{for(let j=1;j<=3;j++){const n=`${fn}_0${j}${h.x}`,b=this.bones[n],R=this.rest[n];if(!b)continue;
+        const nx=this.rest[`${fn}_0${j+1}${h.x}`]?.p,pv=this.rest[`${fn}_0${j-1}${h.x}`]?.p;d.copy(nx?V().subVectors(nx,R.p):pv?V().subVectors(R.p,pv):h.F).normalize();
+        // close the spread at the knuckle: swing toward the middle-finger direction around the palm normal
+        let w=new THREE.Quaternion();
+        if(j===1){const dp=d.clone().addScaledVector(h.N,-d.dot(h.N)).normalize(),ang=Math.atan2(V().crossVectors(dp,h.F).dot(h.N),dp.dot(h.F));w.setFromAxisAngle(h.N,ang*P.sp)}
+        k.crossVectors(d,h.N).normalize();q.setFromAxisAngle(k,P.f[fi][j-1]);w.premultiply(q);
+        qi.copy(R.q).invert();b.quaternion.copy(R.lq).multiply(qi.clone().multiply(w).multiply(R.q))}});
+      for(let j=1;j<=3;j++){const n=`thumb_0${j}${h.x}`,b=this.bones[n],R=this.rest[n];if(!b)continue;
+        const nx=this.rest[`thumb_0${j+1}${h.x}`]?.p,pv=this.rest[`thumb_0${j-1}${h.x}`]?.p;d.copy(nx?V().subVectors(nx,R.p):pv?V().subVectors(R.p,pv):h.F).normalize();
+        k.crossVectors(d,h.N).normalize();q.setFromAxisAngle(k,P.t[j-1]);qi.copy(R.q).invert();b.quaternion.copy(R.lq).multiply(qi.clone().multiply(q).multiply(R.q))}}
   }
   setMuscles(hi,bad){
     const H=this.aHi.array,Bd=this.aBad.array,mh=hi.map(([n,f])=>[MUSCLES[n],f]).filter(x=>x[0]),mb=bad.map(n=>MUSCLES[n]).filter(Boolean);
@@ -300,6 +320,11 @@ float hiK=hk*(1.-clothK);`)
       for(let i=0;i<this.nv;i++){const v=this.meta[i];if(v.side===-1||m.w(v)<.85)continue;const dd=pv.fromBufferAttribute(P,i).distanceToSquared(c);if(dd<d){d=dd;best=i}}
       if(best>=0)this.anchors[n]=best}
   }
+  // centre of the closed fist and the direction a handle runs through it
+  grip(s){const h=this.hand[s],b=this.bones;if(!h)return null;const x=h.x,P=n=>{const v=V();b[n+x].getWorldPosition(v);return v};
+    const H=P("hand"),I=P("index_01"),K=P("pinky_01"),M=P("middle_01"),F=V().subVectors(M,H).normalize(),A=V().subVectors(I,K).normalize();
+    const N=V().crossVectors(F,A).normalize().multiplyScalar(h.sgn);
+    return {c:V().addVectors(I,K).multiplyScalar(.5).lerp(H,.25).addScaledVector(N,.032),a:A}}
   anchorWorld(n,out){const i=this.anchors[n];if(i==null)return null;out.fromBufferAttribute(this.geo.attributes.position,i);this.body.applyBoneTransform(i,out);return this.body.localToWorld(out)}
   setWorldQ(bone,q){bone.parent.updateWorldMatrix(true,false);const pq=new THREE.Quaternion();bone.parent.getWorldQuaternion(pq);bone.quaternion.copy(pq.invert().multiply(q));bone.updateMatrixWorld(true)}
   pose(p){
@@ -320,7 +345,7 @@ float hiK=hk*(1.-clothK);`)
       ua.updateWorldMatrix(true,false);th.updateWorldMatrix(true,false);
       const sh=V(),hp=V();ua.getWorldPosition(sh);th.getWorldPosition(hp);
       const mir=a=>V(a[0],a[1],a[2]*sg);
-      const hand=p["hand"+s]?V(...p["hand"+s]):mir(p.hand),ank=p["foot"+s]?V(...p["foot"+s]):mir(p.foot);
+      const hand=p["hand"+s]?V(...p["hand"+s]):mir(p.hand);if(this.handMode==="flat"&&hand.y<.6)hand.y-=.022;const ank=p["foot"+s]?V(...p["foot"+s]):mir(p.foot);
       const ePole=(p["ePole"+s]?V(...p["ePole"+s]):mir(p.ePole||[-1,-.4,.4])).normalize(),kPole=(p["kPole"+s]?V(...p["kPole"+s]):mir(p.kPole||[1,0,.2])).normalize();
       const arm=ik(sh,hand,this.len["ua"+s],this.len["fa"+s],ePole),leg=ik(hp,ank,this.len["th"+s],this.len["sh"+s],kPole);
       const rd=(a,b)=>V().subVectors(R[b].p,R[a].p).normalize();
@@ -328,7 +353,10 @@ float hiK=hk*(1.-clothK);`)
       const setLimb=(bone,from,to,restA,restB,s0,pole)=>{const d0=rd(restA,restB);const d=V().subVectors(to,from).normalize();this.setWorldQ(bone,basisQ(d0,s0.clone().addScaledVector(d0,-s0.dot(d0)).normalize(),d,pole).multiply(R[restA].q))};
       setLimb(ua,sh,arm.joint,"upperarm"+x,"lowerarm"+x,back,ePole);
       setLimb(fa,arm.joint,arm.end,"lowerarm"+x,"hand"+x,back,ePole);
-      hd.quaternion.copy(R["hand"+x].lq);
+      if(this.handMode==="flat"&&this.hand[s]){// palm flat on the support, fingers pointing where the forearm points
+        const h=this.hand[s],fd=V().subVectors(arm.end,arm.joint);fd.y=0;if(fd.lengthSq()<1e-4)fd.set(1,0,0);fd.normalize();
+        this.setWorldQ(hd,basisQ(h.F,h.N,fd,V(0,-1,0)).multiply(R["hand"+x].q))}
+      else hd.quaternion.copy(R["hand"+x].lq);
       setLimb(th,hp,leg.joint,"thigh"+x,"calf"+x,fwd,kPole);
       setLimb(cf,leg.joint,leg.end,"calf"+x,"foot"+x,fwd,kPole);
       const fy=deg((p.toe||0)*sg+(p.yaw||0)),fp=deg(p.footPitch||0);
@@ -509,7 +537,13 @@ scene.add(props);
 const GLB={};
 let host=null,ui=null,onCue=null;
 function applyMuscles(){const m=MUSAPP[exId]||[[],[]];const mk=mistake&&mv?.mistakes?mv.mistakes.find(x=>x.id===mistake):null;man.setMuscles([...m[0].map(n=>[n,1]),...m[1].map(n=>[n,.42])],mk?mk.parts:[])}
-function buildMan(){if(man)scene.remove(man.g);man=new RealHuman(kind,skin,GLB[kind]);scene.add(man.g);if(exId)applyMuscles()}
+function handMode(){if(!mv)return "relaxed";
+  let low=false;for(const f of mv.frames){man.pose(lerpPose(f,f,1));if(Math.min(man.joints.L.hand.y,man.joints.R.hand.y)<.14)low=true}
+  if(low||exId==="chairdip")return "flat";
+  const e=EXAPP[exId]||{},dyn=mv.dyn;
+  if(["db1","overhead","lat"].includes(mv.props)||(dyn&&!["pad","plate"].includes(dyn))||["db","gym"].includes(e.eq))return "grip";
+  return "relaxed"}
+function buildMan(){if(man)scene.remove(man.g);man=new RealHuman(kind,skin,GLB[kind]);scene.add(man.g);man.setHands(handMode());if(exId)applyMuscles()}
 function buildProps(){
   scene.remove(props);props=new THREE.Group();scene.add(props);if(!mv)return;
   const p=mv.props;
@@ -533,9 +567,9 @@ function framesFor(){if(!mistake||!mv.mistakes)return mv.frames;const m=mv.mista
 // Learn mode (default): every step moves slowly and then holds still for ~2 s so the cue can be read.
 // Real tempo: the rep speed you train at (at least ~5 s per rep).
 let learn=true;
-const SLOWREP=5.2,LEARNREP=8;
-const tScale=()=>{const sum=mv.frames.reduce((s,f)=>s+f.t,0);return learn?Math.max(1.6,LEARNREP/sum):Math.max(1,SLOWREP/sum)};
-const holdT=()=>{const n=mv.frames.length;return learn?(n<=2?2:n<=4?1.8:.3):(n<=2?.7:n<=4?.15:0)};
+const SLOWREP=5.2,LEARNREP=11;
+const tScale=()=>{const sum=mv.frames.reduce((s,f)=>s+f.t,0);return learn?Math.max(2,LEARNREP/sum):Math.max(1,SLOWREP/sum)};
+const holdT=()=>{const n=mv.frames.length;return learn?(n<=4?3.2:.5):(n<=2?.7:n<=4?.15:0)};
 const dur=f=>f.t*tScale()+holdT();
 const total=()=>mv.frames.reduce((s,f)=>s+dur(f),0);
 function sampleAt(time){const fr=framesFor(),T=total(),sc=tScale();let tt=time%T,i=0;while(i<fr.length&&tt>dur(fr[i])){tt-=dur(fr[i]);i++}i=Math.min(i,fr.length-1);
@@ -551,18 +585,28 @@ function update(dt){
   ui.growFill.style.width=`${Math.round(g*100)}%`;
   const J=man.joints,mid=V().addVectors(J.L.hand,J.R.hand).multiplyScalar(.5);
   if(props.userData.db){props.userData.db.position.copy(mid).add(mv.props==="overhead"?V(0,.06,0):V(0,-.04,0))}
-  if(props.userData.dbs){props.userData.dbs[0].position.copy(J.L.hand);props.userData.dbs[1]?.position.copy(J.R.hand)}
+  if(props.userData.dbs){props.userData.dbs.forEach((db,i)=>{if(!db)return;const g=man.handMode==="grip"?man.grip(i?"R":"L"):null;
+    if(g){db.position.copy(g.c);db.quaternion.setFromUnitVectors(V(1,0,0),g.a)}else db.position.copy(J[i?"R":"L"].hand)})}
   if(props.userData.lat){const lm=props.userData.lat;lm.userData.bar.position.copy(mid);placeSeg(lm.userData.cable,mid,V(.12,2.17,0));lm.userData.lift.position.y=Math.max(0,1.62-mid.y)*.55}
   if(props.userData.cable){placeSeg(props.userData.cable.m,mid,props.userData.cable.a)}
   if(props.userData.pad){props.userData.pad.position.copy(V().addVectors(J.L.ank,J.R.ank).multiplyScalar(.5)).add(V(.04,-.02,0))}
   if(props.userData.plate){props.userData.plate.position.copy(V().addVectors(J.L.ank,J.R.ank).multiplyScalar(.5)).add(V(.08,0,0))}
-  if(s.idx!==lastIdx&&ui.steps){const fr=mv.frames,n=fr.length;ui.steps.innerHTML=n<=4?fr.map((f,j)=>`<span class="${j===s.idx?"on":""}"><i>${j+1}</i>${n===2?["Start position","The move"][j]:"Step "+(j+1)}</span>`).join(""):`<span class="on"><i>●</i>Keep a steady rhythm</span>`}
-  if(s.idx!==lastIdx){lastIdx=s.idx;const bad=!!(mk&&s.frame.phase);ui.cueB.textContent=bad?`✕ ${mk.name}`:(s.frame.cue?.[0]||"");ui.cueS.textContent=bad?`Fix: ${mk.fix}`:(s.frame.cue?.[1]||"");ui.cue.classList.toggle("bad",bad)}
+  if(s.idx!==lastIdx){lastIdx=s.idx;const fr=mv.frames,n=fr.length,steps=n<=4;
+    const bad=!!(mk&&s.frame.phase);
+    ui.num.textContent=steps?s.idx+1:"●";
+    ui.of.textContent=bad?"Common mistake":steps?`Step ${s.idx+1} of ${n}${learn?" · hold and read":""}`:"Keep a steady rhythm";
+    ui.cueB.textContent=bad?`✕ ${mk.name}`:(s.frame.cue?.[0]||"");ui.cueS.textContent=bad?`Fix: ${mk.fix}`:(s.frame.cue?.[1]||"");ui.card.classList.toggle("bad",bad);
+    if(ui.steps){ui.steps.innerHTML=steps?fr.map((f,j)=>`<button data-step="${j}" class="${j===s.idx?"on":j<s.idx?"done":""}"><i>${j+1}</i><span>${f.cue?.[0]||"Step "+(j+1)}</span></button>`).join(""):"";
+      ui.steps.querySelectorAll("[data-step]").forEach(b=>b.onclick=()=>goStep(+b.dataset.step))}
+    if(voiceOn&&learn&&rep<=2&&window.speechSynthesis){try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(bad?`${mk.name}. ${mk.fix}`:`${steps?"Step "+(s.idx+1)+". ":""}${s.frame.cue?.[0]||""}. ${s.frame.cue?.[1]||""}`);u.rate=.95;speechSynthesis.speak(u)}catch(e){}}}
   ui.tempo.style.width=`${Math.round((s.kk??s.k)*100)}%`;
 }
+// tap a step: show that step's finished position and pause there
+function goStep(j){const T=total(),r=Math.floor(t/T);let a=0;for(let i=0;i<=j;i++)a+=dur(mv.frames[i]);t=r*T+a-.001;lastIdx=-1;playing=false;const b=host?.querySelector('[data-c3="play"]');if(b)b.textContent="Play"}
+let voiceOn=(()=>{try{return localStorage.getItem("mx3d.voice")!=="0"}catch(e){return true}})();
 function drawCallouts(){
   const m=MUSAPP[exId]||[[],[]],w=host.clientWidth,h=host.clientHeight-(host.querySelector(".c3ctl")?.offsetHeight||0)-(host.querySelector(".c3cuep")?.offsetHeight||0);let html="";
-  if(labelsOn){const BW=Math.min(122,w*.3),BH=36,top=52,bot=h-92,pts=[];
+  if(labelsOn){const BW=Math.min(122,w*.3),BH=36,top=52,bot=h-(ui.card?.offsetHeight||0)-60,pts=[];
     m[0].slice(0,3).forEach(n=>{if(!man.anchorWorld(n,tmpV))return;const p=tmpV.clone().project(camera);if(p.z>1)return;pts.push({n,x:(p.x+1)/2*w,y:(1-p.y)/2*h})});
     for(const side of ["L","R"]){const g=pts.filter(q=>(q.x<w/2)===(side==="L")).sort((a,b)=>a.y-b.y);let last=-1e9;
       g.forEach(q=>{let ly=Math.max(top,Math.min(bot,q.y-BH/2));if(ly<last+BH+6)ly=last+BH+6;last=ly;q.ly=ly;q.side=side});
@@ -586,13 +630,15 @@ function camFor(k){if(!fit)fitMove();const o=V(...CAMS[k]).normalize(),tg=fit?fi
   if(k!=="top")o.y=Math.max(o.y,.12);o.normalize();return {p:tg.clone().addScaledVector(o,d).add(V(0,k==="top"?0:.15,0)),t:tg}}
 function setCam(k,instant){if(!host)return;camKey=k;const c=camFor(k);if(instant){camera.position.copy(c.p);controls.target.copy(c.t);camK=1}else{camFrom={p:camera.position.clone(),t:controls.target.clone()};camTo=c;camK=0}
   host.querySelectorAll("[data-c3cam]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.c3cam===k)))}
-function resize(){if(!host)return;const c1=host.querySelector(".c3ctl")?.offsetHeight||0,c2=host.querySelector(".c3cuep")?.offsetHeight||0,ch=c1+c2;host.style.setProperty("--c3ctlOnly",c1+"px");host.style.setProperty("--c3ctl",ch+"px");const w=host.clientWidth,h=host.clientHeight-ch;if(!w||!h)return;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix()}
+function resize(){if(!host)return;const c1=host.querySelector(".c3ctl")?.offsetHeight||0,c2=host.querySelector(".c3cuep")?.offsetHeight||0,ch=c1+c2;host.style.setProperty("--c3ctlOnly",c1+"px");host.style.setProperty("--c3ctl",ch+"px");const w=host.clientWidth,h=host.clientHeight-ch;if(!w||!h)return;renderer.setSize(w,h,false);camera.aspect=w/h;
+  // keep the body above the step card that floats over the bottom of the video
+  const off=Math.min(h*.4,(host.querySelector(".c3card")?.offsetHeight||0)*.9);if(off>0)camera.setViewOffset(w,h+off,0,off,w,h);else camera.clearViewOffset();camera.updateProjectionMatrix()}
 const ro=new ResizeObserver(resize);
 const clock=new THREE.Clock();
 function frame(){const dt=Math.min(.05,clock.getDelta());if(!host||!host.isConnected){stop();return}
   if(camK<1){camK=Math.min(1,camK+dt*1.8);const k=ease(camK);camera.position.lerpVectors(camFrom.p,camTo.p,k);controls.target.lerpVectors(camFrom.t,camTo.t,k)}
   update(dt);controls.update();renderer.render(scene,camera);drawCallouts()}
-function stop(){renderer.setAnimationLoop(null);running=false;if(host)ro.unobserve(host)}
+function stop(){renderer.setAnimationLoop(null);running=false;if(host)ro.unobserve(host);try{speechSynthesis.cancel()}catch(e){}}
 let loading=null;
 function load(base){if(loading)return loading;const loader=new GLTFLoader();
   loading=Promise.all([["M","male"],["F","female"]].map(([k,f])=>new Promise((ok,no)=>loader.load(`${base}assets/human/${f}.gltf.json`,g=>{GLB[k]=g;ok()},undefined,no))));return loading}
@@ -601,19 +647,25 @@ window.MX3D={
   async mount(el,opts){
     EXAPP=opts.EX||{};MUSAPP=opts.MUS||{};kind=opts.kind||"F";learn=opts.learn??true;skin=opts.skin??1;exId=opts.id;mistake=null;t=0;rep=0;lastIdx=-1;playing=true;speed=1;
     host=el;el.classList.toggle("c3compact",!!opts.compact);el.innerHTML=`<div class="c3load">Loading 3D coach…</div><svg class="c3svg" aria-hidden="true"></svg>
-      <div class="c3hud"><div class="c3top"><span class="c3chip"><b class="c3rep">Rep 1</b><span class="c3sep"></span><span>Growth</span><span class="c3bar"><i></i></span></span></div>
-      </div><div class="c3cuep"><div class="c3steps"></div><div class="c3cue"><b></b><span></span></div><div class="c3tempo"><i></i></div></div>
+      <div class="c3hud"><div class="c3top"><span class="c3chip"><b class="c3rep">Rep 1</b><span class="c3sep"></span><span>Growth</span><span class="c3bar"><i></i></span></span>
+        <button class="c3voice" data-c3="voice" aria-pressed="${voiceOn}" aria-label="Voice coach">${voiceOn?"🔊":"🔇"}</button></div>
+        <div class="c3card"><span class="c3num">1</span><div class="c3txt"><small class="c3of"></small><b></b><span></span><div class="c3tempo"><i></i></div></div></div>
+      </div><div class="c3cuep"><div class="c3steps"></div></div>
       <div class="c3ctl"><div class="c3seg">${[["front","Front"],["side","Side"],["diag","45°"],["top","Top"]].map(([k,l])=>`<button data-c3cam="${k}">${l}</button>`).join("")}</div>
       <div class="c3seg"><button data-c3="play">Pause</button><button data-c3="slow">Real tempo</button><button data-c3="labels" aria-pressed="true">Labels</button><button data-c3="who">${kind==="F"?"Show man":"Show woman"}</button></div></div>`;
-    ui={svg:el.querySelector(".c3svg"),rep:el.querySelector(".c3rep"),growFill:el.querySelector(".c3bar i"),cue:el.querySelector(".c3cuep"),cueB:el.querySelector(".c3cue b"),cueS:el.querySelector(".c3cue span"),tempo:el.querySelector(".c3tempo i"),steps:el.querySelector(".c3steps")};
+    ui={svg:el.querySelector(".c3svg"),rep:el.querySelector(".c3rep"),growFill:el.querySelector(".c3bar i"),card:el.querySelector(".c3card"),num:el.querySelector(".c3num"),of:el.querySelector(".c3of"),cueB:el.querySelector(".c3txt b"),cueS:el.querySelector(".c3txt>span"),tempo:el.querySelector(".c3tempo i"),steps:opts.compact?null:el.querySelector(".c3steps")};
+    if(opts.compact)el.querySelector(".c3cuep").remove();
+    voiceOn=opts.voice??voiceOn;
     el.prepend(renderer.domElement);
     await load(opts.base||"");
     if(host!==el)return;
     el.querySelector(".c3load")?.remove();
     mv=movement(exId,kind);buildMan();buildProps();fit=null;ro.observe(el);resize();setCam("diag",true);
+    t=mv.frames[0].t*tScale(); // open already standing in the start position (step 1), not mid-move
     el.querySelectorAll("[data-c3cam]").forEach(b=>b.onclick=()=>setCam(b.dataset.c3cam));
-    el.querySelector('[data-c3="play"]').onclick=e=>{playing=!playing;e.target.textContent=playing?"Pause":"Play"};
+    el.querySelector('[data-c3="play"]').onclick=e=>{playing=!playing;e.target.textContent=playing?"Pause":"Play";if(!playing)try{speechSynthesis.cancel()}catch(_){}};
     el.querySelector('[data-c3="slow"]').onclick=e=>{const T0=total(),k=(t%T0)/T0,r=Math.floor(t/T0);learn=!learn;t=(r+k)*total();lastIdx=-1;e.target.textContent=learn?"Real tempo":"Learn slowly"};
+    el.querySelector('[data-c3="voice"]').onclick=e=>{voiceOn=!voiceOn;try{localStorage.setItem("mx3d.voice",voiceOn?"1":"0")}catch(_){}e.currentTarget.textContent=voiceOn?"🔊":"🔇";e.currentTarget.setAttribute("aria-pressed",String(voiceOn));if(!voiceOn)try{speechSynthesis.cancel()}catch(_){}else lastIdx=-1};
     el.querySelector('[data-c3="labels"]').onclick=e=>{labelsOn=!labelsOn;e.target.setAttribute("aria-pressed",String(labelsOn))};
     el.querySelector('[data-c3="who"]').onclick=e=>{kind=kind==="F"?"M":"F";e.target.textContent=kind==="F"?"Show man":"Show woman";mv=movement(exId,kind);buildMan();buildProps();fit=null;setCam(camKey);opts.onKind&&opts.onKind(kind)};
     if(!running){running=true;clock.getDelta();renderer.setAnimationLoop(frame)}
@@ -622,5 +674,5 @@ window.MX3D={
   mistakes(id){const m=HAND3D[id];return m&&m.mistakes?m.mistakes.map(x=>({id:x.id,name:x.name,fix:x.fix})):[]},
   unmount(scope){if(scope&&host&&!scope.contains(host))return;stop();host=null}
 };
-window.MX3D._dbg={setT:x=>{t=x;lastIdx=-1},pause:()=>{playing=false},cam:k=>setCam(k,true),studio:()=>{floor.visible=false;ring.visible=false;scene.fog=null;labelsOn=false;growthOn=false},times:()=>{let a=0;return mv.frames.map(f=>(a+=dur(f))-0.001)},frames:()=>mv.frames.map(f=>({phase:f.phase})),flat:()=>{if(!fit)fitMove();return fit.sz.y<Math.max(fit.sz.x,fit.sz.z)*.8}};
+window.MX3D._dbg={man:()=>man,look:(p,t)=>{controls.minDistance=.05;camera.position.set(...p);controls.target.set(...t);camK=1;controls.update()},render:()=>{renderer.render(scene,camera)},setT:x=>{t=x;lastIdx=-1},pause:()=>{playing=false},cam:k=>setCam(k,true),studio:()=>{floor.visible=false;ring.visible=false;scene.fog=null;labelsOn=false;growthOn=false},times:()=>{let a=0;return mv.frames.map(f=>(a+=dur(f))-0.001)},frames:()=>mv.frames.map(f=>({phase:f.phase})),flat:()=>{if(!fit)fitMove();return fit.sz.y<Math.max(fit.sz.x,fit.sz.z)*.8}};
 window.MX3D.ready=true;window.dispatchEvent(new Event("mx3d-ready"));
