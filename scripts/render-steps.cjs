@@ -23,7 +23,7 @@ const BACK=new Set(["lats","rhomboids","traps","hams","glutes","lowerback","rear
       const ends=d.times(),fr=d.frames();
       let k=fr.findIndex(f=>f.phase==="hold");if(k<0)k=fr.length>2?Math.max(1,fr.findLastIndex(f=>f.phase==="down")):1;if(k<0)k=fr.length-1;
       const prim=(window.__MUS[id]||[[]])[0],back=prim.filter(m=>BACK.includes(m)).length>prim.length/2;
-      const plan=[["diag",.05],["diag",ends[k]],[back?"bdiag":d.flat()?"side":"front",ends[k]]],out=[];
+      const plan=[["diag",ends[0]],["diag",ends[k]],[back?"bdiag":d.flat()?"side":"front",ends[k]]],out=[];
       const raf=()=>new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
       for(const [cam,t] of plan){d.cam(cam);d.setT(t);await raf();await raf();
         const src=h.querySelector("canvas"),W=src.width,H=src.height,c=document.createElement("canvas");c.width=W;c.height=H;const x=c.getContext("2d");x.drawImage(src,0,0);

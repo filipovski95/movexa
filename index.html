@@ -139,6 +139,10 @@ section.view{display:grid;gap:22px}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:0;text-align:left;display:grid;overflow:hidden;align-content:start}
 .card .stage{background:var(--sunk);aspect-ratio:4/3;max-width:100%}
+.pair2{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;height:100%;background:radial-gradient(90% 70% at 50% 40%,#fff,#E9EDF3)}
+.pair2>span{position:relative;height:100%;display:grid;place-items:center}.pair2 img{width:100%;height:100%;object-fit:contain;padding:8px 4px 26px;box-sizing:border-box}
+.pair2 b{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);font-size:11px;font-weight:800;color:#12161C;background:rgba(255,255,255,.9);border:1px solid rgba(18,22,28,.08);border-radius:999px;padding:2px 9px;white-space:nowrap}
+.pair2>i{font-style:normal;font-size:22px;font-weight:800;color:#FF5E48}
 .card .stage svg{width:100%;height:100%;display:block}
 .card .body{padding:12px 14px 14px;display:grid;gap:4px}
 .card .body .meta{font-size:13px;color:var(--muted)}
@@ -938,6 +942,8 @@ const streak=()=>{let n=0;const t=dayIndex();for(let i=t;i>=0;i--){if(state.done
 const KG2LB=2.20462, toU=kg=>state.unit==="kg"?kg:kg*KG2LB, fromU=v=>state.unit==="kg"?v:v/KG2LB;
 const fmtW=kg=>`${toU(kg).toFixed(1)} ${state.unit}`;
 const thumbs=new Set();
+// library cards: start and finish side by side, so you can see the whole move at a glance
+function pairSVG(id){const k=who3d();return `<span class="pair2" role="img" aria-label="${esc(EX[id].name)}: start and finish position"><span><img src="assets/steps/${id}-${k}-1.webp" alt="" loading="lazy"><b>1 · Start</b></span><i aria-hidden="true">›</i><span><img src="assets/steps/${id}-${k}-2.webp" alt="" loading="lazy"><b>2 · Finish</b></span></span>`}
 function stageSVG(id){const k=who3d();return `<span class="demo d3" role="img" aria-label="${esc(EX[id].name)}: start and finish position"><img class="f1" src="assets/steps/${id}-${k}-1.webp" alt="" loading="lazy"><img class="f2" src="assets/steps/${id}-${k}-2.webp" alt="" loading="lazy"></span>`}
 const musList=id=>{const m=MUS[id]||[[],[]];return `<div class="mtags">${m[0].map(x=>`<span class="mt p">${MNAME[x]}</span>`).join("")}${m[1].map(x=>`<span class="mt">${MNAME[x]}</span>`).join("")}</div>`};
 const catPill=c=>c==="cardio"?`<span class="pill car">Cardio</span>`:c==="mobility"?`<span class="pill mob">Stretch</span>`:`<span class="pill str">Muscle</span>`;
@@ -1149,14 +1155,14 @@ function renderExercises(){
   <div class="filters" role="group" aria-label="Filter exercises">
     ${[["all","All"],["strength","Build muscle"],["cardio","Cardio"],["mobility","Stretching"],["home","No machines"],["machine","Gym machines"]].map(([k,l])=>`<button class="chip" data-f="${k}" aria-pressed="${libFilter===k}">${l}</button>`).join("")}
   </div>
-  <div class="grid">${ids.map(id=>{const e=EX[id];return `<button class="card" data-open="${id}"><div class="stage">${stageSVG(id)}</div><div class="body"><div class="spread"><h3>${esc(e.name)}</h3>${catPill(e.cat)}</div><div class="meta">${esc(e.muscles)}</div><div class="meta">${esc(e.equip)}${ok.includes(e.eq)?"":" · not in your equipment"}</div></div></button>`}).join("")}</div>`;
+  <div class="grid">${ids.map(id=>{const e=EX[id];return `<button class="card" data-open="${id}"><div class="stage">${pairSVG(id)}</div><div class="body"><div class="spread"><h3>${esc(e.name)}</h3>${catPill(e.cat)}</div><div class="meta">${esc(e.muscles)}</div><div class="meta">${esc(e.equip)}${ok.includes(e.eq)?"":" · not in your equipment"}</div></div></button>`}).join("")}</div>`;
   $$("[data-f]",$("#v-exercises")).forEach(b=>b.onclick=()=>{libFilter=b.dataset.f;renderExercises()});
   bindOpen($("#v-exercises")); scanThumbs();
 }
 function renderMachines(){
   $("#v-machines").innerHTML=`
   <div><h2>Gym machine guide</h2><p class="muted">What each machine is for and how to set it up. Tap a machine to watch the movement.</p></div>
-  <div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr))">${MACHINES.map(m=>`<button class="card mach" data-open="${m.ex}"><div class="stage">${stageSVG(m.ex)}</div><div class="body"><h3>${esc(m.name)}</h3><div class="meta">${esc(m.for)}</div><ol>${m.set.map(s=>`<li>${esc(s)}</li>`).join("")}</ol></div></button>`).join("")}</div>
+  <div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr))">${MACHINES.map(m=>`<button class="card mach" data-open="${m.ex}"><div class="stage">${pairSVG(m.ex)}</div><div class="body"><h3>${esc(m.name)}</h3><div class="meta">${esc(m.for)}</div><ol>${m.set.map(s=>`<li>${esc(s)}</li>`).join("")}</ol></div></button>`).join("")}</div>
   <div class="panel"><h3>Gym basics for first-timers</h3><ul style="margin:0;padding-left:20px;display:grid;gap:4px"><li>Read the instruction plate on each machine and check the pins are fully in.</li><li>Start with a weight that feels easy and add weight next session.</li><li>Wipe down equipment and re-rack weights after use.</li><li>Ask gym staff to show you any machine you're unsure about.</li></ul></div>`;
   bindOpen($("#v-machines")); scanThumbs();
 }

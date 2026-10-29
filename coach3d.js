@@ -15,12 +15,16 @@ const camera=new THREE.PerspectiveCamera(36,1,0.05,60);
 const controls=new OrbitControls(camera,renderer.domElement);
 controls.enableDamping=true; controls.dampingFactor=.08; controls.minDistance=1.6; controls.maxDistance=7; controls.maxPolarAngle=Math.PI*0.495; controls.enablePan=false;
 
-scene.add(new THREE.HemisphereLight(0xffffff,0x8a8f99,1.15));
-const key=new THREE.DirectionalLight(0xffffff,1.9); key.position.set(3.2,5.5,2.6); key.castShadow=true;
+scene.add(new THREE.HemisphereLight(0xffffff,0x6f7580,.55));
+// soft studio reflections (a few bright panels around a grey room) so skin, chrome and pads read as 3D
+{const env=new THREE.Scene(),room=new THREE.Mesh(new THREE.BoxGeometry(10,6,10),new THREE.MeshBasicMaterial({color:0x2c3036,side:THREE.BackSide}));room.position.y=2;env.add(room);
+ for(const [x,y,z,w,h,c] of [[0,5,0,6,6,1.6],[-4.9,2.5,1,.1,3,1.1],[4.9,2,-1,.1,2.5,.6],[0,2.5,4.9,4,2,.7]]){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h<1?.1:h,w<1?3:w>5?6:.1),new THREE.MeshBasicMaterial({color:new THREE.Color(c,c,c)}));m.position.set(x,y,z);env.add(m)}
+ const pm=new THREE.PMREMGenerator(renderer);scene.environment=pm.fromScene(env,.04).texture;pm.dispose()}
+const key=new THREE.DirectionalLight(0xffffff,2.3); key.position.set(3.2,5.5,2.6); key.castShadow=true;
 key.shadow.mapSize.set(2048,2048); Object.assign(key.shadow.camera,{left:-2.5,right:2.5,top:2.5,bottom:-2.5,near:.5,far:14}); key.shadow.bias=-.0004; key.shadow.radius=6;
 scene.add(key);
 const rim=new THREE.DirectionalLight(0xffffff,.9); rim.position.set(-4,3,-3); scene.add(rim);
-const fill=new THREE.DirectionalLight(0xffffff,.7); fill.position.set(-2,2,4); scene.add(fill);
+const fill=new THREE.DirectionalLight(0xffffff,.35); fill.position.set(-2,2,4); scene.add(fill);
 
 // rubber gym floor (procedural tiles)
 function floorTex(){const c=document.createElement("canvas");c.width=c.height=512;const x=c.getContext("2d");
@@ -182,7 +186,7 @@ class RealHuman{
     const CL={F:{skin:0xDCD9D7,top:0x2A2D34,bot:0x2A2D34,shoe:0x30343C,sole:0xE8EAEE},M:{skin:0xD6D9DE,top:0x2A2D34,bot:0x2A2D34,shoe:0x30343C,sole:0xE8EAEE}}[kind];
     this.hw=new Float32Array(24);
     this.U={uTop:{value:new THREE.Color(CL.top)},uBot:{value:new THREE.Color(CL.bot)},uShoe:{value:new THREE.Color(CL.shoe)},uSole:{value:new THREE.Color(CL.sole)},uBulge:{value:0},uGlow:{value:0},uBadGlow:{value:0},uHi:{value:new THREE.Color(0xE5402B)},uHi2:{value:new THREE.Color(0xF5B4A2)},uBad:{value:new THREE.Color(0xC4122F)},uHiMix:{value:1},uHW:{value:this.hw}};
-    const mat=new THREE.MeshStandardMaterial({color:CL.skin,roughness:.62,metalness:0});
+    const mat=new THREE.MeshStandardMaterial({color:CL.skin,roughness:.6,metalness:0,envMapIntensity:.6});
     mat.onBeforeCompile=sh=>{Object.assign(sh.uniforms,this.U);
       sh.vertexShader=sh.vertexShader.replace("#include <common>","#include <common>\nattribute float aHi;attribute float aBad;attribute vec4 aCloth;attribute vec4 aTor;attribute vec4 aM0;attribute vec4 aM1;attribute vec4 aM2;attribute vec4 aM3;attribute vec4 aM4;attribute vec4 aM5;varying vec4 vCloth;varying vec4 vTor;varying vec2 vHB;varying vec4 vM0;varying vec4 vM1;varying vec4 vM2;varying vec4 vM3;varying vec4 vM4;varying vec4 vM5;uniform float uBulge;")
         .replace("#include <begin_vertex>","#include <begin_vertex>\nvHB=vec2(aHi,aBad);vCloth=aCloth;vTor=aTor;vM0=aM0;vM1=aM1;vM2=aM2;vM3=aM3;vM4=aM4;vM5=aM5;transformed+=objectNormal*(smoothstep(-.004,.012,aCloth.z)*.011+smoothstep(-.004,.01,max(aCloth.x,aCloth.y))*.0035);transformed+=objectNormal*aHi*uBulge;");
@@ -208,7 +212,7 @@ float hw=uHW[i1]*inM;
 vec3 hc=mix(uHi2,uHi,smoothstep(.6,.9,hw));
 float hk=smoothstep(.2,.4,hw)*mix(.8,1.,smoothstep(.6,.9,hw));
 cc=mix(cc,hc*mix(.8,1.08,pillow),hk*uHiMix);
-cc*=1.-.34*clamp(lines,0.,1.);
+cc*=1.-.26*clamp(lines,0.,1.);
 float cT=smoothstep(-.005,.005,vCloth.x),cB=smoothstep(-.005,.005,vCloth.y),cS=smoothstep(-.004,.004,vCloth.z),cSo=smoothstep(-.003,.003,vCloth.w);
 float ck=.5*smoothstep(.35,.8,vHB.x)*uHiMix;cc=mix(cc,mix(uBot,uHi*.6,ck),cB);cc=mix(cc,mix(uTop,uHi*.6,ck),cT);cc=mix(cc,uShoe,cS);cc=mix(cc,uSole,cSo*cS);
 float seam=(1.-smoothstep(.003,.011,abs(vCloth.x)))*cT+(1.-smoothstep(.003,.011,abs(vCloth.y)))*cB;cc*=1.-.3*clamp(seam,0.,1.);
@@ -278,6 +282,7 @@ float hiK=hk*(1.-clothK);`)
     }
     geo.setAttribute("aCloth",new THREE.BufferAttribute(cloth,4));geo.setAttribute("aTor",new THREE.BufferAttribute(tor,4));
     MW.forEach((a,k)=>geo.setAttribute("aM"+k,new THREE.BufferAttribute(a,4)));
+    this.sculpt(geo,MW,tor,kind);
     // hand rig: palm frame per hand (rest pose) so fingers curl toward the palm and close together
     this.hand={};
     for(const s of ["L","R"]){const x=this.sfx[s],P=n=>this.rest[n+x]?.p;if(!P("hand"))continue;
@@ -290,6 +295,21 @@ float hiK=hk*(1.-clothK);`)
     geo.setAttribute("aHi",this.aHi);geo.setAttribute("aBad",this.aBad);
     this.joints={};
   }
+  // athletic definition: lift each muscle belly a few millimetres and sink the gaps between muscles,
+  // then rebuild smooth normals (welding UV-seam duplicates so no seams show)
+  sculpt(geo,MW,tor,kind){
+    const AMP=[.009,.009,.009,.008,.008,.007,.005,.005,.004,.003,.006,.006,.004,.004,.006,.008,.009,.007,.006,.007,.007,.008,.008,.004];
+    const g=kind==="F"?.8:1.6,P=geo.attributes.position,N=geo.attributes.normal,n=P.count,W=new Float32Array(24);
+    for(let i=0;i<n;i++){let t1=0,t2=0,i1=0;for(let k=0;k<24;k++){const w=MW[k>>2][i*4+(k&3)];W[k]=w;if(w>t1){t2=t1;t1=w;i1=k}else if(w>t2)t2=w}
+      let d=AMP[i1]*Math.pow(t1,1.4)-.0025*Math.max(0,.35-(t1-t2))*(t1>.15?1:0);
+      if(tor[i*4+3]){const yy=tor[i*4],sn=tor[i*4+1],cs=tor[i*4+2];
+        if(cs>.85&&yy>.07&&yy<.34){let r=1;for(const ry of [.155,.215,.27])r=Math.min(r,Math.abs(yy-ry)/.012);d-=.0025*Math.max(0,1-r)+.002*Math.max(0,1-Math.abs(sn)/.05)}}
+      d*=g;P.setXYZ(i,P.getX(i)+N.getX(i)*d,P.getY(i)+N.getY(i)*d,P.getZ(i)+N.getZ(i)*d)}
+    P.needsUpdate=true;geo.computeVertexNormals();
+    const key=i=>`${Math.round(P.getX(i)*1e4)},${Math.round(P.getY(i)*1e4)},${Math.round(P.getZ(i)*1e4)}`,acc=new Map();
+    for(let i=0;i<n;i++){const k=key(i);let a=acc.get(k);if(!a){a=[0,0,0];acc.set(k,a)}a[0]+=N.getX(i);a[1]+=N.getY(i);a[2]+=N.getZ(i)}
+    for(let i=0;i<n;i++){const a=acc.get(key(i)),l=Math.hypot(a[0],a[1],a[2])||1;N.setXYZ(i,a[0]/l,a[1]/l,a[2]/l)}
+    N.needsUpdate=true}
   // finger poses: relaxed (soft natural curl), grip (wrapped round a handle), flat (palm on the floor or a bench)
   setHands(mode){this.handMode=mode;
     const P={relaxed:{f:[[.38,.5,.32],[.42,.55,.34],[.48,.6,.36],[.55,.64,.38]],t:[.2,.25,.25],sp:.8},
@@ -569,16 +589,26 @@ function framesFor(){if(!mistake||!mv.mistakes)return mv.frames;const m=mv.mista
 let learn=true;
 const SLOWREP=5.2,LEARNREP=11;
 const tScale=()=>{const sum=mv.frames.reduce((s,f)=>s+f.t,0);return learn?Math.max(2,LEARNREP/sum):Math.max(1,SLOWREP/sum)};
-const holdT=()=>{const n=mv.frames.length;return learn?(n<=4?3.2:.5):(n<=2?.7:n<=4?.15:0)};
+const holdT=()=>{const n=mv.frames.length;return learn?(n<=4?3.2:0):(n<=2?.7:n<=4?.15:0)};
 const dur=f=>f.t*tScale()+holdT();
 const total=()=>mv.frames.reduce((s,f)=>s+dur(f),0);
 function sampleAt(time){const fr=framesFor(),T=total(),sc=tScale();let tt=time%T,i=0;while(i<fr.length&&tt>dur(fr[i])){tt-=dur(fr[i]);i++}i=Math.min(i,fr.length-1);
-  const prev=fr[(i-1+fr.length)%fr.length],cur=fr[i],mt=cur.t*sc,k=Math.min(1,tt/mt);return {pose:lerpPose(prev,cur,ease(k)),frame:cur,idx:i,k,kk:Math.min(1,tt/dur(cur))}}
+  const L=fr.length,prev=fr[(i-1+L)%L],cur=fr[i],mt=cur.t*sc,k=Math.min(1,tt/mt);
+  // rhythmic moves (running, rope, climbers) flow through their positions on a smooth curve instead of stopping at each one
+  const pose=L>4?catmull(fr[(i-2+L)%L],prev,cur,fr[(i+1)%L],k):lerpPose(prev,cur,ease(k));
+  return {pose,frame:cur,idx:i,k,kk:Math.min(1,tt/dur(cur))}}
+function catmull(a,b,c,d,k){const o=lerpPose(b,c,k),k2=k*k,k3=k2*k,cr=(p0,p1,p2,p3)=>.5*(2*p1+(p2-p0)*k+(2*p0-5*p1+4*p2-p3)*k2+(3*p1-p0-3*p2+p3)*k3);
+  for(const key of Object.keys(o)){const A=a[key],B=b[key],C=c[key],D=d[key];
+    if(Array.isArray(B)&&Array.isArray(C)&&Array.isArray(A)&&Array.isArray(D)&&typeof B[0]==="number")o[key]=B.map((v,j)=>cr(A[j],v,C[j],D[j]));
+    else if([A,B,C,D].every(x=>typeof x==="number"))o[key]=cr(A,B,C,D)}return o}
 let lastIdx=-1;const tmpV=V();
 function update(dt){
   if(playing)t+=dt*speed;
   const T=total(),r=Math.floor(t/T)+1;if(r!==rep){rep=r;ui.rep.textContent=`Rep ${rep}`}
-  const s=sampleAt(t);man.pose(s.pose);
+  const s=sampleAt(t);
+  // the coach breathes while holding a position, so a pause never looks frozen
+  if(s.k>=1&&mv.frames.length<=4)s.pose.round=(s.pose.round||0)+Math.sin(t*2.2)*1.3;
+  man.pose(s.pose);
   const mk=mistake&&mv.mistakes?mv.mistakes.find(x=>x.id===mistake):null;
   const g=growthOn?Math.min(1,t/(T*5)):0,pump=s.frame.con?Math.sin(s.k*Math.PI)*.5:s.frame.phase==="hold"?.45:0;
   man.U.uBulge.value=growthOn?.016*(.15+g*.85)*(1+pump):0;man.U.uHiMix.value=.88;man.U.uGlow.value=.18+.22*pump;man.U.uBadGlow.value=mk?.35+.25*Math.sin(t*8):0;
