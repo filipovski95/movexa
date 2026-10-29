@@ -11,17 +11,16 @@ renderer.shadowMap.enabled=true; renderer.shadowMap.type=THREE.PCFSoftShadowMap;
 renderer.outputColorSpace=THREE.SRGBColorSpace; renderer.toneMapping=THREE.ACESFilmicToneMapping; renderer.toneMappingExposure=1.05;
 
 const scene=new THREE.Scene();
-scene.fog=new THREE.Fog(0x10141b,7,16);
 const camera=new THREE.PerspectiveCamera(36,1,0.05,60);
 const controls=new OrbitControls(camera,renderer.domElement);
 controls.enableDamping=true; controls.dampingFactor=.08; controls.minDistance=1.6; controls.maxDistance=7; controls.maxPolarAngle=Math.PI*0.495; controls.enablePan=false;
 
-scene.add(new THREE.HemisphereLight(0xdfe8ff,0x1a1410,0.75));
-const key=new THREE.DirectionalLight(0xffffff,2.1); key.position.set(3.2,5.5,2.6); key.castShadow=true;
-key.shadow.mapSize.set(2048,2048); Object.assign(key.shadow.camera,{left:-2.5,right:2.5,top:2.5,bottom:-2.5,near:.5,far:14}); key.shadow.bias=-.0004; key.shadow.radius=4;
+scene.add(new THREE.HemisphereLight(0xffffff,0x8a8f99,1.15));
+const key=new THREE.DirectionalLight(0xffffff,1.9); key.position.set(3.2,5.5,2.6); key.castShadow=true;
+key.shadow.mapSize.set(2048,2048); Object.assign(key.shadow.camera,{left:-2.5,right:2.5,top:2.5,bottom:-2.5,near:.5,far:14}); key.shadow.bias=-.0004; key.shadow.radius=6;
 scene.add(key);
-const rim=new THREE.DirectionalLight(0xff9a7a,1.1); rim.position.set(-4,3,-3); scene.add(rim);
-const fill=new THREE.DirectionalLight(0x9ab8ff,.45); fill.position.set(-2,2,4); scene.add(fill);
+const rim=new THREE.DirectionalLight(0xffffff,.9); rim.position.set(-4,3,-3); scene.add(rim);
+const fill=new THREE.DirectionalLight(0xffffff,.7); fill.position.set(-2,2,4); scene.add(fill);
 
 // rubber gym floor (procedural tiles)
 function floorTex(){const c=document.createElement("canvas");c.width=c.height=512;const x=c.getContext("2d");
@@ -29,9 +28,10 @@ function floorTex(){const c=document.createElement("canvas");c.width=c.height=51
   for(let i=0;i<5000;i++){x.fillStyle=`rgba(${Math.random()<.5?255:0},${Math.random()<.5?255:0},${Math.random()<.5?255:0},${Math.random()*.05})`;x.fillRect(Math.random()*512,Math.random()*512,1.4,1.4)}
   x.strokeStyle="rgba(0,0,0,.55)";x.lineWidth=3;x.strokeRect(1.5,1.5,509,509);
   const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(8,8);t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=8;return t}
-const floor=new THREE.Mesh(new THREE.CircleGeometry(8,64),new THREE.MeshStandardMaterial({map:floorTex(),roughness:.92,metalness:0}));
+// clean studio: the page background shows through, the floor only catches a soft shadow
+const floor=new THREE.Mesh(new THREE.CircleGeometry(8,64),new THREE.ShadowMaterial({color:0x1d2633,opacity:.16}));
 floor.rotation.x=-Math.PI/2; floor.receiveShadow=true; scene.add(floor);
-const ring=new THREE.Mesh(new THREE.RingGeometry(1.35,1.38,96),new THREE.MeshBasicMaterial({color:0xff5e48,transparent:true,opacity:.35}));
+const ring=new THREE.Mesh(new THREE.RingGeometry(1.35,1.38,96),new THREE.MeshBasicMaterial({color:0xff5e48,transparent:true,opacity:.22}));
 ring.rotation.x=-Math.PI/2; ring.position.y=.002; scene.add(ring);
 
 /* ================= materials ================= */
@@ -42,7 +42,7 @@ const M={
   dark:new THREE.MeshStandardMaterial({color:0x2a2f37,roughness:.55,metalness:.4}),
   pad:new THREE.MeshStandardMaterial({color:0x22262d,roughness:.85}),
   plate:new THREE.MeshStandardMaterial({color:0x30353d,roughness:.6,metalness:.3}),
-  accent:new THREE.MeshStandardMaterial({color:0xff5e48,roughness:.45,metalness:.2}),
+  accent:new THREE.MeshStandardMaterial({color:0x6B7685,roughness:.45,metalness:.3}),
   shoe:new THREE.MeshStandardMaterial({color:0x3b4250,roughness:.7}),
   hair:new THREE.MeshStandardMaterial({color:0x3a2a22,roughness:.7})
 };
@@ -113,6 +113,40 @@ const MUSCLES={
  spine:{name:"Spine",latin:"",w:v=>v.p==="T"?band(v.y,.05,.45,.04)*arc(Math.abs(v.th),Math.PI,.5,.25):0}
 };
 
+/* ================= anatomy chart: muscle shapes drawn on the skin (per-pixel outlines, like an anatomy atlas) ================= */
+// Each shape is a soft bump peaking at the muscle belly; the shader draws a crease wherever two bellies meet.
+const bump=u=>u>=1?0:1-u*u;
+function ell(x,a,b,th,c,half,tapA=0,tapB=0){if(x<=a||x>=b)return 0;const k=(x-a)/(b-a),ux=Math.abs(k*2-1);
+  const w=half*(1-tapA*(1-k)*(1-k)-tapB*k*k);return bump(ux)*bump(Math.abs(wrapA(th-c))/Math.max(.05,w))}
+const ANAT=[
+ /*0 pec*/      v=>v.p==="T"?ell(v.yy,.295+.075*Math.min(1,Math.abs(v.th)/1.15)**2,.478,Math.abs(v.th),.62,.58,0,.25):0,
+ /*1 deltA*/    v=>v.p==="A"?ell(v.x,-.06,.155,v.th,.45,.75,0,.7):0,
+ /*2 deltL*/    v=>v.p==="A"?ell(v.x,-.07,.16,v.th,1.6,.7,0,.75):0,
+ /*3 deltP*/    v=>v.p==="A"?ell(v.x,-.06,.15,v.th,2.7,.75,0,.7):0,
+ /*4 biceps*/   v=>v.p==="A"?ell(v.x,.08,v.ua-.015,v.th,-.05,.9,.45,.45):0,
+ /*5 triceps*/  v=>v.p==="A"?ell(v.x,.0,v.ua+.005,v.th,Math.PI,1.25,.2,.45):0,
+ /*6 flexors*/  v=>v.p==="A"?ell(v.x,v.ua-.01,v.ua+.21,v.th,-.7,1.45,.2,.6):0,
+ /*7 extensors*/v=>v.p==="A"?ell(v.x,v.ua-.01,v.ua+.21,v.th,2.3,1.45,.2,.6):0,
+ /*8 abs*/      v=>v.p==="T"?ell(v.yy,.065,.335,v.th,0,.37,.15,0):0,
+ /*9 obliques*/ v=>v.p==="T"?ell(v.yy,.03,.33,Math.abs(v.th),1.0,.55,.2,.1):0,
+ /*10 lats*/    v=>{if(v.p!=="T")return 0;const s=Math.min(1,Math.max(0,(v.yy-.12)/.31));return ell(v.yy,.12,.44,Math.abs(v.th),2.75-.85*s,.5,.45,0)},
+ /*11 traps*/   v=>v.p==="T"?Math.max(ell(v.yy,.42,.6,Math.abs(v.th),Math.PI,1.35,.3,0),ell(v.yy,.2,.48,Math.abs(v.th),Math.PI,.5,.9,0)):0,
+ /*12 rhomboid*/v=>v.p==="T"?ell(v.yy,.29,.44,Math.abs(v.th),2.45,.3):0,
+ /*13 erector*/ v=>v.p==="T"?ell(v.yy,.0,.31,Math.abs(v.th),Math.PI-.15,.15,.0,.3):0,
+ /*14 glutes*/  v=>v.p==="T"?ell(v.yy,-.16,.075,Math.abs(v.th),2.5,.75,.2,.3):v.p==="L"?ell(v.x,-.14,.1,v.th,Math.PI,1.15):0,
+ /*15 rectfem*/ v=>v.p==="L"?ell(v.x,.03,.43,v.th,.1,.4,.5,.55):0,
+ /*16 vastlat*/ v=>v.p==="L"?ell(v.x,.04,.45,v.th,1.0,.6,.3,.2):0,
+ /*17 vastmed*/ v=>v.p==="L"?ell(v.x,.22,.46,v.th,-.5,.5,.6,0):0,
+ /*18 adduct*/  v=>v.p==="L"?ell(v.x,-.03,.32,v.th,-1.55,.65,0,.7):0,
+ /*19 bicfem*/  v=>v.p==="L"?ell(v.x,.05,.44,v.th,2.55,.6,.3,.4):0,
+ /*20 semiten*/ v=>v.p==="L"?ell(v.x,.05,.44,v.th,-2.5,.6,.3,.4):0,
+ /*21 gastroL*/ v=>v.p==="L"?ell(v.x,v.th0+.02,v.th0+.25,v.th,2.55,.6,.2,.6):0,
+ /*22 gastroM*/ v=>v.p==="L"?ell(v.x,v.th0+.02,v.th0+.28,v.th,-2.6,.65,.2,.6):0,
+ /*23 tibialis*/v=>v.p==="L"?ell(v.x,v.th0+.03,v.th0+.34,v.th,.5,.4,.2,.6):0
+];
+// app muscle groups → anatomy shapes
+const AMAP={chest:[0],frontdelt:[1],sidedelt:[2],reardelt:[3],biceps:[4],triceps:[5],forearms:[6,7],abs:[8],obliques:[9],lats:[10],traps:[11],rhomboids:[12],lowerback:[13],spine:[13],glutes:[14],quads:[15,16,17],adductors:[18],hams:[19,20],calves:[21,22]};
+
 /* ================= realistic human (MakeHuman / MPFB, CC0) driven by the same exercise poses ================= */
 const HIP_TARGET={M:.965,F:.925}; // hip-joint height the exercise poses were authored for
 const TORSO_N={M:.53,F:.5};
@@ -144,40 +178,68 @@ class RealHuman{
       this.len["ua"+s]=R("upperarm"+x).distanceTo(R("lowerarm"+x));this.len["fa"+s]=R("lowerarm"+x).distanceTo(R("hand"+x));
       this.len["th"+s]=R("thigh"+x).distanceTo(R("calf"+x));this.len["sh"+s]=R("calf"+x).distanceTo(R("foot"+x));}
     this.pelvisY=R("pelvis").y;this.torsoLen=R("neck_01").y-R("pelvis").y;
-    // materials
-    const C={skin:new THREE.Color(SKIN[skinIdx]),top:new THREE.Color(kind==="F"?0x6D5DF2:0x16A394),bottom:new THREE.Color(kind==="F"?0x2B2F3A:0x262A33)};
-    const CL={F:{top:0x5B4FE0,bot:0x23262F,shoe:0xF4F5F7,sole:0xC9CED6},M:{top:0x13A08F,bot:0x23262F,shoe:0x2A2F3A,sole:0xEDEFF2}}[kind];
-    this.U={uTop:{value:new THREE.Color(CL.top)},uBot:{value:new THREE.Color(CL.bot)},uShoe:{value:new THREE.Color(CL.shoe)},uSole:{value:new THREE.Color(CL.sole)},uBulge:{value:0},uGlow:{value:0},uBadGlow:{value:0},uHi:{value:new THREE.Color(0xFF4A2E)},uBad:{value:new THREE.Color(0xFF1E3C)},uHiMix:{value:0}};
-    const mat=new THREE.MeshStandardMaterial({vertexColors:true,roughness:.55,metalness:0});
+    // materials: clean anatomy-atlas look (light grey figure, dark shorts, working muscles in red)
+    const CL={F:{skin:0xDCD9D7,top:0x2A2D34,bot:0x2A2D34,shoe:0x30343C,sole:0xE8EAEE},M:{skin:0xD6D9DE,top:0x2A2D34,bot:0x2A2D34,shoe:0x30343C,sole:0xE8EAEE}}[kind];
+    this.hw=new Float32Array(24);
+    this.U={uTop:{value:new THREE.Color(CL.top)},uBot:{value:new THREE.Color(CL.bot)},uShoe:{value:new THREE.Color(CL.shoe)},uSole:{value:new THREE.Color(CL.sole)},uBulge:{value:0},uGlow:{value:0},uBadGlow:{value:0},uHi:{value:new THREE.Color(0xE5402B)},uHi2:{value:new THREE.Color(0xF5B4A2)},uBad:{value:new THREE.Color(0xC4122F)},uHiMix:{value:1},uHW:{value:this.hw}};
+    const mat=new THREE.MeshStandardMaterial({color:CL.skin,roughness:.62,metalness:0});
     mat.onBeforeCompile=sh=>{Object.assign(sh.uniforms,this.U);
-      sh.vertexShader=sh.vertexShader.replace("#include <common>","#include <common>\nattribute float aHi;attribute float aBad;attribute vec4 aCloth;varying vec4 vCloth;varying float vHi;varying float vBad;uniform float uBulge;")
-        .replace("#include <begin_vertex>","#include <begin_vertex>\nvHi=aHi;vBad=aBad;vCloth=aCloth;transformed+=objectNormal*(smoothstep(-.004,.012,aCloth.z)*.011+smoothstep(-.004,.01,max(aCloth.x,aCloth.y))*.0025);transformed+=objectNormal*aHi*uBulge;");
-      sh.fragmentShader=sh.fragmentShader.replace("#include <common>","#include <common>\nvarying vec4 vCloth;uniform vec3 uTop;uniform vec3 uBot;uniform vec3 uShoe;uniform vec3 uSole;varying float vHi;varying float vBad;uniform vec3 uHi;uniform vec3 uBad;uniform float uGlow;uniform float uBadGlow;uniform float uHiMix;")
+      sh.vertexShader=sh.vertexShader.replace("#include <common>","#include <common>\nattribute float aHi;attribute float aBad;attribute vec4 aCloth;attribute vec4 aTor;attribute vec4 aM0;attribute vec4 aM1;attribute vec4 aM2;attribute vec4 aM3;attribute vec4 aM4;attribute vec4 aM5;varying vec4 vCloth;varying vec4 vTor;varying vec2 vHB;varying vec4 vM0;varying vec4 vM1;varying vec4 vM2;varying vec4 vM3;varying vec4 vM4;varying vec4 vM5;uniform float uBulge;")
+        .replace("#include <begin_vertex>","#include <begin_vertex>\nvHB=vec2(aHi,aBad);vCloth=aCloth;vTor=aTor;vM0=aM0;vM1=aM1;vM2=aM2;vM3=aM3;vM4=aM4;vM5=aM5;transformed+=objectNormal*(smoothstep(-.004,.012,aCloth.z)*.011+smoothstep(-.004,.01,max(aCloth.x,aCloth.y))*.0035);transformed+=objectNormal*aHi*uBulge;");
+      sh.fragmentShader=sh.fragmentShader.replace("#include <common>","#include <common>\nvarying vec4 vCloth;varying vec4 vTor;varying vec2 vHB;varying vec4 vM0;varying vec4 vM1;varying vec4 vM2;varying vec4 vM3;varying vec4 vM4;varying vec4 vM5;uniform vec3 uTop;uniform vec3 uBot;uniform vec3 uShoe;uniform vec3 uSole;uniform vec3 uHi;uniform vec3 uHi2;uniform vec3 uBad;uniform float uGlow;uniform float uBadGlow;uniform float uHiMix;uniform float uHW[24];")
         .replace("#include <color_fragment>",`#include <color_fragment>
+float W[24];W[0]=vM0.x;W[1]=vM0.y;W[2]=vM0.z;W[3]=vM0.w;W[4]=vM1.x;W[5]=vM1.y;W[6]=vM1.z;W[7]=vM1.w;W[8]=vM2.x;W[9]=vM2.y;W[10]=vM2.z;W[11]=vM2.w;
+W[12]=vM3.x;W[13]=vM3.y;W[14]=vM3.z;W[15]=vM3.w;W[16]=vM4.x;W[17]=vM4.y;W[18]=vM4.z;W[19]=vM4.w;W[20]=vM5.x;W[21]=vM5.y;W[22]=vM5.z;W[23]=vM5.w;
+float t1=0.,t2=0.;int i1=0;
+for(int i=0;i<24;i++){float w=W[i];if(w>t1){t2=t1;t1=w;i1=i;}else if(w>t2){t2=w;}}
+float df=t1-t2,fd=fwidth(df)+1e-4,ft=fwidth(t1)+1e-4;
+float inM=smoothstep(.015,.06+ft,t1);
+float crease=(1.-smoothstep(.0,fd*1.2+.035,df))*smoothstep(.04,.14,t1);
+float edge=1.-smoothstep(0.,ft*1.2+.015,abs(t1-.1));
+// torso atlas lines: linea alba, six-pack rows, spine
+float isT=vTor.w,yy=vTor.x,sn=vTor.y,cs=vTor.z,fs=fwidth(sn)+1e-4,fy=fwidth(yy)+1e-4;
+float alba=(1.-smoothstep(0.,fs*1.3+.012,abs(sn)))*step(0.,cs)*smoothstep(.06,.09,yy)*(1.-smoothstep(.42,.46,yy));
+float rows=0.;for(int r=0;r<3;r++){float ry=.155+.06*float(r);rows=max(rows,(1.-smoothstep(0.,fy*1.2+.004,abs(yy-ry)))*smoothstep(.83,.95,cs));}
+float spine=(1.-smoothstep(0.,fs*1.3+.014,abs(sn)))*step(cs,0.)*smoothstep(.02,.06,yy)*(1.-smoothstep(.5,.54,yy));
+float lines=max(max(crease,edge*.55),isT*max(max(alba,rows*W[8]*1.6),spine*.8));
+float pillow=sqrt(clamp(t1,0.,1.));
+vec3 cc=diffuseColor.rgb*mix(1.,mix(.84,1.04,pillow),inM)*(1.-.1*(1.-smoothstep(0.,.3,df))*smoothstep(.05,.2,t1));
+float hw=uHW[i1]*inM;
+vec3 hc=mix(uHi2,uHi,smoothstep(.6,.9,hw));
+float hk=smoothstep(.2,.4,hw)*mix(.8,1.,smoothstep(.6,.9,hw));
+cc=mix(cc,hc*mix(.8,1.08,pillow),hk*uHiMix);
+cc*=1.-.34*clamp(lines,0.,1.);
 float cT=smoothstep(-.005,.005,vCloth.x),cB=smoothstep(-.005,.005,vCloth.y),cS=smoothstep(-.004,.004,vCloth.z),cSo=smoothstep(-.003,.003,vCloth.w);
-vec3 cc=diffuseColor.rgb;cc=mix(cc,uBot,cB);cc=mix(cc,uTop,cT);cc=mix(cc,uShoe,cS);cc=mix(cc,uSole,cSo*cS);
-float seam=(1.-smoothstep(.003,.011,abs(vCloth.x)))*cT+(1.-smoothstep(.003,.011,abs(vCloth.y)))*cB;cc*=1.-.28*clamp(seam,0.,1.);
+float ck=.5*smoothstep(.35,.8,vHB.x)*uHiMix;cc=mix(cc,mix(uBot,uHi*.6,ck),cB);cc=mix(cc,mix(uTop,uHi*.6,ck),cT);cc=mix(cc,uShoe,cS);cc=mix(cc,uSole,cSo*cS);
+float seam=(1.-smoothstep(.003,.011,abs(vCloth.x)))*cT+(1.-smoothstep(.003,.011,abs(vCloth.y)))*cB;cc*=1.-.3*clamp(seam,0.,1.);
 float clothK=max(max(cT,cB),cS);
-float hm=smoothstep(.04,.5,vHi)*(.6+.4*smoothstep(.45,.75,vHi));
-cc=mix(cc,uHi,hm*uHiMix);
-cc=mix(cc,uBad,clamp(vBad,0.,1.)*.85);diffuseColor.rgb=cc;`)
+cc=mix(cc,uBad,clamp(vHB.y,0.,1.)*.85*(1.-clothK*.5));diffuseColor.rgb=cc;
+float hiK=hk*(1.-clothK);`)
         .replace("#include <roughnessmap_fragment>","#include <roughnessmap_fragment>\nroughnessFactor=mix(roughnessFactor,.92,clothK);")
-        .replace("#include <emissivemap_fragment>","#include <emissivemap_fragment>\ntotalEmissiveRadiance+=uHi*smoothstep(.04,.5,vHi)*vHi*uGlow+uBad*vBad*uBadGlow;");
+        .replace("#include <emissivemap_fragment>","#include <emissivemap_fragment>\ntotalEmissiveRadiance+=uHi*hiK*hw*uGlow+uBad*vHB.y*uBadGlow;");
     };
     body.material=mat;body.castShadow=true;body.receiveShadow=true;body.frustumCulled=false;
     for(const o of extras){o.castShadow=true;o.frustumCulled=false;const n=o.name.toLowerCase();
-      o.material=new THREE.MeshStandardMaterial({color:/eye(?!brow)|low-poly|high-poly/.test(n)&&!/brow/.test(n)?0x2a211c:/brow|lash/.test(n)?0x2b1d16:kind==="F"?0x4a2c1d:0x2a1d15,roughness:.7,side:THREE.DoubleSide})}
+      const eye=/low-poly|high-poly/.test(n)||/eye(?!brow)/.test(n),brow=/brow|lash/.test(n);
+      o.material=new THREE.MeshStandardMaterial({color:eye?0xffffff:brow?0x8A8E96:0x4A4E57,roughness:eye?.3:.8,side:THREE.DoubleSide,vertexColors:eye});
+      if(eye){// soft grey iris on the front of each eyeball (model faces +Z)
+        const P=o.geometry.attributes.position,n=P.count,c=new Float32Array(n*3),q=V(),cen={l:V(),r:V()},cnt={l:0,r:0};
+        for(let i=0;i<n;i++){q.fromBufferAttribute(P,i);const k=q.x>0?"l":"r";cen[k].add(q);cnt[k]++}
+        for(const k of ["l","r"])if(cnt[k])cen[k].divideScalar(cnt[k]);
+        for(let i=0;i<n;i++){q.fromBufferAttribute(P,i);const d=q.sub(cen[q.x>0?"l":"r"]).normalize(),f=sstep(.72,.9,d.z),pu=sstep(.93,.98,d.z);
+          const g=.92-.55*f-.25*pu;c[i*3]=g;c[i*3+1]=g*1.01;c[i*3+2]=g*1.03}
+        o.geometry=o.geometry.clone();o.geometry.setAttribute("color",new THREE.BufferAttribute(c,3))}}
     // per-vertex anatomy coordinates (rest pose, world space)
     const geo=body.geometry,P=geo.attributes.position,SI=geo.attributes.skinIndex,SW=geo.attributes.skinWeight,nv=P.count;
     const bn=body.skeleton.bones.map(b=>b.name);
     const fwd=V(1,0,0);
-    const meta=new Array(nv),col=new Float32Array(nv*3),v=V(),cloth=new Float32Array(nv*4);
+    const meta=new Array(nv),v=V(),cloth=new Float32Array(nv*4),tor=new Float32Array(nv*4),MW=[0,1,2,3,4,5].map(()=>new Float32Array(nv*4));
     const ortho=(a,axis)=>a.clone().addScaledVector(axis,-a.dot(axis)).normalize();
     const pr=this.rest,tn=TORSO_N[kind]/this.torsoLen;
     const shZ=Math.abs(pr["upperarm"+this.sfx.L].p.z-pr.pelvis.p.z),pz=pr.pelvis.p.z,TL=this.torsoLen;
     const hipZ=Math.abs(pr["thigh"+this.sfx.L].p.z-pz),hipY=pr["thigh"+this.sfx.L].p.y,kneeY=pr["calf"+this.sfx.L].p.y,ankY=pr["foot"+this.sfx.L].p.y;
     const sleeve=(vv,x)=>{const a=pr["upperarm"+x].p,b=pr["lowerarm"+x].p,ax=V().subVectors(b,a).normalize(),d=V().subVectors(vv,a),t=d.dot(ax),rad=d.addScaledVector(ax,-t).length();return Math.min(.15-t,t+.09,.085-rad)};
-    const hemY=kind==="F"?kneeY-.17:hipY-(hipY-kneeY)*.42, waistF=kind==="F"?.06:.09;
+    const hemY=kind==="F"?hipY-(hipY-kneeY)*.36:hipY-(hipY-kneeY)*.42, waistF=kind==="F"?.06:.09;
     for(let i=0;i<nv;i++){
       v.fromBufferAttribute(P,i).applyMatrix4(body.matrixWorld);
       let best=0,bw=-1;for(let k=0;k<4;k++){const w=SW.getComponent(i,k);if(w>bw){bw=w;best=SI.getComponent(i,k)}}
@@ -197,7 +259,8 @@ cc=mix(cc,uBad,clamp(vBad,0.,1.)*.85);diffuseColor.rgb=cc;`)
         const f=ortho(fwd,ax),sd=ortho(V(0,0,side),ax);
         m={p:/^(upperarm|lowerarm)/.test(name)?"A":"Hn",x:(onUA?t:uaLen+t)*(this.B.ua/uaLen),th:Math.atan2(rad.dot(sd),rad.dot(f)),ua:this.B.ua,side};
       }else if(/^(pelvis|spine|clavicle)/.test(name)){
-        const y=(v.y-this.pelvisY)*tn;m={p:"T",x:y,y,th:Math.atan2(v.z,v.x-pr.pelvis.p.x),side:v.z>=0?1:-1};
+        const y=(v.y-this.pelvisY)*tn;m={p:"T",x:y,y,yy:y*.53/TORSO_N[kind],th:Math.atan2(v.z,v.x-pr.pelvis.p.x),side:v.z>=0?1:-1};
+        tor[i*4]=m.yy;tor[i*4+1]=Math.sin(m.th);tor[i*4+2]=Math.cos(m.th);tor[i*4+3]=1;
       }else{m={p:"H",x:0,th:0,y:0}}
       meta[i]=m;
       // gym clothes: smooth signed distances (metres) so the shader draws clean hems
@@ -205,14 +268,16 @@ cc=mix(cc,uBad,clamp(vBad,0.,1.)*.85);diffuseColor.rgb=cc;`)
       let top=-1,bot=-1;
       if(!isHand){
         const colz=shZ*.95-lat;
-        top=kind==="F"?Math.min((fy-.45)*TL,(.86-fy)*TL,colz):Math.max(Math.min((fy-.03)*TL,(.92-fy)*TL,colz),sleeve(v,this.sfx.L),sleeve(v,this.sfx.R));
+        top=kind==="F"?Math.min((fy-.6)*TL,(.815-fy)*TL,colz):-1; // sports bra for her, bare torso for him so the muscles show
         bot=Math.min((waistF-fy)*TL,v.y-hemY,hipZ+.115-lat);
       }
       const shoe=isHand?-1:ankY+.035-v.y,sole=.011-v.y;
       cloth[i*4]=top;cloth[i*4+1]=bot;cloth[i*4+2]=shoe;cloth[i*4+3]=sole;
-      const c=C.skin;m.cl=top>0||bot>0;col[i*3]=c.r;col[i*3+1]=c.g;col[i*3+2]=c.b;
+      m.cl=top>0||bot>0;
+      for(let k=0;k<24;k++)MW[k>>2][i*4+(k&3)]=ANAT[k](m);
     }
-    geo.setAttribute("color",new THREE.BufferAttribute(col,3));geo.setAttribute("aCloth",new THREE.BufferAttribute(cloth,4));
+    geo.setAttribute("aCloth",new THREE.BufferAttribute(cloth,4));geo.setAttribute("aTor",new THREE.BufferAttribute(tor,4));
+    MW.forEach((a,k)=>geo.setAttribute("aM"+k,new THREE.BufferAttribute(a,4)));
     // relaxed hands: gently curl the fingers (thumb less)
     const curl=window.MX_CURL||{ax:"z",a:.45};
     for(const [n,bn2] of Object.entries(bones)){const mm=/^(index|middle|ring|pinky|thumb)_0([123])_/.exec(n);if(!mm)continue;
@@ -227,6 +292,7 @@ cc=mix(cc,uBad,clamp(vBad,0.,1.)*.85);diffuseColor.rgb=cc;`)
     const H=this.aHi.array,Bd=this.aBad.array,mh=hi.map(([n,f])=>[MUSCLES[n],f]).filter(x=>x[0]),mb=bad.map(n=>MUSCLES[n]).filter(Boolean);
     for(let i=0;i<this.nv;i++){const v=this.meta[i];let a=0,b=0;for(const [m,f] of mh)a=Math.max(a,m.w(v)*(f<1&&v.cl?0:f));for(const m of mb)b=Math.max(b,m.w(v));H[i]=a;Bd[i]=b}
     this.aHi.needsUpdate=true;this.aBad.needsUpdate=true;
+    this.hw.fill(0);for(const [n,f] of hi)for(const k of AMAP[n]||[])this.hw[k]=Math.max(this.hw[k],f>=1?1:.5);
     this.anchors={};const P=this.geo.attributes.position,pv=V();
     for(const n of hi.filter(x=>x[1]>=1).map(x=>x[0])){const m=MUSCLES[n];if(!m)continue;const c=V();let cnt=0;
       for(let i=0;i<this.nv;i++){const v=this.meta[i];if(v.side===-1)continue;if(m.w(v)>.85){c.add(pv.fromBufferAttribute(P,i));cnt++}}
@@ -297,7 +363,7 @@ function latMachine(){const g=new THREE.Group();
     const tip=new THREE.Mesh(new THREE.CylinderGeometry(.02,.015,.12,12),M.steel);tip.position.set(0,-.04,s*.6);tip.rotation.x=s*.6;bar.add(tip)}
   bar.traverse(o=>{if(o.isMesh)o.castShadow=true});g.add(bar);g.userData.bar=bar;
   return g}
-function mat(){const m=box(1.9,.015,.62,new THREE.MeshStandardMaterial({color:0x245a55,roughness:.9}),.006);m.position.set(-.15,.008,0);return m}
+function mat(){const m=box(1.9,.015,.62,new THREE.MeshStandardMaterial({color:0x3A404A,roughness:.9}),.006);m.position.set(-.15,.008,0);return m}
 
 const EXL={
  squat:{name:"Goblet Squat",cat:"Legs · Strength",equip:"Dumbbell",tempo:"2 s down · 1 s up",
@@ -464,10 +530,12 @@ const ease=k=>k<.5?4*k*k*k:1-Math.pow(-2*k+2,3)/2;
 function lerpPose(a,b,k){const o={};for(const key of new Set([...Object.keys(a),...Object.keys(b)])){if(key==="cue"||key==="mod")continue;const x=a[key]??b[key],y=b[key]??a[key];
   if(Array.isArray(x)&&typeof x[0]==="number")o[key]=x.map((v,i)=>v+(y[i]-v)*k);else if(typeof x==="number")o[key]=x+(y-x)*k;else o[key]=k<.5?x:y}return o}
 function framesFor(){if(!mistake||!mv.mistakes)return mv.frames;const m=mv.mistakes.find(x=>x.id===mistake);return mv.frames.map(f=>({...m.mod(f),cue:f.cue,t:f.t,phase:f.phase,con:f.con}))}
-// slow, teachable tempo: every rep lasts at least ~5 s, and 2-position moves pause at each end
-const SLOWREP=5.2;
-const tScale=()=>Math.max(1,SLOWREP/mv.frames.reduce((s,f)=>s+f.t,0));
-const holdT=()=>mv.frames.length<=2?.7:mv.frames.length<=4?.15:0;
+// Learn mode (default): every step moves slowly and then holds still for ~2 s so the cue can be read.
+// Real tempo: the rep speed you train at (at least ~5 s per rep).
+let learn=true;
+const SLOWREP=5.2,LEARNREP=8;
+const tScale=()=>{const sum=mv.frames.reduce((s,f)=>s+f.t,0);return learn?Math.max(1.6,LEARNREP/sum):Math.max(1,SLOWREP/sum)};
+const holdT=()=>{const n=mv.frames.length;return learn?(n<=2?2:n<=4?1.8:.3):(n<=2?.7:n<=4?.15:0)};
 const dur=f=>f.t*tScale()+holdT();
 const total=()=>mv.frames.reduce((s,f)=>s+dur(f),0);
 function sampleAt(time){const fr=framesFor(),T=total(),sc=tScale();let tt=time%T,i=0;while(i<fr.length&&tt>dur(fr[i])){tt-=dur(fr[i]);i++}i=Math.min(i,fr.length-1);
@@ -504,9 +572,18 @@ function drawCallouts(){
       <foreignObject x="${bx}" y="${q.ly}" width="${BW}" height="${BH+4}"><div xmlns="http://www.w3.org/1999/xhtml" class="m3label ${L?"":"r"}"><b>${M_.name}</b><span>${M_.latin.split(" · ")[0]}</span></div></foreignObject>`}}
   ui.svg.setAttribute("viewBox",`0 0 ${w} ${h}`);ui.svg.innerHTML=html;
 }
-const CAMS={back:[-3.2,0,.15],front:[3.2,0,0],side:[.1,0,3.3],diag:[2.4,.35,2.4],top:[1,2.6,.7]};
+const CAMS={bdiag:[-2.4,.5,2.4],back:[-3.2,0,.15],front:[3.2,0,0],side:[.1,0,3.3],diag:[2.4,.35,2.4],top:[1,2.6,.7]};
 let camKey="diag",camFrom=null,camTo=null,camK=1;
-function camFor(k){const tg=V(...(mv?.cam?.target||[0,.85,0]));const o=CAMS[k];const ext=mv?.props==="lat"||mv?.converted&&(mv.props2||[]).some(x=>["pull","cableLow","tread","legpress"].includes(x))?1.15:1;return {p:V(tg.x+o[0]*ext,tg.y+.35+o[1]*ext,tg.z+o[2]*ext),t:tg}}
+// frame the whole movement: bounding sphere of the body over every step of the exercise
+let fit=null;
+function fitMove(){if(!man||!mv)return;const bx=new THREE.Box3(),hp=V();
+  for(const f of framesFor()){man.pose(lerpPose(f,f,1));man.bones.head.getWorldPosition(hp);bx.expandByPoint(hp.clone().add(V(0,.12,0)));
+    for(const s of ["L","R"]){const J=man.joints[s];for(const q of [J.hand,J.elbow,J.knee,J.ank,J.hip,J.sh])bx.expandByPoint(q)}}
+  bx.expandByPoint(V(bx.min.x,0,bx.min.z));const c=V();bx.getCenter(c);const sz=V();bx.getSize(sz);
+  fit={c,sz,r:Math.max(.55,sz.length()/2)}}
+function camFor(k){if(!fit)fitMove();const o=V(...CAMS[k]).normalize(),tg=fit?fit.c.clone():V(0,.85,0),r=fit?fit.r:1;
+  const asp=Math.min(1,camera.aspect||1),d=Math.min(7,Math.max(1.9,r/Math.tan(THREE.MathUtils.degToRad(camera.fov/2))/Math.max(.62,asp)*1.12));
+  if(k!=="top")o.y=Math.max(o.y,.12);o.normalize();return {p:tg.clone().addScaledVector(o,d).add(V(0,k==="top"?0:.15,0)),t:tg}}
 function setCam(k,instant){if(!host)return;camKey=k;const c=camFor(k);if(instant){camera.position.copy(c.p);controls.target.copy(c.t);camK=1}else{camFrom={p:camera.position.clone(),t:controls.target.clone()};camTo=c;camK=0}
   host.querySelectorAll("[data-c3cam]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.c3cam===k)))}
 function resize(){if(!host)return;const c1=host.querySelector(".c3ctl")?.offsetHeight||0,c2=host.querySelector(".c3cuep")?.offsetHeight||0,ch=c1+c2;host.style.setProperty("--c3ctlOnly",c1+"px");host.style.setProperty("--c3ctl",ch+"px");const w=host.clientWidth,h=host.clientHeight-ch;if(!w||!h)return;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix()}
@@ -522,28 +599,28 @@ function load(base){if(loading)return loading;const loader=new GLTFLoader();
 window.MX3D={
   supported:(()=>{try{const c=document.createElement("canvas");return !!(c.getContext("webgl2")||c.getContext("webgl"))}catch(e){return false}})(),
   async mount(el,opts){
-    EXAPP=opts.EX||{};MUSAPP=opts.MUS||{};kind=opts.kind||"F";skin=opts.skin??1;exId=opts.id;mistake=null;t=0;rep=0;lastIdx=-1;playing=true;speed=1;
+    EXAPP=opts.EX||{};MUSAPP=opts.MUS||{};kind=opts.kind||"F";learn=opts.learn??true;skin=opts.skin??1;exId=opts.id;mistake=null;t=0;rep=0;lastIdx=-1;playing=true;speed=1;
     host=el;el.classList.toggle("c3compact",!!opts.compact);el.innerHTML=`<div class="c3load">Loading 3D coach…</div><svg class="c3svg" aria-hidden="true"></svg>
       <div class="c3hud"><div class="c3top"><span class="c3chip"><b class="c3rep">Rep 1</b><span class="c3sep"></span><span>Growth</span><span class="c3bar"><i></i></span></span></div>
       </div><div class="c3cuep"><div class="c3steps"></div><div class="c3cue"><b></b><span></span></div><div class="c3tempo"><i></i></div></div>
       <div class="c3ctl"><div class="c3seg">${[["front","Front"],["side","Side"],["diag","45°"],["top","Top"]].map(([k,l])=>`<button data-c3cam="${k}">${l}</button>`).join("")}</div>
-      <div class="c3seg"><button data-c3="play">Pause</button><button data-c3="slow">Slower</button><button data-c3="labels" aria-pressed="true">Labels</button><button data-c3="who">${kind==="F"?"Show man":"Show woman"}</button></div></div>`;
+      <div class="c3seg"><button data-c3="play">Pause</button><button data-c3="slow">Real tempo</button><button data-c3="labels" aria-pressed="true">Labels</button><button data-c3="who">${kind==="F"?"Show man":"Show woman"}</button></div></div>`;
     ui={svg:el.querySelector(".c3svg"),rep:el.querySelector(".c3rep"),growFill:el.querySelector(".c3bar i"),cue:el.querySelector(".c3cuep"),cueB:el.querySelector(".c3cue b"),cueS:el.querySelector(".c3cue span"),tempo:el.querySelector(".c3tempo i"),steps:el.querySelector(".c3steps")};
     el.prepend(renderer.domElement);
     await load(opts.base||"");
     if(host!==el)return;
     el.querySelector(".c3load")?.remove();
-    mv=movement(exId,kind);buildMan();buildProps();setCam("diag",true);ro.observe(el);resize();
+    mv=movement(exId,kind);buildMan();buildProps();fit=null;ro.observe(el);resize();setCam("diag",true);
     el.querySelectorAll("[data-c3cam]").forEach(b=>b.onclick=()=>setCam(b.dataset.c3cam));
     el.querySelector('[data-c3="play"]').onclick=e=>{playing=!playing;e.target.textContent=playing?"Pause":"Play"};
-    el.querySelector('[data-c3="slow"]').onclick=e=>{speed=speed===1?.5:1;e.target.textContent=speed===1?"Slower":"Normal"};
+    el.querySelector('[data-c3="slow"]').onclick=e=>{const T0=total(),k=(t%T0)/T0,r=Math.floor(t/T0);learn=!learn;t=(r+k)*total();lastIdx=-1;e.target.textContent=learn?"Real tempo":"Learn slowly"};
     el.querySelector('[data-c3="labels"]').onclick=e=>{labelsOn=!labelsOn;e.target.setAttribute("aria-pressed",String(labelsOn))};
-    el.querySelector('[data-c3="who"]').onclick=e=>{kind=kind==="F"?"M":"F";e.target.textContent=kind==="F"?"Show man":"Show woman";mv=movement(exId,kind);buildMan();buildProps();opts.onKind&&opts.onKind(kind)};
+    el.querySelector('[data-c3="who"]').onclick=e=>{kind=kind==="F"?"M":"F";e.target.textContent=kind==="F"?"Show man":"Show woman";mv=movement(exId,kind);buildMan();buildProps();fit=null;setCam(camKey);opts.onKind&&opts.onKind(kind)};
     if(!running){running=true;clock.getDelta();renderer.setAnimationLoop(frame)}
   },
   setMistake(m){mistake=m;lastIdx=-1;if(man)applyMuscles()},
   mistakes(id){const m=HAND3D[id];return m&&m.mistakes?m.mistakes.map(x=>({id:x.id,name:x.name,fix:x.fix})):[]},
   unmount(scope){if(scope&&host&&!scope.contains(host))return;stop();host=null}
 };
-window.MX3D._dbg={setT:x=>{t=x;lastIdx=-1},pause:()=>{playing=false},cam:k=>setCam(k,true),studio:()=>{floor.visible=false;ring.visible=false;scene.fog=null;labelsOn=false;growthOn=false},times:()=>{let a=0;return mv.frames.map(f=>(a+=dur(f))-0.001)}};
+window.MX3D._dbg={setT:x=>{t=x;lastIdx=-1},pause:()=>{playing=false},cam:k=>setCam(k,true),studio:()=>{floor.visible=false;ring.visible=false;scene.fog=null;labelsOn=false;growthOn=false},times:()=>{let a=0;return mv.frames.map(f=>(a+=dur(f))-0.001)},frames:()=>mv.frames.map(f=>({phase:f.phase})),flat:()=>{if(!fit)fitMove();return fit.sz.y<Math.max(fit.sz.x,fit.sz.z)*.8}};
 window.MX3D.ready=true;window.dispatchEvent(new Event("mx3d-ready"));

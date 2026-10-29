@@ -4,7 +4,7 @@
   "webDir": "www",
   "android": {
     "backgroundColor": "#0B0E13",
-    "adjustMarginsForEdgeToEdge": "auto"
+    "adjustMarginsForEdgeToEdge": "force"
   },
   "plugins": {
     "LocalNotifications": {
