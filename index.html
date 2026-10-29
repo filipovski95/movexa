@@ -314,6 +314,80 @@ nav.tabs a{display:inline-flex;align-items:center;gap:7px}
 .mt{font-size:12px;font-weight:600;border-radius:999px;padding:3px 10px;background:color-mix(in srgb,#FFA08A 32%,transparent)}
 .mt.p{background:#FF4A2E;color:#fff}
 
+/* ---- welcome / setup ---- */
+.wl{position:fixed;inset:0;z-index:80;overflow:auto;background:radial-gradient(120% 70% at 50% 0%,#24304A 0%,#0F131B 55%,#0A0D12 100%);color:#F3F5F8;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}
+body.wlOpen{overflow:hidden}
+.wlIn0{max-width:460px;margin:0 auto;min-height:100%;padding:16px 20px 28px;box-sizing:border-box;display:flex;flex-direction:column}
+.wlHero{display:flex;flex-direction:column;align-items:center;text-align:center;gap:14px;flex:1;justify-content:center}
+.wlFigs{display:flex;justify-content:center;align-items:flex-end;height:min(38vh,320px);position:relative}
+.wlFigs:before{content:"";position:absolute;left:10%;right:10%;bottom:4%;height:26%;border-radius:50%;background:radial-gradient(closest-side,rgba(182,255,74,.28),transparent)}
+.wlFigs img{height:100%;width:auto;position:relative}.wlFigs img+img{margin-left:-30%}
+.wlBrand{display:flex;align-items:center;gap:10px;font-family:var(--f-display);font-weight:800;letter-spacing:.12em;font-size:18px}
+.wl h1{font-family:var(--f-display);font-size:clamp(28px,8vw,38px);line-height:1.08;margin:4px 0}
+.wl h1 em{font-style:normal;color:#C8FF4E}
+.wlFeat{list-style:none;padding:0;margin:4px 0 8px;display:grid;gap:8px;text-align:left}
+.wlFeat li{display:flex;gap:10px;align-items:center;font-size:15px;color:#D6DCE6}.wlFeat svg{color:#C8FF4E;flex:none}
+.wlBtn{width:100%;border:0;border-radius:16px;padding:16px;font:inherit;font-size:17px;font-weight:800;background:linear-gradient(135deg,#EEFF6A,#7CF03A);color:#0B0E13;margin-top:10px;box-shadow:0 10px 30px rgba(124,240,58,.25)}
+.wlSkip{background:none;border:0;color:#9AA4B5;font:inherit;font-weight:600;padding:12px;margin-top:2px}
+.wlFine{font-size:12px;color:#8E98AA;margin:4px 0}
+.wlTop{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.wlBack{width:40px;height:40px;border-radius:50%;border:0;background:rgba(255,255,255,.08);color:#fff;font-size:26px;line-height:1}
+.wlDots{display:flex;gap:6px}.wlDots i{width:18px;height:5px;border-radius:3px;background:rgba(255,255,255,.15)}.wlDots i.on{background:#C8FF4E}
+.wlQ{display:flex;flex-direction:column;gap:12px;flex:1}
+.wlQ h2{font-family:var(--f-display);font-size:26px;line-height:1.15;margin:8px 0 0}.wlQ>p{color:#AEB6C4;margin:0}
+.wlIn{width:100%;box-sizing:border-box;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:#fff;border-radius:14px;padding:15px 16px;font:inherit;font-size:20px}
+.wlIn:focus{outline:2px solid #C8FF4E;outline-offset:1px}
+.wlRow{display:flex;justify-content:space-between;align-items:center;margin-top:6px}.wlRow2{display:flex;gap:10px}
+.wlLbl{font-weight:700;color:#D6DCE6}
+.wlSeg{display:inline-flex;padding:3px;border-radius:999px;background:rgba(255,255,255,.08);gap:2px}
+.wlSeg button{border:0;background:none;color:#AEB6C4;font:inherit;font-weight:700;padding:7px 14px;border-radius:999px;min-width:44px}
+.wlSeg button[aria-pressed="true"]{background:#fff;color:#0B0E13}
+.wlSex{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:6px}
+.wlSex button{border:2px solid rgba(255,255,255,.1);background:rgba(255,255,255,.05);border-radius:20px;padding:10px 8px 14px;color:#fff;font:inherit;display:flex;flex-direction:column;align-items:center;gap:2px}
+.wlSex img{height:190px;width:auto}.wlSex b{font-size:18px}.wlSex small{color:#9AA4B5}
+.wlSex button[aria-pressed="true"]{border-color:#C8FF4E;background:rgba(200,255,78,.08)}
+.wlCards{display:grid;gap:10px;margin-top:4px}
+.wlCard{display:flex;gap:14px;align-items:center;text-align:left;border:2px solid rgba(255,255,255,.1);background:rgba(255,255,255,.05);border-radius:18px;padding:14px 16px;color:#fff;font:inherit}
+.wlCard .ic{width:52px;height:52px;border-radius:14px;display:grid;place-items:center;background:rgba(200,255,78,.12);color:#C8FF4E;flex:none}
+.wlCard b{display:block;font-size:17px}.wlCard small{color:#9AA4B5;font-size:13px}
+.wlCard[aria-pressed="true"]{border-color:#C8FF4E;background:rgba(200,255,78,.08)}
+.wlNum{display:flex;align-items:center;gap:12px}.wlNum input{flex:1;text-align:center;font-size:40px;font-weight:800;font-family:var(--f-display);border:0;background:none;color:#fff;width:100%}
+.wlNum button{width:56px;height:56px;border-radius:50%;border:0;background:rgba(255,255,255,.1);color:#fff;font-size:28px}
+.wlErr{color:#FF8A7A;min-height:1em;margin:0;font-size:14px}
+.wlDone{align-items:center;text-align:center}.wlCoach{height:min(30vh,240px);width:auto}
+.wlSum{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;width:100%}.wlSum div{background:rgba(255,255,255,.06);border-radius:14px;padding:12px}
+.wlSum b{display:block;font-size:20px;font-family:var(--f-display)}.wlSum span{font-size:12px;color:#9AA4B5}
+/* ---- exercise guide ---- */
+.dose{display:grid;grid-template-columns:repeat(auto-fit,minmax(70px,1fr));gap:8px}
+.dose div{background:var(--sunk);border-radius:14px;padding:10px 8px;text-align:center}
+.dose b{display:block;font-family:var(--f-display);font-size:18px}.dose span{font-size:11.5px;color:var(--muted)}
+.dose .hot{background:color-mix(in srgb,var(--coral) 12%,transparent)}.dose .hot b{color:var(--coral)}
+.steps3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:6px}
+.steps3 figure{margin:0;background:var(--sunk);border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
+.steps3 .si{aspect-ratio:1/1.05;background:radial-gradient(90% 70% at 50% 40%,#fff,#E9EDF3)}
+.steps3 .si img{width:100%;height:100%;object-fit:contain}.steps3 .si.none{display:none}
+.steps3 figcaption{padding:8px;display:grid;gap:2px;font-size:12px;line-height:1.3}
+.steps3 figcaption i{font-style:normal;width:20px;height:20px;border-radius:50%;background:var(--coral);color:#fff;display:grid;place-items:center;font-weight:800;font-size:11px}
+.steps3 figcaption b{font-size:12.5px}.steps3 figcaption span{color:var(--muted)}
+.dodont{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.dodont>div{display:flex;gap:8px;align-items:flex-start;border-radius:12px;padding:10px;font-size:13px;line-height:1.3}
+.dodont svg{flex:none}.do{background:color-mix(in srgb,#2BB673 12%,transparent)}.do svg{color:#1E9E5E}
+.dont{background:color-mix(in srgb,#E8473A 10%,transparent)}.dont svg{color:#E8473A}
+details.more{border:1px solid var(--line);border-radius:14px;padding:10px 14px}details.more summary{font-weight:700;cursor:pointer}
+details.more[open]{display:grid;gap:8px}
+.kcalLine{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:6px 0 0;font-size:14px}
+.kcalLine b{color:inherit}.kcalLine span{display:inline-flex;gap:4px;align-items:center;opacity:.85}.kcalLine>svg{color:#FF9A6B}
+.tgl{display:flex;gap:8px;align-items:center;font-size:13px;color:var(--muted)}
+.nutHero{display:flex;gap:16px;align-items:center;flex-wrap:wrap;background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:18px}
+.ring{width:150px;height:150px;border-radius:50%;display:grid;place-content:center;text-align:center;background:conic-gradient(#7CF03A 0 50%,#E8735E 50% 75%,#F2C14E 75%);position:relative;flex:none}
+.ring:before{content:"";position:absolute;inset:12px;border-radius:50%;background:var(--surface)}
+.ring b,.ring span{position:relative}.ring b{font-family:var(--f-display);font-size:28px}.ring span{font-size:12px;color:var(--muted)}
+.nutSide{display:grid;gap:10px;flex:1;min-width:160px}.nutSide b{display:block;font-family:var(--f-display);font-size:20px}.nutSide span{font-size:12px;color:var(--muted)}
+.plateRow{display:flex;gap:16px;align-items:center;flex-wrap:wrap}.plate{width:130px;height:130px;flex:none}
+.hands{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;flex:1;min-width:220px}
+.hand{display:grid;grid-template-columns:auto 1fr;column-gap:8px;align-items:center;background:var(--sunk);border-radius:12px;padding:8px}
+.hand .hic{grid-row:span 3}.hand b{font-size:14px}.hand span{font-size:12px}.hand small{font-size:11px;color:var(--muted)}
+
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -358,6 +432,7 @@ nav.tabs a{display:inline-flex;align-items:center;gap:7px}
 <dialog id="exDlg" aria-labelledby="dlgTitle"></dialog>
 <dialog id="player" aria-label="Workout player"></dialog>
 <dialog id="legalDlg" aria-label="Legal"></dialog>
+<section id="welcome" class="wl" hidden aria-live="polite"></section>
 <dialog id="obDlg" class="ob" aria-label="Welcome to MOVEXA"></dialog>
 <div id="toastHost"></div>
 
@@ -365,6 +440,7 @@ nav.tabs a{display:inline-flex;align-items:center;gap:7px}
 <script type="module" src="coach3d.js"></script>
 <script src="coach-kb.js"></script>
 <script src="musclemap.js"></script>
+<script src="guide.js"></script>
 <script>
 (()=>{
 /* =============== CONFIG — fill these in before public launch =============== */
@@ -392,8 +468,8 @@ const LEGAL={
   email:"[privacy@yourdomain.com]",
   country:"[Country / State whose law governs]",
   minAge:16,
-  version:"1.0",
-  updated:"October 28, 2026"
+  version:"1.1",
+  updated:"October 29, 2026"
 };
 
 /* =============== figure rig =============== */
@@ -679,6 +755,16 @@ MACHINES.push(
  {name:"Pec Deck",for:"Chest fly with a guided path",ex:"pecfly",set:["Set the seat so handles are at chest height.","Back flat on the pad.","Keep a soft bend in your elbows.","Squeeze together, open slowly."]},
  {name:"Shoulder Press Machine",for:"Pressing overhead with back support",ex:"shoulderpress",set:["Handles start at shoulder height.","Back flat on the pad, feet down.","Press up without locking out hard.","Lower slowly."]});
 MACHINES.forEach(m=>{if(m.name==="Smith Machine")m.ex="deadlift";if(m.name==="Cable Station")m.ex="pushdown"});
+/* proper 3D movement recordings for the machine/extra exercises (hz = hand width, ep = elbow direction) */
+const FR=(id,frames,o={})=>Object.assign(EX[id],{frames,dyn:undefined,...o});
+FR("legcurl",[{h:[84,124],t:-8,hd:[96,132],ft:[150,118],ks:1},{h:[84,124],t:-8,hd:[96,132],ft:[106,168],ks:1}],{dyn:"pad",props:["floor","legext"]});
+FR("pecfly",[{h:[86,138],t:-8,hd:[84,92],hz:.62,ep:[-.4,-.1,1],ft:[126,180]},{h:[86,138],t:-8,hd:[122,92],hz:.07,ep:[-.2,-.2,1],ft:[126,180]}],{props:["floor","seatBack"]});
+FR("shoulderpress",[{h:[86,138],t:-8,hd:[92,90],hz:.3,ep:[0,-1,.6],ft:[126,180]},{h:[86,138],t:-8,hd:[82,38],hz:.2,ep:[0,-.2,1],ft:[126,180]}],{props:["floor","seatBack"]});
+FR("pushdown",[{h:[100,112],t:8,hd:[124,100],hz:.13,ep:[-1,-.3,.2],ft:[104,180]},{h:[100,112],t:8,hd:[114,150],hz:.13,ep:[-1,0,.2],ft:[104,180]}],{props:["floor"]});
+FR("latraise",[{h:[100,112],t:0,hd:[103,160],hz:.24,ep:[-.3,0,1],ft:[104,180]},{h:[100,112],t:0,hd:[104,68],hz:.74,ep:[0,1,.4],ft:[104,180]}],{dyn:"db",props:["floor"]});
+FR("crunch",[{h:[100,174],t:-90,hd:[46,166],es:-1,ft:[140,179]},{h:[100,174],t:-62,hd:[52,144],es:-1,ft:[140,179]}],{props:["mat"]});
+FR("hyperext",[{h:[96,122],t:140,hd:[120,152],hz:.06,ft:[44,160],ks:1},{h:[96,122],t:88,hd:[132,128],hz:.06,ft:[44,160],ks:1}],{props:["floor","hyper"]});
+FR("deadlift",[{h:[100,112],t:0,hd:[103,161],ft:[104,180]},{h:[80,128],t:62,hd:[122,166],ft:[104,180]}],{dyn:"db",props:["floor"]});
 
 /* =============== coaches & plan engine =============== */
 const COACH={
@@ -749,7 +835,7 @@ const TYPE={str:["str","Strength"],car:["car","Cardio"],rec:["rec","Recovery"],r
 
 /* =============== state & storage =============== */
 const todayISO=(d=new Date())=>new Date(d.getTime()-d.getTimezoneOffset()*6e4).toISOString().slice(0,10);
-const DEFAULT=()=>({v:2,consent:null,parq:null,profile:{name:"",sex:"",age:null,height:null,goal:"fit",level:"beginner",equip:"gym",days:5,mins:45},
+const DEFAULT=()=>({v:2,consent:null,parq:null,profile:{name:"",sex:"",age:null,height:null,goal:"fit",level:"beginner",equip:"gym",days:5,mins:45},setup:false,hideCal:false,
  coach:"maya",start:todayISO(),done:{},checks:{},logs:[],swaps:{},unit:"kg",goalW:null,weights:[],meas:[],water:{},sound:"bell",voice:true,
  reminders:[{id:"r1",label:"Workout time with your coach",time:"18:00",days:[1,1,1,1,1,0,0],on:true},
             {id:"r2",label:"Drink a glass of water",time:"11:00",days:[1,1,1,1,1,1,1],on:true},
@@ -838,6 +924,38 @@ const musList=id=>{const m=MUS[id]||[[],[]];return `<div class="mtags">${m[0].ma
 const catPill=c=>c==="cardio"?`<span class="pill car">Cardio</span>`:c==="mobility"?`<span class="pill mob">Stretch</span>`:`<span class="pill str">Muscle</span>`;
 const latestKg=()=>state.weights.length?state.weights[state.weights.length-1].kg:null;
 
+/* =============== level, dose & calorie estimates =============== */
+const LV=()=>({beginner:0,intermediate:1,advanced:2}[state.profile.level]??0);
+const LVNAME=()=>["beginners","intermediate level","advanced level"][LV()];
+const isMinor=()=>!!(state.profile.age&&state.profile.age<18);
+const showCal=()=>!state.hideCal;
+function metFor(id){const M=window.MX_MET||{},e=EX[id],l=LV();if(M[id])return M[id][l];if(e&&e.cat==="mobility")return (M._stretch||[2.3,2.3,2.5])[l];return (M._strength||[3.5,5,6])[l]}
+const bodyKg=()=>latestKg();
+const r5=x=>Math.max(5,Math.round(x/5)*5);
+function kcalOf(met,mins){const kg=bodyKg()||70,k=met*kg*mins/60;return [r5(k*.8),r5(k*1.2)]}
+function dose(id){const e=EX[id],l=LV(),each=["lunge","stepup","row"].includes(id)?" each side":"";
+  if(["plank","superman"].includes(id))return {sets:[2,3,3][l],work:id==="plank"?`${[20,30,45][l]} s`:`${[8,10,12][l]} reps`,unit:id==="plank"?"hold":"each set",rest:[45,45,60][l],mins:[2,3,3.5][l],freq:"2–4× per week"};
+  if(["rope","highknees","mtn"].includes(id))return {sets:[3,4,6][l],work:`${[20,30,40][l]} s`,unit:"fast",rest:[40,30,20][l],mins:[3,4,6][l],freq:"2–3× per week"};
+  if(e.cat==="mobility")return {sets:2,work:`${[20,30,45][l]} s`,unit:id==="hipflexor"?"each side":"hold",rest:15,mins:2,freq:"After every workout"};
+  if(e.cat==="cardio"&&id!=="stepup")return {sets:1,work:`${[12,20,30][l]} min`,unit:["easy pace","moderate","with intervals"][l],rest:0,mins:[12,20,30][l],freq:["3× per week","3–4× per week","3–5× per week"][l]};
+  return {sets:[2,3,4][l],work:["10–12","8–12","6–10"][l],unit:"reps"+each,rest:[60,75,90][l],mins:[2,3,4][l]*([60,75,90][l]+40)/60,freq:"2–3× per week, with a rest day between"}}
+function itemMins(x){if(x.mins)return x.mins;if(x.secs)return x.sets*((x.secs+(x.off||15))/60);return x.sets*((x.rest||60)+40)/60}
+function workoutKcal(d){if(!d||!d.list.length)return null;let mins=5;const kg=bodyKg()||70;let k=3.5*kg*5/60;
+  for(const x of d.list){const m=itemMins(x);mins+=m;k+=metFor(x.id)*kg*m/60}
+  for(const x of d.cool||[]){mins+=.75;k+=2.3*kg*.75/60}
+  return {lo:r5(k*.8),hi:r5(k*1.2),mins:Math.round(mins),est:!bodyKg()}}
+const KCAL_NOTE=()=>`Estimate for ${bodyKg()?"your weight":"a 70 kg person (log your weight for a personal number)"}, based on published MET values from the Compendium of Physical Activities. Real burn varies a lot with effort, fitness, body size and rest times, so treat it as a rough range, not a measurement.`;
+const ICO={fire:'<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c4 0 7-2.7 7-7 0-4-3-6-4-9-1 2-2 3-3.5 3.5C11 7 11 4 9 2 9 6 5 9 5 15c0 4.3 3 7 7 7z"/></svg>',
+ clock:'<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+ ok:'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg>',
+ no:'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>'};
+function stepsStrip(id){const G=(window.MX_GUIDE||{})[id],k=who3d(),m=(MUS[id]||[[]])[0];if(!G)return "";
+  const caps=[G[0],G[1],`Feel it here: ${m.slice(0,2).map(x=>MNAME[x]).join(" & ")||EX[id].muscles}`],tit=["Get in position","Do the move","Where you feel it"];
+  return `<div class="steps3">${caps.map((c,n)=>`<figure><div class="si"><img src="assets/steps/${id}-${k}-${n+1}.webp" alt="Step ${n+1}: ${esc(c)}" loading="lazy" onerror="this.parentNode.classList.add('none')"></div><figcaption><i>${n+1}</i><b>${tit[n]}</b><span>${esc(c)}</span></figcaption></figure>`).join("")}</div>`}
+function doseBlock(id){const d=dose(id),[lo,hi]=kcalOf(metFor(id),d.mins);
+  return `<div class="dose"><div><b>${d.sets}</b><span>${d.sets>1?"sets":"set"}</span></div><div><b>${d.work}</b><span>${esc(d.unit)}</span></div>${d.rest?`<div><b>${d.rest} s</b><span>rest</span></div>`:""}${showCal()?`<div class="hot"><b>${lo}–${hi}</b><span>kcal*</span></div>`:""}</div>
+  <p class="muted small" style="margin:0">Suggested for ${LVNAME()} · ${esc(d.freq)}. Start lighter if it feels hard; good form first.${showCal()?` <button class="linkBtn" data-kcalinfo>*How we estimate calories</button>`:""}</p>`}
+
 /* =============== records =============== */
 function exHistory(id){return state.logs.filter(l=>l.sets&&l.sets[id]).map(l=>({date:l.date,sets:l.sets[id]}))}
 function prs(){
@@ -908,8 +1026,8 @@ function renderToday(){
   const i=dayIndex(), d=dayPlan(i), c=COACH[state.coach], doneCount=Object.keys(state.done).length;
   const checked=d.list.filter((x,k)=>state.checks[`${i}-${k}`]).length;
   const pct=d.list.length?Math.round(checked/d.list.length*100):(state.done[i]?100:0);
-  const [pc,pl]=TYPE[d.type]; const lastW=latestKg(); const wg=waterGoal(), wn=state.water[todayISO()]||0;
-  $("#v-today").innerHTML=`${!state.consent?`<div class="notice ok">Welcome to ${APP}! Your plan is ready below. Tap <b>Start guided workout</b>; we'll do a 20-second safety check first. You can personalise your plan any time in <a href="#profile">Profile</a>.</div>`:""}
+  const [pc,pl]=TYPE[d.type]; const lastW=latestKg(); const wk=workoutKcal(d); const wg=waterGoal(), wn=state.water[todayISO()]||0;
+  $("#v-today").innerHTML=`${!state.consent?`<div class="notice ok">${state.profile.name?`Hi ${esc(state.profile.name)}! `:""}Your plan is ready below. Tap <b>Start guided workout</b>; we'll do a 20-second safety check first.</div>`:""}
   ${state.parq&&state.parq.flag?`<div class="notice bad">Your health check suggested talking to a doctor before training hard. Keep the effort light until you have medical clearance. <button class="linkBtn" data-goto="profile">Redo health check</button></div>`:""}
   <div class="today">
     <div class="dayHead" style="--pct:${pct}%">
@@ -918,6 +1036,7 @@ function renderToday(){
       <div class="big">Day ${i+1}<small>of 30</small></div>
       <h2>${esc(d.title)}</h2>
       <p style="opacity:.8">${esc(WEEK[Math.min(3,Math.floor(i/7))].theme)} · ${esc(d.focus)}</p>
+      ${showCal()&&wk?`<p class="kcalLine">${ICO.fire}<b>About ${wk.lo}–${wk.hi} kcal</b><span>${ICO.clock}~${wk.mins} min</span><button class="linkBtn" id="kcalInfo">How?</button></p>`:""}
       <div class="coachMsg"><span class="av ${state.coach}">${c.name[0]}</span><p><b>Coach ${c.name}:</b> ${esc(c.hello[i%c.hello.length])}${d.note?" "+esc(d.note):""}</p></div>
       ${d.list.length?`<div class="row"><button class="btn primary big" id="startW">${state.done[i]?"Do it again":"Start guided workout"}</button></div>`:""}
     </div>
@@ -958,6 +1077,7 @@ function renderToday(){
   </div>`;
   const md=$("#markDay"); if(md)md.onclick=()=>{state.done[i]=!state.done[i];if(!state.done[i])delete state.done[i];else{playSound("bell");checkBadges()}save();renderToday();renderPlan()};
   const sw=$("#startW"); if(sw)sw.onclick=()=>startPlayer(i);
+  const ki=$("#kcalInfo"); if(ki)ki.onclick=()=>toastMsg(KCAL_NOTE()+" Please don't use these numbers to restrict food or to push through pain.");
   $$("[data-glass]").forEach(b=>b.onclick=()=>{const k=+b.dataset.glass,t=todayISO();state.water[t]=(state.water[t]||0)===k+1?k:k+1;save();checkBadges();renderToday();renderNutrition()});
   $$("[data-rest]",$("#v-today")).forEach(b=>b.onclick=()=>startTimer(+b.dataset.rest));
   $("#timerStop").onclick=()=>{clearInterval(timerI);timerLeft=0;$("#timerT").textContent=fmtT(d.rest||60)};
@@ -1156,44 +1276,48 @@ function nutri(){
   const base=10*kg+6.25*h-5*a, bmr=p.sex==="male"?base+5:p.sex==="female"?base-161:base-78;
   const act={3:1.375,4:1.46,5:1.55}[p.days]||1.46, tdee=bmr*act;
   const floor=p.sex==="male"?1500:p.sex==="female"?1200:1350;
-  let target=p.goal==="fat"?Math.max(floor,tdee*.85):p.goal==="muscle"?tdee*1.08:tdee;
+  const minor=a<18;
+  let target=minor?tdee:p.goal==="fat"?Math.max(floor,tdee*.85):p.goal==="muscle"?tdee*1.08:tdee;
   const prot=[Math.round(kg*1.6),Math.round(kg*(p.goal==="fit"?1.8:2.2))];
   const bmi=kg/((h/100)**2);
-  return {bmr,tdee,target,prot,bmi,floorHit:p.goal==="fat"&&target===floor};
+  return {bmr,tdee,target,prot,bmi,minor,floorHit:!minor&&p.goal==="fat"&&target===floor};
 }
 function bmiCat(b){return b<18.5?"Underweight":b<25?"Healthy range":b<30?"Overweight":"Obesity range"}
 function renderNutrition(){
-  const n=nutri(), p=state.profile, wg=waterGoal(), wn=state.water[todayISO()]||0;
+  const n=nutri(), p=state.profile, wg=waterGoal(), wn=state.water[todayISO()]||0, men=p.sex==="male", two=men&&!n?.minor;
+  const wk=workoutKcal(dayPlan(dayIndex()));
+  const hand=(ic,t,c,sub)=>`<div class="hand"><span class="hic">${ic}</span><b>${c}</b><span>${t}</span><small>${sub}</small></div>`;
+  const H={palm:'<svg viewBox="0 0 40 40" width="38" height="38"><rect x="9" y="12" width="22" height="22" rx="8" fill="#F2B79A"/><rect x="9" y="4" width="4.5" height="12" rx="2.2" fill="#F2B79A"/><rect x="14.5" y="2" width="4.5" height="13" rx="2.2" fill="#F2B79A"/><rect x="20" y="3" width="4.5" height="12" rx="2.2" fill="#F2B79A"/><rect x="25.5" y="6" width="4.5" height="10" rx="2.2" fill="#F2B79A"/></svg>',
+   fist:'<svg viewBox="0 0 40 40" width="38" height="38"><rect x="8" y="9" width="24" height="22" rx="9" fill="#F2B79A"/><path d="M12 15h16M12 21h16" stroke="#D9906F" stroke-width="2" stroke-linecap="round"/></svg>',
+   cup:'<svg viewBox="0 0 40 40" width="38" height="38"><path d="M6 16h28c0 9-6 16-14 16S6 25 6 16z" fill="#F2B79A"/><path d="M10 16c2-5 6-7 10-7s8 2 10 7" fill="#FFE4A8"/></svg>',
+   thumb:'<svg viewBox="0 0 40 40" width="38" height="38"><rect x="15" y="6" width="10" height="26" rx="5" fill="#F2B79A"/><rect x="16.5" y="7.5" width="7" height="6" rx="2.5" fill="#FBD6C4"/></svg>'};
   $("#v-nutrition").innerHTML=`
-  <div><h2>Nutrition & hydration</h2><p class="muted">Estimates to guide you, based on your profile and latest weigh-in.</p></div>
-  ${n?`<div class="stats four">
-    <div class="stat"><b class="mono">${Math.round(n.target).toLocaleString()}</b><span>kcal/day for ${esc(GOALS[p.goal])}</span></div>
-    <div class="stat"><b class="mono">${n.prot[0]}–${n.prot[1]} g</b><span>protein per day</span></div>
-    <div class="stat"><b class="mono">${(wg*.25).toFixed(1)} L</b><span>water per day</span></div>
-    <div class="stat"><b class="mono">${n.bmi.toFixed(1)}</b><span>BMI · ${bmiCat(n.bmi)}</span></div>
-  </div>
-  <div class="two">
-    <div class="panel"><h3>How we worked it out</h3>
-      <dl class="dl"><dt>Resting burn (BMR)</dt><dd class="mono">${Math.round(n.bmr).toLocaleString()} kcal</dd><dt>With your training</dt><dd class="mono">${Math.round(n.tdee).toLocaleString()} kcal</dd><dt>Your target</dt><dd class="mono">${Math.round(n.target).toLocaleString()} kcal</dd></dl>
-      <p class="muted small">BMR uses the Mifflin-St Jeor equation${p.sex?"":" averaged for both sexes because you didn't set one"}. ${p.goal==="fat"?"For fat loss we use a gentle 15% deficit.":p.goal==="muscle"?"For muscle gain we add about 8% to support training.":"For general fitness we aim to maintain your weight."} ${n.floorHit?"Your target is held at a safe minimum.":""}</p>
-      <p class="muted small">BMI doesn't separate muscle from fat, so use it as one signal among many.</p>
-    </div>
-    <div class="panel"><h3>Simple eating habits</h3>
-      <ul style="margin:0;padding-left:20px;display:grid;gap:6px;font-size:14px">
-        <li>Build each meal around a palm-sized protein: eggs, yogurt, fish, chicken, tofu, beans or lentils.</li>
-        <li>Fill half your plate with vegetables or fruit.</li>
-        <li>Eat a carb source like rice, oats, potatoes or bread 1–3 hours before training.</li>
-        <li>Have some protein within a few hours after your workout.</li>
-        <li>Keep treats, just plan them. Consistency beats perfection.</li>
-      </ul></div>
-  </div>`:`<div class="panel"><h3>Add your details</h3><p class="muted">Add your age and height in your profile, and log one weigh-in, to see calorie and protein targets.</p><div class="row"><a class="btn primary" href="#profile">Edit profile</a><a class="btn ghost" href="#progress">Log weight</a></div></div>`}
+  <div class="spread"><div><h2>Nutrition</h2><p class="muted">Simple guidance from your profile${p.height&&p.age?"":", add your details for personal numbers"}.</p></div>
+    <label class="tgl"><input type="checkbox" id="hideCal" ${state.hideCal?"checked":""}><span>Hide calorie numbers</span></label></div>
+  ${n&&showCal()?`<div class="nutHero">
+    <div class="ring"><b>${(Math.round(n.target/10)*10).toLocaleString()}</b><span>kcal / day</span></div>
+    <div class="nutSide"><div><b>${n.prot[0]}–${n.prot[1]} g</b><span>protein</span></div><div><b>${(wg*.25).toFixed(1)} L</b><span>water</span></div>${wk?`<div><b>${wk.lo}–${wk.hi}</b><span>kcal in today's workout*</span></div>`:""}</div></div>
+    <p class="muted small">${n.minor?"Because you're under 18, this is an energy guide to support growth and training, never a diet. Talk to a parent, doctor or dietitian before changing how you eat.":p.goal==="fat"?"Fat loss: about 15% below your daily burn, never below a safe minimum.":p.goal==="muscle"?"Muscle gain: about 8% above your daily burn to support training.":"General fitness: about what you burn, to keep your weight steady."} ${n.floorHit?"Your target is held at a safe minimum.":""} <button class="linkBtn" id="howNut">How we worked it out</button></p>`:n?"":`<div class="panel"><h3>Add your details</h3><p class="muted">Add your age, height and weight to see personal guidance.</p><div class="row"><button class="btn primary" id="nutSetup">Add my details</button></div></div>`}
+  <div class="panel"><h3>Your plate, every meal</h3>
+    <div class="plateRow"><svg class="plate" viewBox="0 0 120 120" role="img" aria-label="Half vegetables, a quarter protein, a quarter carbs">
+      <circle cx="60" cy="60" r="57" fill="#fff" stroke="#E3E7EE" stroke-width="3"/><path d="M60 60 L60 10 A50 50 0 0 0 60 110Z" fill="#5BC27A"/><path d="M60 60 L60 10 A50 50 0 0 1 110 60Z" fill="#E8735E"/><path d="M60 60 L110 60 A50 50 0 0 1 60 110Z" fill="#F2C14E"/>
+      <text x="36" y="64" font-size="10" font-weight="700" fill="#fff" text-anchor="middle">Veg</text><text x="80" y="44" font-size="9" font-weight="700" fill="#fff" text-anchor="middle">Protein</text><text x="80" y="84" font-size="9" font-weight="700" fill="#5a4300" text-anchor="middle">Carbs</text></svg>
+      <div class="hands">${hand(H.palm,"protein",two?"2 palms":"1 palm","meat, fish, eggs, tofu")}${hand(H.fist,"vegetables",two?"2 fists":"1–2 fists","any colour")}${hand(H.cup,"carbs",two?"2 cupped":"1 cupped","rice, oats, potato")}${hand(H.thumb,"fats",two?"2 thumbs":"1 thumb","oil, nuts, avocado")}</div></div>
+    <p class="muted small">Hand portions per meal, 3–4 meals a day. ${p.goal==="muscle"?"Add an extra cupped hand of carbs around workouts.":p.goal==="fat"&&!n?.minor?"If progress stalls for 2–3 weeks, remove one cupped hand of carbs from one meal.":"Adjust by hunger and energy."}</p></div>
+  <div class="panel"><h3>Easy habits</h3><div class="dodont">
+    <div class="do">${ICO.ok}<span>Protein at every meal</span></div><div class="do">${ICO.ok}<span>Carbs 1–3 h before training</span></div>
+    <div class="do">${ICO.ok}<span>Water with every meal</span></div><div class="do">${ICO.ok}<span>Sleep 7–9 hours</span></div>
+    <div class="dont">${ICO.no}<span>Skipping meals to "save" calories</span></div><div class="dont">${ICO.no}<span>Training to "burn off" food</span></div></div></div>
   <div class="panel">
     <div class="spread"><h3>Water today</h3><span class="mono">${wn} / ${wg} glasses (250 ml)</span></div>
     <div class="water">${Array.from({length:wg},(_,k)=>`<button class="glass ${k<wn?"full":""}" data-glass2="${k}" aria-label="Glass ${k+1}"></button>`).join("")}</div>
     <div class="row"><button class="btn small" id="wPlus">+ 1 glass</button><button class="btn small ghost" id="wMinus">− 1</button></div>
   </div>
-  <div class="notice">These numbers are general estimates, not medical or dietary advice. If you are pregnant or breastfeeding, under 18, have diabetes, kidney disease or another condition, or if food and weight feel stressful, talk to a doctor or registered dietitian first.</div>`;
+  <div class="notice">These numbers are general estimates, not medical or dietary advice, and are not a meal plan. If you are pregnant or breastfeeding, under 18, have diabetes, kidney disease or another condition, take medication that affects appetite or weight, or if food and weight feel stressful, talk to a doctor or registered dietitian first. If you're struggling with eating, you can reach out for confidential support (in the US: the National Alliance for Eating Disorders helpline, 1-866-662-1235).</div>`;
   const setW=v=>{state.water[todayISO()]=Math.max(0,Math.min(wg,v));save();checkBadges();renderNutrition();renderToday()};
+  $("#hideCal").onchange=e=>{state.hideCal=e.target.checked;save();renderAll()};
+  const ns=$("#nutSetup");if(ns)ns.onclick=()=>openWelcome(3);
+  const hn=$("#howNut");if(hn)hn.onclick=()=>toastMsg(`Resting burn ${Math.round(n.bmr).toLocaleString()} kcal (Mifflin-St Jeor${p.sex?"":", averaged for both sexes"}), × your activity = ${Math.round(n.tdee).toLocaleString()} kcal daily burn.${n.minor?"":` BMI ${n.bmi.toFixed(1)} (${bmiCat(n.bmi)}); BMI doesn't tell muscle from fat.`} *Workout calories: ${KCAL_NOTE()}`);
   $$("[data-glass2]").forEach(b=>b.onclick=()=>{const k=+b.dataset.glass2;setW(wn===k+1?k:k+1)});
   $("#wPlus").onclick=()=>setW(wn+1); $("#wMinus").onclick=()=>setW(wn-1);
 }
@@ -1383,7 +1507,7 @@ function renderProfile(){
   $("#v-profile").innerHTML=`
   <div><h2>Profile & data</h2><p class="muted">Your plan, your preferences, and full control over your data.</p></div>
   <div class="panel"><h3>Your profile</h3>${profileFields("pf-",state.profile)}
-    <div class="row"><button class="btn primary" id="pfSave">Save and update my plan</button><span class="muted small" id="pfMsg"></span></div></div>
+    <div class="row"><button class="btn primary" id="pfSave">Save and update my plan</button><button class="btn ghost" id="pfWizard">Redo setup with pictures</button><span class="muted small" id="pfMsg"></span></div></div>
   <div class="two">
     <div class="panel"><h3>Preferences</h3>
       <label class="row" style="gap:8px;font-weight:600"><input type="checkbox" class="switch" id="prVoice" ${state.voice?"checked":""}> Voice cues during workouts</label>
@@ -1418,6 +1542,7 @@ function renderProfile(){
     delStep=0;await deleteCloud();try{localStorage.removeItem(LSKEY);localStorage.removeItem("forma.v1")}catch(e){}state=DEFAULT();renderAll();openOnboarding(0)};
   const dc=$("#delCancel");if(dc)dc.onclick=()=>{delStep=0;renderProfile()};
   $$("[data-legal]",$("#v-profile")).forEach(b=>b.onclick=()=>openLegal(b.dataset.legal));
+  const pw=$("#pfWizard");if(pw)pw.onclick=()=>openWelcome(1);
 }
 
 
@@ -1444,26 +1569,29 @@ function legalDocs(){
   <h3>1. Who can use ${APP}</h3><p>You must be at least ${LEGAL.minAge} years old. If you are under the age of majority where you live, you may use the App only with the involvement and permission of a parent or guardian.</p>
   <h3>2. Not medical advice</h3><p>The App provides general fitness and wellness information only. It is not medical advice and is not a medical device. It doesn't diagnose, treat, cure or prevent any disease. Always consult a qualified health professional before starting any exercise or nutrition program, especially if you are pregnant, have an injury, or have a medical condition. Read our <b>Health &amp; Safety Disclaimer</b>, which forms part of these Terms.</p>
   <h3>3. Assumption of risk</h3><p>Exercise involves a risk of injury. You choose whether, how and when to exercise, and you are responsible for using equipment safely, following gym rules, and stopping if you feel pain or discomfort. To the extent permitted by law, you voluntarily assume these risks.</p>
-  <h3>4. AI coach</h3><p>The "Ask Coach" feature uses artificial intelligence to generate answers. Answers may be incomplete or wrong and are general information only. Don't rely on them for medical decisions and don't enter sensitive medical information.</p>
-  <h3>5. Your content and data</h3><p>You own the data you enter. You give us permission to store and process it only to provide the App to you, as described in our Privacy Policy and Consumer Health Data Notice.</p>
-  <h3>6. Acceptable use</h3><p>Don't misuse the App, try to break or reverse-engineer it, use it for anything unlawful, or copy its content for commercial use without permission.</p>
-  <h3>7. Our content</h3><p>The App, its name, logo, illustrations, exercise descriptions and design belong to us or our licensors and are protected by intellectual property laws. Third-party names of gym machines are used descriptively only.</p>
-  <h3>8. Third-party services</h3><p>Optional features may connect to third-party services you choose to use (for example, a calendar). Their own terms and privacy policies apply to them.</p>
-  <h3>9. Disclaimer of warranties</h3><p>The App is provided "as is" and "as available". To the fullest extent permitted by law, we disclaim all warranties, express or implied, including fitness for a particular purpose and non-infringement. We don't promise any particular fitness, weight or health result.</p>
-  <h3>10. Limitation of liability</h3><p>To the fullest extent permitted by law, we are not liable for any indirect, incidental, special or consequential damages, or for any injury arising from exercises or advice you choose to follow. Our total liability for any claim is limited to the amount you paid us for the App in the 12 months before the claim (or USD 50 if you paid nothing). Nothing in these Terms limits liability that cannot be limited by law, including for death or personal injury caused by negligence where such a limit is prohibited, or your rights as a consumer under mandatory local law.</p>
-  <h3>11. Indemnity</h3><p>To the extent permitted by law, you agree to indemnify us against claims arising from your misuse of the App or breach of these Terms.</p>
-  <h3>12. Changes and termination</h3><p>We may update the App and these Terms. We'll tell you about material changes in the App. You can stop using the App and delete your data at any time from Profile &amp; data.</p>
-  <h3>13. Governing law</h3><p>These Terms are governed by the laws of ${G}, except where the mandatory consumer laws of your country of residence give you more protection.</p>
-  <h3>14. Contact</h3><p>${C}, ${A}. Email: ${E}</p>`],
+  <h3>4. Estimates and suggestions</h3><p>Calorie targets, calories burned during workouts, protein, water, hand portions, BMI, and suggested sets, reps, rest and frequency are general estimates calculated from published formulas (such as the Mifflin-St Jeor equation and MET values from the Compendium of Physical Activities) and the details you enter. They can differ from your real needs by a large margin. They are not a diet, meal plan, prescription or medical measurement, and you should not use them to restrict food, compensate for eating, or push through pain or exhaustion. For users under 18, we do not provide calorie-deficit targets.</p>
+  <h3>5. Demonstrations</h3><p>3D figures, step pictures, drawings and animations are simplified illustrations of typical movement. They can't see you, check your form, or account for your body, injuries or equipment. Machines differ between manufacturers and gyms; follow the instructions on the machine and from gym staff. If you are a beginner, we recommend asking a qualified trainer to check your technique.</p>
+  <h3>6. Your responsibility</h3><p>You are responsible for choosing loads and intensity that are safe for you, warming up, using spotters or safety stops where appropriate, and stopping when something doesn't feel right. Results are not guaranteed and depend on many factors outside our control.</p>
+  <h3>7. AI coach</h3><p>The "Ask Coach" feature uses artificial intelligence to generate answers. Answers may be incomplete or wrong and are general information only. Don't rely on them for medical decisions and don't enter sensitive medical information.</p>
+  <h3>8. Your content and data</h3><p>You own the data you enter. You give us permission to store and process it only to provide the App to you, as described in our Privacy Policy and Consumer Health Data Notice.</p>
+  <h3>9. Acceptable use</h3><p>Don't misuse the App, try to break or reverse-engineer it, use it for anything unlawful, or copy its content for commercial use without permission.</p>
+  <h3>10. Our content</h3><p>The App, its name, logo, illustrations, exercise descriptions and design belong to us or our licensors and are protected by intellectual property laws. Third-party names of gym machines are used descriptively only.</p>
+  <h3>11. Third-party services</h3><p>Optional features may connect to third-party services you choose to use (for example, a calendar). Their own terms and privacy policies apply to them.</p>
+  <h3>12. Disclaimer of warranties</h3><p>The App is provided "as is" and "as available". To the fullest extent permitted by law, we disclaim all warranties, express or implied, including fitness for a particular purpose and non-infringement. We don't promise any particular fitness, weight or health result.</p>
+  <h3>13. Limitation of liability</h3><p>To the fullest extent permitted by law, we are not liable for any indirect, incidental, special or consequential damages, or for any injury arising from exercises or advice you choose to follow. Our total liability for any claim is limited to the amount you paid us for the App in the 12 months before the claim (or USD 50 if you paid nothing). Nothing in these Terms limits liability that cannot be limited by law, including for death or personal injury caused by negligence where such a limit is prohibited, or your rights as a consumer under mandatory local law.</p>
+  <h3>14. Indemnity</h3><p>To the extent permitted by law, you agree to indemnify us against claims arising from your misuse of the App or breach of these Terms.</p>
+  <h3>15. Changes and termination</h3><p>We may update the App and these Terms. We'll tell you about material changes in the App. You can stop using the App and delete your data at any time from Profile &amp; data.</p>
+  <h3>16. Governing law</h3><p>These Terms are governed by the laws of ${G}, except where the mandatory consumer laws of your country of residence give you more protection.</p>
+  <h3>17. Contact</h3><p>${C}, ${A}. Email: ${E}</p>`],
   privacy:["Privacy Policy",`<p><i>Last updated ${U}</i></p>
   <p>This policy explains what ${C} ("we") collects through ${APP}, why, and your choices. We designed ${APP} to collect as little as possible.</p>
   <h3>What we collect</h3><ul>
-   <li><b>Profile:</b> optional first name, age, height, sex (optional), goal, experience, equipment and schedule.</li>
+   <li><b>Profile (entered during setup or later):</b> optional first name, age, height, body weight, sex or "prefer not to say", goal, experience, equipment and schedule. We use sex only to pick your coach figure and for calorie formulas.</li>
    <li><b>Health and fitness data:</b> body weight, body measurements, workouts, sets, reps and weights, water intake, and whether your health check suggested seeing a doctor (we store only that yes/no result, not your answers).</li>
    <li><b>App settings:</b> coach, units, reminders and sound preferences.</li>
    <li><b>Ask Coach messages:</b> your questions and the answers, kept in your account (last 20) so you can see your chat.</li></ul>
   <p>We don't collect your precise location, contacts, photos, or advertising identifiers, and we don't use tracking cookies.</p>
-  <h3>How we use it</h3><p>Only to provide the App to you: build your plan, show your progress, calculate estimates, play reminders, and answer your coach questions. We don't use your data for advertising or profiling.</p>
+  <h3>How we use it</h3><p>Only to provide the App to you: build your plan, choose your coach figure, show your progress, calculate estimates (calories, protein, water, calories burned), play reminders, and answer your coach questions. We don't use your data for advertising or profiling.</p>
   <h3>Where it's stored</h3><p>By default your data is stored on your device. If you turn on "Save my health and fitness data to my account", it is also stored in your private account space, which only you can access. You can turn this off at any time and the account copy is deleted.</p>
   <h3>Sharing</h3><p>We <b>do not sell</b> your personal data or your health data, and we don't share it for targeted advertising. Data is shared only with service providers that host the App and process data on our behalf under contract, when you choose a connected service (for example, adding a reminder to your calendar sends that reminder's title and time to the calendar provider), when AI processes your Ask Coach questions, or where required by law.</p>
   <h3>Your rights</h3><p>You can access, download, correct and delete your data at any time from <b>Profile &amp; data</b>, and withdraw consent for storing health data. Depending on where you live (for example under the EU/UK GDPR, the California Consumer Privacy Act, or Washington's My Health My Data Act), you may also have rights to object, restrict processing, data portability, and to complain to your data protection authority. Contact ${E} for any request; we respond within the time the law requires.</p>
@@ -1475,7 +1603,7 @@ function legalDocs(){
   <h3>Contact</h3><p>${C}, ${A}. Email: ${E}</p>`],
   health:["Consumer Health Data Notice",`<p><i>Last updated ${U}</i></p>
   <p>This notice is for residents of Washington State, Nevada, and other places with consumer health data laws, and describes how ${C} handles "consumer health data".</p>
-  <h3>Categories of consumer health data we collect</h3><p>Body weight, body measurements, height, age, sex (optional), exercise and workout logs, water intake, fitness goals, and a yes/no result of a pre-exercise health check.</p>
+  <h3>Categories of consumer health data we collect</h3><p>Body weight, body measurements, height, age, sex (optional), exercise and workout logs, water intake, fitness goals, nutrition and calorie estimates derived from these, and a yes/no result of a pre-exercise health check.</p>
   <h3>Sources</h3><p>Directly from you, when you enter it in the App.</p>
   <h3>Purposes</h3><p>To provide your workout plan, progress tracking, nutrition estimates and reminders. Nothing else.</p>
   <h3>Consent</h3><p>We collect consumer health data only after you give consent during setup. Storing it in your account requires a separate opt-in. You can withdraw consent at any time in Profile &amp; data.</p>
@@ -1490,8 +1618,12 @@ function legalDocs(){
   <ul><li>Consult your doctor before starting any new exercise or diet program, particularly if you are pregnant or postpartum, over 40 and new to exercise, or have heart disease, high blood pressure, diabetes, joint problems, or any other condition.</li>
   <li>Stop exercising immediately and seek medical help if you feel chest pain or pressure, severe shortness of breath, dizziness, fainting, irregular heartbeat, or sharp pain. In an emergency, call your local emergency number.</li>
   <li>Use gym equipment only as the manufacturer and gym intend. Ask staff for help if you're unsure.</li>
-  <li>Calorie, protein, BMI and water figures are estimates and may not suit you. They are not a prescription.</li>
-  <li>Animated demonstrations are simplified illustrations of movement and may not show every detail of correct technique.</li>
+  <li>Calorie, protein, BMI, hand-portion and water figures are estimates and may not suit you. They are not a prescription, diet or meal plan.</li>
+  <li>"Calories burned" figures are rough ranges based on average MET values for each activity and your body weight. Actual burn can be 20–30% higher or lower, or more. Don't use them to decide how little to eat or how much extra to train.</li>
+  <li>Suggested sets, reps, rest and frequency are general starting points by experience level. Reduce them if you are new, unwell, recovering from injury, or if anything hurts.</li>
+  <li>If you are under 18, train with the knowledge and approval of a parent or guardian, and don't follow calorie-restriction advice from any app.</li>
+  <li>If you have, or think you may have, an eating disorder, please talk to a health professional before using calorie features. You can turn calorie numbers off in Nutrition. US: National Alliance for Eating Disorders helpline, 1-866-662-1235.</li>
+  <li>3D figures, step pictures and animated demonstrations are simplified illustrations of movement and may not show every detail of correct technique or suit your body.</li>
   <li>Results vary and are not guaranteed.</li></ul>
   <p>By using ${APP}, you agree that you are responsible for your own health and safety, and that you exercise at your own risk to the extent permitted by law.</p>`]};
 }
@@ -1511,7 +1643,7 @@ document.addEventListener("click",e=>{const b=e.target.closest("footer [data-leg
 /* =============== onboarding / consent gate =============== */
 const PARQ=["Has a doctor ever said you have a heart condition or high blood pressure?","Do you feel pain in your chest at rest, during daily activities, or when you exercise?","Do you lose balance because of dizziness, or have you lost consciousness in the last 12 months?","Have you been diagnosed with another chronic medical condition (for example diabetes, asthma, epilepsy)?","Are you currently taking medicine for a chronic medical condition?","Do you have a bone, joint or soft-tissue problem that could get worse with more activity?","Are you pregnant, or have you given birth in the last 6 months?","Has a doctor ever said you should only do medically supervised physical activity?"];
 let ob={step:0,ans:{},agree:false,hd:true,age:null,redo:false};
-function openOnboarding(step=0,redo=false,after=null){ob={...ob,step,redo,after,ans:{}};drawOb();const d=$("#obDlg");if(!d.open)d.showModal()}
+function openOnboarding(step=0,redo=false,after=null){ob={...ob,step,redo,after,ans:{},age:ob.age??state.profile.age};drawOb();const d=$("#obDlg");if(!d.open)d.showModal()}
 
 function drawOb(){
   const d=$("#obDlg"), S=ob.step;
@@ -1525,7 +1657,7 @@ function drawOb(){
     <div>${PARQ.map((q,k)=>`<div class="q"><span>${esc(q)}</span><div class="yn" role="group" aria-label="Answer"><button data-a="${k}:1" aria-pressed="${ob.ans[k]===1}">Yes</button><button data-a="${k}:0" aria-pressed="${ob.ans[k]===0}">No</button></div></div>`).join("")}</div>
     ${Object.values(ob.ans).includes(1)?`<div class="notice bad"><b>Please talk to a doctor before you start.</b> You answered yes to at least one question. Get medical clearance before doing the workouts, and start at a gentle level. You can still continue setting up the app.</div>`:""}
     <p class="muted small" id="obErr"></p><div class="row"><button class="btn primary big" id="obNext">${ob.redo?"Save":"Continue"}</button>${ob.redo?`<button class="btn ghost" id="obClose">Cancel</button>`:""}</div>`;
-  if(S===2)h=`${bar}<h2>Before you start</h2>
+  if(S===2)h=`${bar}<h2>${state.consent&&state.consent.v!==LEGAL.version?"We updated our terms":"Before you start"}</h2>${state.consent&&state.consent.v!==LEGAL.version?`<p class="muted">We added calorie estimates, nutrition guidance and picture guides, and updated our Terms, Privacy Policy and Health &amp; Safety Disclaimer to cover them. Please review and agree to continue.</p>`:""}
     <div class="notice"><b>${APP} is not medical advice.</b> Exercise has risks. Stop if you feel pain, dizziness, chest pain or shortness of breath, and get medical help in an emergency.</div>
     <label class="agree"><input type="checkbox" id="obAgree" ${ob.agree?"checked":""}><span>I'm ${LEGAL.minAge} or older and I agree to the <button class="linkBtn" data-legal2="terms">Terms of Use</button> and <button class="linkBtn" data-legal2="disclaimer">Health &amp; Safety Disclaimer</button>, and I've read the <button class="linkBtn" data-legal2="privacy">Privacy Policy</button>. <b>(Required)</b></span></label>
     <label class="agree"><input type="checkbox" id="obHD" ${ob.hd?"checked":""}><span>I consent to ${APP} saving my health and fitness data (weight, measurements, workouts and health-check result) to my private account so it's available on my devices. Only I can see it, it's never sold, and I can withdraw consent and delete it at any time. <button class="linkBtn" data-legal2="health">Consumer Health Data Notice</button>. <b>(Optional — without it, data stays on this device.)</b></span></label>
@@ -1551,9 +1683,98 @@ function drawOb(){
       state.parq={flag:Object.values(ob.ans).includes(1),at:todayISO()};
       if(ob.redo){save();d.close();renderAll();return} ob.step=2;drawOb();return}
     if(S===2){if(!ob.agree){err("Please tick the first box to continue.");return}
-      state.consent={v:LEGAL.version,at:new Date().toISOString(),healthData:!!ob.hd,ageConfirmed:true};save();flush();if(ob.after){const f=ob.after;ob.after=null;d.close();renderAll();f();return}ob.step=3;drawOb();return}
+      state.consent={v:LEGAL.version,at:new Date().toISOString(),healthData:!!ob.hd,ageConfirmed:true};save();flush();if(ob.after){const f=ob.after;ob.after=null;d.close();renderAll();f();return}if(state.setup){d.close();renderAll();return}ob.step=3;drawOb();return}
     if(S===3){state.profile=readProfile("ob-");if(!state.profile.age)state.profile.age=ob.age;state.start=todayISO();save();flush();d.close();renderAll();toastMsg(`Your plan is ready. Day 1 starts today with Coach ${COACH[state.coach].name}.`)}
   };
+}
+
+
+/* =============== welcome & first-run setup =============== */
+const W={step:0,ht:"cm",d:{}};
+const WICO={
+ fat:'<svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c4 0 7-2.7 7-7 0-4-3-6-4-9-1 2-2 3-3.5 3.5C11 7 11 4 9 2 9 6 5 9 5 15c0 4.3 3 7 7 7z"/></svg>',
+ muscle:'<svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10h3v4H3zM18 10h3v4h-3zM6 8h3v8H6zM15 8h3v8h-3zM9 12h6"/></svg>',
+ fit:'<svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 5.6a5 5 0 0 0-7.1 0L12 7.3l-1.7-1.7a5 5 0 1 0-7.1 7.1L12 21.5l8.8-8.8a5 5 0 0 0 0-7.1z"/><path d="M3 12h4l2-3 3 6 2-3h7"/></svg>',
+ gym:'<svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 21V4h3v17M17 21V4h3v17M7 8h10M7 16h10"/></svg>',
+ db:'<svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 10v4M5 7v10M19 7v10M22 10v4M5 12h14"/></svg>',
+ bw:'<svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="4.5" r="2"/><path d="M12 7v7M7 10l5-2 5 2M9 21l3-7 3 7"/></svg>',
+ lv:n=>`<svg viewBox="0 0 24 24" width="30" height="30" fill="currentColor">${[0,1,2].map(k=>`<rect x="${4+k*6}" y="${16-k*5}" width="4" height="${5+k*5}" rx="1" opacity="${k<=n?1:.25}"/>`).join("")}</svg>`};
+function needsSetup(){return !state.setup&&!(state.consent&&state.profile.age)}
+function openWelcome(step=0){W.step=step;W.d={name:state.profile.name||"",sex:state.profile.sex||"",age:state.profile.age||"",height:state.profile.height||"",kg:latestKg()||"",goal:state.profile.goal||"fit",level:state.profile.level||"beginner",equip:state.profile.equip||"gym",days:state.profile.days||5,mins:state.profile.mins||45};drawWelcome();$("#welcome").hidden=false;document.body.classList.add("wlOpen")}
+function closeWelcome(){$("#welcome").hidden=true;document.body.classList.remove("wlOpen")}
+function drawWelcome(){
+  const el=$("#welcome"),S=W.step,D=W.d,N=8,fig=k=>`assets/steps/bwsquat-${k}-1.webp`;
+  const dots=S>0?`<div class="wlTop"><button class="wlBack" id="wlBack" aria-label="Back">‹</button><div class="wlDots">${Array.from({length:N},(_,k)=>`<i class="${k<S?"on":""}"></i>`).join("")}</div><span style="width:40px"></span></div>`:"";
+  const card=(attr,val,on,icon,t,sub)=>`<button class="wlCard" ${attr}="${val}" aria-pressed="${on}"><span class="ic">${icon}</span><span><b>${t}</b>${sub?`<small>${sub}</small>`:""}</span></button>`;
+  let h="";
+  if(S===0)h=`<div class="wlHero"><div class="wlFigs"><img src="${fig("F")}" alt="3D woman coach"><img src="${fig("M")}" alt="3D man coach"></div>
+    <div class="wlBrand"><svg width="44" height="44" aria-hidden="true"><use href="#mxIcon"/></svg><span>${APP}</span></div>
+    <h1>Your 3D gym coach,<br><em>move by move.</em></h1>
+    <ul class="wlFeat"><li>${ICO.ok}3D coach shows every exercise</li><li>${ICO.ok}30-day plan made for you</li><li>${ICO.ok}Nutrition and calorie guide</li></ul>
+    <button class="wlBtn" id="wlNext">Get started</button><p class="wlFine">Takes 1 minute · Your data stays on your phone</p></div>`;
+  if(S===1)h=`${dots}<div class="wlQ"><h2>What should your coach call you?</h2><input class="wlIn" id="wlName" maxlength="40" autocomplete="given-name" placeholder="Your first name" value="${esc(D.name)}"><button class="wlBtn" id="wlNext">Next</button><button class="wlSkip" id="wlSkip">Skip</button></div>`;
+  if(S===2)h=`${dots}<div class="wlQ"><h2>Who's training?</h2><p>We'll match your 3D coach.</p><div class="wlSex">
+    <button data-sex="female" aria-pressed="${D.sex==="female"}"><img src="${fig("F")}" alt=""><b>Woman</b><small>Coach Maya</small></button>
+    <button data-sex="male" aria-pressed="${D.sex==="male"}"><img src="${fig("M")}" alt=""><b>Man</b><small>Coach Leo</small></button></div>
+    <button class="wlSkip" data-sex="">Prefer not to say</button></div>`;
+  if(S===3)h=`${dots}<div class="wlQ"><h2>How old are you?</h2><p>Used for your safety check and calorie estimate.</p><div class="wlNum"><button data-age="-1" aria-label="Younger">−</button><input id="wlAge" type="number" inputmode="numeric" min="1" max="110" value="${D.age||25}"><button data-age="1" aria-label="Older">+</button></div><p class="wlErr" id="wlErr"></p><button class="wlBtn" id="wlNext">Next</button></div>`;
+  if(S===4){const cm=+D.height||"",ft=cm?Math.floor(cm/30.48):"",inch=cm?Math.round(cm/2.54-ft*12):"",wv=D.kg?(state.unit==="kg"?(+D.kg).toFixed(1):(D.kg*KG2LB).toFixed(1)):"";
+    h=`${dots}<div class="wlQ"><h2>Your height and weight</h2><p>For calorie and protein guidance. You can skip this.</p>
+    <div class="wlRow"><span class="wlLbl">Height</span><div class="wlSeg"><button data-ht="cm" aria-pressed="${W.ht==="cm"}">cm</button><button data-ht="ft" aria-pressed="${W.ht==="ft"}">ft</button></div></div>
+    ${W.ht==="cm"?`<input class="wlIn" id="wlH" type="number" inputmode="numeric" placeholder="170" value="${cm}">`:`<div class="wlRow2"><input class="wlIn" id="wlFt" type="number" inputmode="numeric" placeholder="5 ft" value="${ft}"><input class="wlIn" id="wlInch" type="number" inputmode="numeric" placeholder="7 in" value="${inch}"></div>`}
+    <div class="wlRow"><span class="wlLbl">Weight</span><div class="wlSeg"><button data-wu="kg" aria-pressed="${state.unit==="kg"}">kg</button><button data-wu="lb" aria-pressed="${state.unit==="lb"}">lb</button></div></div>
+    <input class="wlIn" id="wlW" type="number" inputmode="decimal" step="0.1" placeholder="${state.unit==="kg"?"70":"155"}" value="${wv}">
+    <p class="wlErr" id="wlErr"></p><button class="wlBtn" id="wlNext">Next</button><button class="wlSkip" id="wlSkip">Skip</button></div>`}
+  if(S===5)h=`${dots}<div class="wlQ"><h2>What's your main goal?</h2><div class="wlCards">
+    ${card("data-goal","fat",D.goal==="fat",WICO.fat,"Lose fat","More cardio, steady strength")}
+    ${card("data-goal","muscle",D.goal==="muscle",WICO.muscle,"Build muscle","Heavier sets, more protein")}
+    ${card("data-goal","fit",D.goal==="fit",WICO.fit,"Get fit & healthy","Balanced strength and cardio")}</div></div>`;
+  if(S===6)h=`${dots}<div class="wlQ"><h2>Your experience</h2><div class="wlCards">
+    ${card("data-lv","beginner",D.level==="beginner",WICO.lv(0),"Beginner","New or returning · more pictures, less reading")}
+    ${card("data-lv","intermediate",D.level==="intermediate",WICO.lv(1),"Intermediate","Training 6+ months")}
+    ${card("data-lv","advanced",D.level==="advanced",WICO.lv(2),"Advanced","Training 2+ years")}</div></div>`;
+  if(S===7)h=`${dots}<div class="wlQ"><h2>Where will you train?</h2><div class="wlCards">
+    ${card("data-eq","gym",D.equip==="gym",WICO.gym,"Gym","Machines and free weights")}
+    ${card("data-eq","db",D.equip==="db",WICO.db,"Home with dumbbells","")}
+    ${card("data-eq","bw",D.equip==="bw",WICO.bw,"Home, no equipment","")}</div>
+    <div class="wlRow"><span class="wlLbl">Days per week</span><div class="wlSeg">${[3,4,5].map(k=>`<button data-days="${k}" aria-pressed="${D.days==k}">${k}</button>`).join("")}</div></div>
+    <div class="wlRow"><span class="wlLbl">Minutes per session</span><div class="wlSeg">${[30,45,60].map(k=>`<button data-mins="${k}" aria-pressed="${D.mins==k}">${k}</button>`).join("")}</div></div>
+    <button class="wlBtn" id="wlNext">Next</button></div>`;
+  if(S===8){const k=D.sex==="male"?"M":"F",coach=D.sex==="male"?"Leo":"Maya",n=nutri(),minor=D.age<18;
+    h=`${dots}<div class="wlQ wlDone"><img class="wlCoach" src="${fig(k)}" alt=""><h2>${D.name?`${esc(D.name)}, meet`:"Meet"} Coach ${coach}</h2><p>Your 30-day plan is ready.</p>
+    <div class="wlSum"><div><b>${D.days}×</b><span>per week</span></div><div><b>${D.mins}</b><span>min sessions</span></div><div><b>${["Beginner","Intermediate","Advanced"][["beginner","intermediate","advanced"].indexOf(D.level)]}</b><span>level</span></div>
+    ${n&&showCal()?`<div><b>~${(Math.round(n.target/50)*50).toLocaleString()}</b><span>kcal/day guide${minor?"":" for your goal"}</span></div>`:""}</div>
+    ${minor?`<p class="wlFine">Because you're under 18, we only show general healthy-eating guidance, never a diet. Train with a parent's or guardian's OK.</p>`:""}
+    <p class="wlFine">Before your first workout we'll do a 20-second safety check. General guidance only, not medical advice.</p>
+    <button class="wlBtn" id="wlNext">Start my plan</button></div>`}
+  el.innerHTML=`<div class="wlIn0">${h}</div>`;
+  const go=n=>{W.step=n;drawWelcome();el.scrollTop=0}, err=t=>{const e=$("#wlErr");if(e)e.textContent=t};
+  const back=$("#wlBack");if(back)back.onclick=()=>go(S-1);
+  const skip=$("#wlSkip");if(skip)skip.onclick=()=>go(S+1);
+  $$("[data-sex]",el).forEach(b=>b.onclick=()=>{D.sex=b.dataset.sex;state.coach=D.sex==="male"?"leo":"maya";state.view3d=null;go(3)});
+  $$("[data-goal]",el).forEach(b=>b.onclick=()=>{D.goal=b.dataset.goal;go(6)});
+  $$("[data-lv]",el).forEach(b=>b.onclick=()=>{D.level=b.dataset.lv;go(7)});
+  $$("[data-eq]",el).forEach(b=>b.onclick=()=>{D.equip=b.dataset.eq;drawWelcome()});
+  $$("[data-days]",el).forEach(b=>b.onclick=()=>{D.days=+b.dataset.days;drawWelcome()});
+  $$("[data-mins]",el).forEach(b=>b.onclick=()=>{D.mins=+b.dataset.mins;drawWelcome()});
+  $$("[data-age]",el).forEach(b=>b.onclick=()=>{const i=$("#wlAge");i.value=Math.max(1,Math.min(110,(+i.value||25)+(+b.dataset.age)))});
+  const readBody=()=>{if(W.ht==="cm"){const v=$("#wlH")?.value;D.height=v?+v:""}else{const f=+($("#wlFt")?.value||0),i=+($("#wlInch")?.value||0);D.height=f||i?Math.round((f*12+i)*2.54):""}
+    const w=$("#wlW")?.value;D.kg=w?+(state.unit==="kg"?+w:w/KG2LB).toFixed(2):""};
+  $$("[data-ht]",el).forEach(b=>b.onclick=()=>{readBody();W.ht=b.dataset.ht;drawWelcome()});
+  $$("[data-wu]",el).forEach(b=>b.onclick=()=>{readBody();state.unit=b.dataset.wu;drawWelcome()});
+  const nx=$("#wlNext");if(nx)nx.onclick=()=>{unlockAudio();
+    if(S===1)D.name=$("#wlName").value.trim();
+    if(S===3){const a=+$("#wlAge").value;if(!a){err("Please enter your age.");return}
+      if(a<LEGAL.minAge){el.innerHTML=`<div class="wlIn0"><div class="wlQ"><h2>Sorry, ${APP} isn't for you yet</h2><p>${APP} is designed for people aged ${LEGAL.minAge} and over. Staying active is great at any age; ask a parent, PE teacher or coach about activities that suit you.</p></div></div>`;return}
+      if(a>110){err("Please check your age.");return}D.age=a}
+    if(S===4){readBody();if(D.height&&(D.height<100||D.height>250)){err("Height looks unusual. Please check it.");return}if(D.kg&&(D.kg<30||D.kg>350)){err("Weight looks unusual. Please check it.");return}
+      state.profile.height=D.height||null;state.profile.age=D.age;state.profile.sex=D.sex;
+      if(D.kg){const t=todayISO();state.weights=state.weights.filter(x=>x.d!==t);state.weights.push({d:t,kg:D.kg});state.weights.sort((a,b)=>a.d<b.d?-1:1)}}
+    if(S===8){state.profile={...state.profile,name:D.name,sex:D.sex,age:D.age||null,height:D.height||null,goal:D.goal,level:D.level,equip:D.equip,days:D.days,mins:D.mins};
+      state.setup=true;state.start=todayISO();save();closeWelcome();renderAll();toastMsg(`Your plan is ready${D.name?", "+D.name:""}. Day 1 starts today with Coach ${COACH[state.coach].name}.`);return}
+    if(S===8-1||S<8){Object.assign(state.profile,{goal:D.goal,level:D.level,equip:D.equip,days:D.days,mins:D.mins,sex:D.sex,age:D.age||state.profile.age})}
+    go(S+1)};
+  const ni=$("#wlName");if(ni)ni.onkeydown=e=>{if(e.key==="Enter")nx.click()};
 }
 
 /* =============== audio =============== */
@@ -1624,7 +1845,7 @@ function buildSteps(d){
 }
 function startPlayer(i){
   const d=dayPlan(i); if(!d.list.length)return; unlockAudio();
-  if(!state.consent){openOnboarding(0,false,()=>startPlayer(i));return}
+  if(!state.consent||state.consent.v!==LEGAL.version){openOnboarding(state.consent?2:(state.profile.age?1:0),false,()=>startPlayer(i));return}
   PL={i,d,steps:buildSteps(d),p:0,t0:Date.now(),sets:{},left:0,run:false,tick:null,prsBefore:prs()};
   const dlg=$("#player"); drawPlayer(); if(!dlg.open)dlg.showModal();
   try{navigator.wakeLock?.request("screen").then(w=>PL.wl=w).catch(()=>{})}catch(e){}
@@ -1720,15 +1941,20 @@ function openEx(id){
   dlgHTML(`<div class="mGrid"><div class="mLeft">${use3d?`<div class="viewTabs"><div class="seg2" role="group" aria-label="View"><button data-view="3d" aria-pressed="true">3D coach</button>${ILL.has(id)?`<button data-view="2d" aria-pressed="false">Drawing</button>`:""}</div></div><div class="c3wrap" id="c3host"></div>`:""}<div class="mStage ${ILL.has(id)?"ill":""}" id="m2d" ${use3d?"hidden":""}>${ILL.has(id)?stageSVG(id).replace('class="demo"','class="demo big" id="bigDemo"'):`<svg viewBox="0 0 200 190" data-big="1" role="img" aria-label="${esc(e.name)} demo">${drawSVG(e,0)}</svg>`}<div class="ctrl"><button class="btn small" id="pp">Pause</button><button class="btn small" id="slow">Slow</button></div>${ILL.has(id)?`<span class="credit">Illustration: Everkinetic, CC BY-SA 3.0</span>`:""}</div></div>
   <div class="mBody">
     <div>${catPill(e.cat)}<h2 id="dlgTitle" style="margin-top:8px">${esc(e.name)}</h2></div>
+    ${doseBlock(id)}
+    <div><span class="label">Step by step</span>${stepsStrip(id)}</div>
     <div class="mapWrap">${window.muscleMap?muscleMap(mm[0],mm[1]):""}</div>
     <div class="legend2"><span><i class="p"></i>Main muscles</span><span><i></i>Helper muscles</span></div>
     ${musList(id)}
     <dl class="dl"><dt>Works</dt><dd>${esc(e.muscles)}</dd><dt>Equipment</dt><dd>${esc(e.equip)}</dd>${mach.length?`<dt>Machine</dt><dd>${esc(mach.join(", "))}</dd>`:""}${alts.length?`<dt>Alternatives</dt><dd>${alts.map(a=>esc(EX[a].name)).join(", ")}</dd>`:""}</dl>
+    ${LV()===0?`<div class="dodont">${e.cues.slice(0,2).map(s=>`<div class="do">${ICO.ok}<span>${esc(s)}</span></div>`).join("")}${e.mistakes.slice(0,2).map(s=>`<div class="dont">${ICO.no}<span>${esc(s)}</span></div>`).join("")}</div>
+    <details class="more"><summary>Read the full instructions</summary><ol>${e.steps.map(s=>`<li>${esc(s)}</li>`).join("")}</ol><span class="label">Coach ${COACH[state.coach].name}'s cues</span><ul>${e.cues.map(s=>`<li>${esc(s)}</li>`).join("")}</ul><span class="label">Avoid</span><ul>${e.mistakes.map(s=>`<li>${esc(s)}</li>`).join("")}</ul></details>`:`
     <div><span class="label">How to do it</span><ol>${e.steps.map(s=>`<li>${esc(s)}</li>`).join("")}</ol></div>
     <div><span class="label">Coach ${COACH[state.coach].name}'s cues</span><ul>${e.cues.map(s=>`<li>${esc(s)}</li>`).join("")}</ul></div>
-    <div><span class="label">Avoid</span><ul>${e.mistakes.map(s=>`<li>${esc(s)}</li>`).join("")}</ul></div>
-    <p class="muted small">Simplified illustration. Stop if you feel pain.</p>
+    <div><span class="label">Avoid</span><ul>${e.mistakes.map(s=>`<li>${esc(s)}</li>`).join("")}</ul></div>`}
+    <p class="muted small">3D figures and pictures are simplified demonstrations, not a full technique assessment. Stop if you feel pain, and ask a qualified trainer to check your form.</p>
   </div></div>`);
+  $$("[data-kcalinfo]",dlg).forEach(b=>b.onclick=()=>toastMsg(KCAL_NOTE()));
   dlgId=id;paused=false;
   if(use3d){const mount=()=>window.MX3D.mount($("#c3host"),{id,EX,MUS,kind:who3d(),skin:state.skin3d??1,onKind:k=>{state.view3d=k;save()}});
     if(window.MX3D&&window.MX3D.ready)mount();else window.addEventListener("mx3d-ready",mount,{once:true});
@@ -1766,8 +1992,9 @@ function renderAll(){
   $$("header [data-coach]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.coach===state.coach)));
   renderToday();renderPlan();renderExercises();renderMachines();renderProgress();renderNutrition();renderCoach();renderReminders();renderProfile();renderMore();route();
 }
-function boot(){renderAll();if(state.consent&&$("#obDlg").open&&!ob.redo)$("#obDlg").close()}
+function boot(){if(state.consent&&state.profile.age&&!state.setup)state.setup=true;renderAll();if(needsSetup())openWelcome(0);if(state.consent&&$("#obDlg").open&&!ob.redo)$("#obDlg").close()}
 $("#copy").textContent=`© ${new Date().getFullYear()} ${APP}`;
+window.__MX={EX,MUS,ILL};
 boot();
 connectCloud();
 if(NATIVE)syncNative(true);

@@ -356,6 +356,7 @@ const PROPS3={
  pull:()=>latMachine(),
  cableLow:()=>{const g=new THREE.Group();g.add(boxFrom(180,40,190,181,M.dark,.3));g.add(boxFrom(40,160,100,168,M.pad,.4));g.add(boxFrom(150,150,158,180,M.dark,.45));const pl=new THREE.Mesh(new THREE.TorusGeometry(.04,.01,8,20),M.steel);const p=c2(184,150);pl.position.set(p[0],p[1],0);g.add(pl);return g},
  box:()=>boxFrom(108,150,158,181,M.pad,.5),
+ hyper:()=>{const g=new THREE.Group();g.add(boxFrom(84,124,112,132,M.pad,.42));g.add(bar2(98,132,84,181,.035,M.dark));g.add(bar2(46,170,84,181,.03,M.dark));g.add(boxFrom(36,160,54,168,M.pad,.36));g.add(boxFrom(40,179,104,181,M.dark,.5));return g},
  tread:()=>{const g=new THREE.Group();g.add(boxFrom(30,178,170,186,M.dark,.7));g.add(pair(z=>bar2(160,178,176,100,.025,M.dark,z*1.6)));g.add(bar2(176,100,150,100,.02,M.steel,.32),bar2(176,100,150,100,.02,M.steel,-.32));g.add(boxFrom(170,96,180,104,M.accent,.5));return g},
  ellip:()=>{const g=new THREE.Group();g.add(boxFrom(40,178,160,184,M.dark,.5));g.add(bar2(160,180,166,70,.03,M.dark));g.add(bar2(166,72,166,72,.02,M.steel));return g},
  bike:()=>{const g=new THREE.Group();g.add(bar2(88,124,112,160,.035,M.dark),bar2(112,160,150,96,.035,M.dark),bar2(70,182,160,182,.035,M.dark));g.add(boxFrom(74,118,100,126,M.pad,.16));const w=new THREE.Mesh(new THREE.CylinderGeometry(20*S2,20*S2,.05,28),M.plate);w.rotation.x=Math.PI/2;const p=c2(116,158);w.position.set(p[0],p[1],0);g.add(w);g.add(bar2(150,96,150,96,.02,M.steel));const hb=bar2(150,96,150,96,.02,M.steel);const q=c2(150,96);g.add(tube([q[0],q[1],-.2],[q[0],q[1],.2],.018,M.steel));return g},
@@ -399,8 +400,9 @@ function conv2(f,kind){
   const handAt=a=>{const dx=(a[1][0]-r.s[0])*armS,dy=-(a[1][1]-r.s[1])*armS;return [sh3[0]+dx,Math.max(.03,sh3[1]+dy)]};
   const footAt=l=>{const dx=(l[1][0]-r.h[0])*legS,dy=-(l[1][1]-r.h[1])*legS;return [hip[0]+dx,Math.max(.075,hip[1]+dy)]};
   const hL=handAt(r.a1),hR=handAt(r.a2),fL=footAt(r.l1),fR=footAt(r.l2);
-  return {root,pitch:f.t,handL:[hL[0],hL[1],.2],handR:[hR[0],hR[1],-.2],footL:[fL[0],fL[1],.12],footR:[fR[0],fR[1],-.12],
-    ePoleL:pole(r.s,r.a1[0],r.a1[1]),ePoleR:(()=>{const q=pole(r.s,r.a2[0],r.a2[1]);return [q[0],q[1],-.3]})(),
+  const hz=f.hz??.2,ep=f.ep;
+  return {root,pitch:f.t,handL:[hL[0],hL[1],hz],handR:[hR[0],hR[1],-hz],footL:[fL[0],fL[1],.12],footR:[fR[0],fR[1],-.12],
+    ePoleL:ep?[ep[0],ep[1],ep[2]]:pole(r.s,r.a1[0],r.a1[1]),ePoleR:ep?[ep[0],ep[1],-ep[2]]:(()=>{const q=pole(r.s,r.a2[0],r.a2[1]);return [q[0],q[1],-.3]})(),
     kPoleL:pole(r.h,r.l1[0],r.l1[1]),kPoleR:(()=>{const q=pole(r.h,r.l2[0],r.l2[1]);return [q[0],q[1],-.3]})(),
     hand:[0,0,0],foot:[0,0,0]};
 }
@@ -474,7 +476,7 @@ function drawCallouts(){
       <foreignObject x="${bx}" y="${q.ly}" width="${BW}" height="${BH+4}"><div xmlns="http://www.w3.org/1999/xhtml" class="m3label ${L?"":"r"}"><b>${M_.name}</b><span>${M_.latin.split(" · ")[0]}</span></div></foreignObject>`}}
   ui.svg.setAttribute("viewBox",`0 0 ${w} ${h}`);ui.svg.innerHTML=html;
 }
-const CAMS={front:[3.2,0,0],side:[.1,0,3.3],diag:[2.4,.35,2.4],top:[1,2.6,.7]};
+const CAMS={back:[-3.2,0,.15],front:[3.2,0,0],side:[.1,0,3.3],diag:[2.4,.35,2.4],top:[1,2.6,.7]};
 let camKey="diag",camFrom=null,camTo=null,camK=1;
 function camFor(k){const tg=V(...(mv?.cam?.target||[0,.85,0]));const o=CAMS[k];const ext=mv?.props==="lat"||mv?.converted&&(mv.props2||[]).some(x=>["pull","cableLow","tread","legpress"].includes(x))?1.15:1;return {p:V(tg.x+o[0]*ext,tg.y+.35+o[1]*ext,tg.z+o[2]*ext),t:tg}}
 function setCam(k,instant){camKey=k;const c=camFor(k);if(instant){camera.position.copy(c.p);controls.target.copy(c.t);camK=1}else{camFrom={p:camera.position.clone(),t:controls.target.clone()};camTo=c;camK=0}
