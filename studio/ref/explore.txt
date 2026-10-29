@@ -1,0 +1,116 @@
+enabled mpfb
+['bl_ext.user_default.mpfb']
+get_log_dir /home/runner/.config/blender/4.2/extensions/.user/user_default/mpfb/logs
+get_mh_user_data None
+get_mpfb_data /home/runner/.config/blender/4.2/extensions/user_default/mpfb/data
+get_mpfb_root /home/runner/.config/blender/4.2/extensions/user_default/mpfb
+get_mpfb_test /home/runner/.config/blender/4.2/extensions/test
+get_second_root None
+get_user_cache /home/runner/.config/blender/4.2/extensions/.user/user_default/mpfb/cache
+get_user_config /home/runner/.config/blender/4.2/extensions/.user/user_default/mpfb/config
+get_user_data /home/runner/.config/blender/4.2/extensions/.user/user_default/mpfb/data
+get_user_home /home/runner/.config/blender/4.2/extensions/.user/user_default/mpfb
+MODULE animationservice
+MODULE assetservice
+MODULE blenderconfigset
+MODULE clothesservice
+MODULE configurationset
+MODULE dynamicconfigset
+MODULE exportservice
+MODULE faceservice
+MODULE hairbakeservice
+MODULE haircardservice
+MODULE haireditorservices
+MODULE hairoverlayservice
+MODULE humanservice
+MODULE jsoncall
+MODULE locationservice
+MODULE logservice
+MODULE materialservice
+MODULE meshservice
+MODULE modifierservice
+MODULE nodeservice
+MODULE nodetreeservice
+MODULE objectservice
+MODULE randomizationservice
+MODULE rigservice
+MODULE sceneconfigset
+MODULE socketservice
+MODULE systemservice
+MODULE targetservice
+MODULE uiservice
+HumanService.__init__ (self) -> None
+HumanService._apply_expressions_from_human_info (human_info: dict[str, typing.Any], basemesh: bpy_types.Object) -> None
+HumanService._check_add_bodyparts (human_info: dict[str, typing.Any], basemesh: bpy_types.Object, subdiv_levels: int = 1, material_model: str | None = None, eyes_material_model: str | None = None) -> None
+HumanService._check_add_clothes (human_info: dict[str, typing.Any], basemesh: bpy_types.Object, subdiv_levels: int = 1, material_model: str | None = None) -> None
+HumanService._check_add_proxy (human_info: dict[str, typing.Any], basemesh: bpy_types.Object, subdiv_levels: int = 1) -> None
+HumanService._check_add_rig (human_info: dict[str, typing.Any], basemesh: bpy_types.Object) -> None
+HumanService._check_parse_mhm_bodypart_line (human_info: dict[str, typing.Any], line: str, perform_deep_search: bool = True) -> bool
+HumanService._check_parse_mhm_clothes_line (human_info: dict[str, typing.Any], line: str, perform_deep_search: bool = False) -> bool
+HumanService._create_default_human_info_dict () -> dict[str, typing.Any]
+HumanService._load_targets (human_info: dict[str, typing.Any], basemesh: bpy_types.Object) -> None
+HumanService._parse_mhm_modifier_line (human_info: dict[str, typing.Any], line: str) -> None
+HumanService._populate_alternative_material (human_info: dict[str, typing.Any], obj: bpy_types.Object | None) -> None
+HumanService._populate_human_info_with_basemesh_info (human_info: dict[str, typing.Any], basemesh: bpy_types.Object) -> None
+HumanService._populate_human_info_with_bodyparts_info (human_info: dict[str, typing.Any], basemesh: bpy_types.Object) -> None
+HumanService._populate_human_info_with_clothes_info (human_info: dict[str, typing.Any], basemesh: bpy_types.Object) -> None
+HumanService._populate_human_info_with_expression_info (human_info: dict[str, typing.Any], basemesh: bpy_types.Object) -> None
+HumanService._populate_human_info_with_eye_material_info (human_info: dict[str, typing.Any], basemesh: bpy_types.Object) -> None
+HumanService._populate_human_info_with_makeup_info (human_info: dict[str, typing.Any], basemesh: bpy_types.Object) -> None
+HumanService._populate_human_info_with_proxy_info (human_info: dict[str, typing.Any], basemesh: bpy_types.Object) -> None
+HumanService._populate_human_info_with_rig_info (human_info: dict[str, typing.Any], basemesh: bpy_types.Object) -> None
+HumanService._populate_human_info_with_skin_info (human_info: dict[str, typing.Any], basemesh: bpy_types.Object) -> None
+HumanService._proxy_corrective (proxymesh: bpy_types.Object) -> None
+HumanService._set_eyes (human_info: dict[str, typing.Any], basemesh: bpy_types.Object, material_model: str | None = None) -> None
+HumanService._set_skin (human_info: dict[str, typing.Any], basemesh: bpy_types.Object) -> None
+HumanService.add_builtin_rig (basemesh: bpy_types.Object, rig_name: str, *, import_weights: bool = True, operator: bpy_types.Operator | None = None) -> bpy_types.Object | None
+HumanService.add_custom_rig (basemesh: bpy_types.Object, rig_name: str, *, import_weights: bool = True, operator: bpy_types.Operator | None = None) -> bpy_types.Object | None
+HumanService.add_mhclo_asset (mhclo_file: str, basemesh: bpy_types.Object, asset_type: str = 'Clothes', subdiv_levels: int = 1, material_type: str = 'MAKESKIN', alternative_materials: dict[str, str] | None = None, color_adjustments: dict[str, dict[str, typing.Any]] | None = None, set_up_rigging: bool = True, interpolate_weights: bool = True, import_subrig: bool = True, import_weights: bool = True, *, operator: bpy_types.Operator | None = None) -> bpy_types.Object
+HumanService.create_human (mask_helpers: bool = True, detailed_helpers: bool = True, extra_vertex_groups: bool = True, feet_on_ground: bool = True, scale: float = 0.1, macro_detail_dict: dict[str, typing.Any] | None = None) -> bpy_types.Object
+HumanService.deserialize_from_dict (human_info: dict[str, typing.Any], deserialization_settings: dict[str, typing.Any]) -> bpy_types.Object
+HumanService.deserialize_from_json_file (filename: str, deserialization_settings: dict[str, typing.Any]) -> bpy_types.Object
+HumanService.deserialize_from_mhm (filename: str, deserialization_settings: dict[str, typing.Any]) -> bpy_types.Object
+HumanService.get_asset_sources_of_equipped_mesh_assets (basemesh: bpy_types.Object | None) -> list[str]
+HumanService.get_default_deserialization_settings () -> dict[str, typing.Any]
+HumanService.get_list_of_human_presets (as_list_enum: bool = True, use_cache: bool = True) -> list[str] | list[tuple[str, str, str]]
+HumanService.refit (blender_object: bpy_types.Object | None, *, operator: bpy_types.Operator | None = None) -> None
+HumanService.serialize_to_json_file (basemesh: bpy_types.Object | None, filename: str, save_clothes: bool = False) -> None
+HumanService.serialize_to_json_string (basemesh: bpy_types.Object | None, save_clothes: bool = False) -> str
+HumanService.set_character_skin (mhmat_file: str | None, basemesh: bpy_types.Object, bodyproxy: bpy_types.Object | None = None, skin_type: str = 'ENHANCED_SSS', material_instances: bool = True, slot_overrides: dict[str, dict[str, typing.Any]] | None = None, *, operator: bpy_types.Operator | None = None) -> None
+HumanService.unload_mhclo_asset (basemesh: bpy_types.Object | None, asset: bpy_types.Object | None) -> None
+HumanService.update_list_of_human_presets () -> None
+TargetService.__init__ (self) -> None
+TargetService._interpolate_macro_components (macro_name: str, value: float) -> list[list[typing.Any]]
+TargetService._load_mirror_table () -> None
+TargetService._set_shape_key_coords_from_dict (blender_object: bpy_types.Object, shape_key: bpy.types.ShapeKey, info: dict[str, typing.Any], *, scale_factor: float | None = None) -> None
+TargetService._target_string_to_shape_key_info (target_string: str, shape_key_name: str) -> dict[str, typing.Any]
+TargetService.bake_targets (basemesh: bpy_types.Object) -> None
+TargetService.bulk_load_targets (blender_object: bpy_types.Object, target_stack: collections.abc.Iterable[bl_ext.user_default.mpfb.services.targetservice.TargetStackEntry], encode_target_names: bool = False) -> None
+TargetService.calculate_target_stack_from_macro_info_dict (macro_info: dict[str, typing.Any] | None, cutoff: float = 0.01) -> list[list[typing.Any]]
+TargetService.create_shape_key (blender_object: bpy_types.Object, shape_key_name: str, also_create_basis: bool = True, create_from_mix: bool = False) -> bpy.types.ShapeKey
+TargetService.decode_shapekey_name (encoded_name: str) -> str
+TargetService.encode_shapekey_name (original_name: str) -> str
+TargetService.expression_name_to_shapekey_name (face_unit_name: str) -> str
+TargetService.filename_to_shapekey_name (filename: str, *, macrodetail: bool | None = False, encode_name: bool | None = None) -> str
+TargetService.get_current_macro_targets (basemesh: bpy_types.Object | None, decode_names: bool = True) -> list[str]
+TargetService.get_default_macro_info_dict () -> dict[str, typing.Any]
+TargetService.get_macro_info_dict_from_basemesh (basemesh: bpy_types.Object) -> dict[str, typing.Any]
+TargetService.get_shape_key_as_dict (blender_object: bpy_types.Object | None, shape_key_name: str | bpy.types.ShapeKey, *, smaller_than_counts_as_unmodified: float = 0.0001, only_modified_verts: bool = True) -> dict[str, typing.Any]
+TargetService.get_target_stack (blender_object: bpy_types.Object | None, exclude_starts_with: str | collections.abc.Iterable[str] | None = None, exclude_ends_with: str | collections.abc.Iterable[str] | None = None) -> list[bl_ext.user_default.mpfb.services.targetservice.TargetStackEntry]
+TargetService.get_target_value (blender_object: bpy_types.Object | None, target_name: str | None) -> float
+TargetService.has_any_shapekey (blender_object: bpy_types.Object | None) -> bool
+TargetService.has_target (blender_object: bpy_types.Object | None, target_name: str | None, also_check_for_encoded: bool = True) -> bool
+TargetService.load_target (blender_object: bpy_types.Object | None, full_path: str, *, weight: float = 0.0, name: str | None = None) -> bpy.types.ShapeKey
+TargetService.macrodetail_filename_to_shapekey_name (filename: str, encode_name: bool = False) -> str
+TargetService.prune_shapekeys (blender_object: bpy_types.Object, cutoff: float = 0.0001) -> None
+TargetService.reapply_all_details (basemesh: bpy_types.Object, remove_zero_weight_targets: bool = True) -> None
+TargetService.reapply_macro_details (basemesh: bpy_types.Object, remove_zero_weight_targets: bool = True) -> None
+TargetService.set_target_value (blender_object: bpy_types.Object | None, target_name: str | None, value: float, delete_target_on_zero: bool = False) -> None
+TargetService.shape_key_info_as_target_string (shape_key_info: dict[str, typing.Any], include_header: bool = True) -> str
+TargetService.shapekey_is_target (shapekey_name: str | None) -> bool
+TargetService.shapekey_name_to_expression_name (shapekey_name: str | None) -> str | None
+TargetService.symmetrize_shape_key (blender_object: bpy_types.Object, shape_key_name: str, copy_left_to_right: bool = True) -> None
+TargetService.target_full_path (target_name: str) -> str | None
+TargetService.target_string_to_shape_key (target_string: str, shape_key_name: str, blender_object: bpy_types.Object, *, reuse_existing: bool = False) -> bpy.types.ShapeKey
+TargetService.translate_mhm_target_line_to_target_fragment (mhm_line: str) -> bl_ext.user_default.mpfb.services.targetservice.TargetStackEntry
+created <bpy_struct, Object("Human") at 0x7f48be913b08> Human 19158
