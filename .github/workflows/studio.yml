@@ -1,0 +1,45 @@
+name: Studio 3D humans
+
+on:
+  push:
+    branches: [studio]
+    paths: ["studio/scripts/**", ".github/workflows/studio.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Blender 4.2 LTS
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq libxi6 libxxf86vm1 libxfixes3 libxrender1 libgl1 libxkbcommon0 libsm6 > /dev/null
+          curl -sSL -o /tmp/b.tar.xz https://download.blender.org/release/Blender4.2/blender-4.2.3-linux-x64.tar.xz
+          mkdir -p /opt/blender && tar -xf /tmp/b.tar.xz -C /opt/blender --strip-components=1
+          /opt/blender/blender --version | head -1
+      - name: Install MPFB2 (MakeHuman plugin, GPL) and CC0 system assets
+        run: |
+          git clone --depth 1 https://github.com/makehumancommunity/mpfb2 /tmp/mpfb2
+          EXT=$HOME/.config/blender/4.2/extensions/user_default
+          mkdir -p $EXT && cp -r /tmp/mpfb2/src/mpfb $EXT/mpfb
+          curl -sSL -o /tmp/sys.zip https://files.makehumancommunity.org/asset_packs/makehuman_system_assets/makehuman_system_assets_cc0.zip || curl -sSL -o /tmp/sys.zip https://files2.makehumancommunity.org/asset_packs/makehuman_system_assets/makehuman_system_assets_cc0.zip
+          ls -la /tmp/sys.zip && unzip -l /tmp/sys.zip | head -30
+          mkdir -p studio/ref && cp -r /tmp/mpfb2/docs studio/ref/mpfb-docs || true
+          ls /tmp/mpfb2/src/mpfb/services > studio/ref/services.txt
+      - name: Run
+        env:
+          LOG: ${{ github.workspace }}/studio/ref/explore.txt
+        run: |
+          /opt/blender/blender -b --factory-startup -noaudio --python-exit-code 1 --python studio/scripts/explore.py 2>&1 | tail -80 || true
+          unzip -l /tmp/sys.zip | awk '{print $4}' | sed -n '1,4000p' > studio/ref/sysassets_list.txt
+      - name: Commit results
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add studio
+          git commit -m "Studio: results" || echo nothing
+          git push
