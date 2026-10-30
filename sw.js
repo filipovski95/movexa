@@ -1,5 +1,5 @@
 // MOVEXA offline cache: app shell is cached on first visit, then works without internet.
-const CACHE="movexa-v7";
+const CACHE="movexa-v8";
 const SHELL=["./","index.html","manifest.webmanifest","icon.svg","icon-192.png","icon-512.png","coach-kb.js","musclemap.js","guide.js","coach3d.js","vendor/three.module.js","vendor/jsm/controls/OrbitControls.js","vendor/jsm/geometries/RoundedBoxGeometry.js","vendor/jsm/loaders/GLTFLoader.js","vendor/jsm/utils/BufferGeometryUtils.js","vendor/jsm/utils/SkeletonUtils.js","assets/human/male.gltf.json","assets/human/female.gltf.json"];
 self.addEventListener("install",e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(SHELL)).then(()=>self.skipWaiting()))});
 self.addEventListener("activate",e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});

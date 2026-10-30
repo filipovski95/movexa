@@ -383,7 +383,7 @@ float hiK=hk*(1.-clothK);`)
           if(e<1){const al=Math.min(.98,Math.abs(l/W));if(front||al<.7){const sg=f<-.02?-1:1,fs=(sg>0?D:(PF.bk[j]+r))*Math.pow(1-al**2.5,1/2.5);out.addScaledVector(fP,sg*fs-f)}else{const k=1/e-1;out.addScaledVector(fP,f*k).addScaledVector(lP,l*k)}}}}
       const q=h.clone().add(out);
       for(const [a2,b2] of thighs){const ax=V().subVectors(b2,a2),L=ax.length();ax.normalize();const t=Math.max(0,Math.min(L,V().subVectors(q,a2).dot(ax))),c=a2.clone().addScaledVector(ax,t),d=V().subVectors(q,c),rr=thR*(1-.3*t/L)+r,dl=d.length();
-        if(dl<rr&&t>-.01){const dir=front?fP.clone():(dl>1e-3?d.normalize():V()).addScaledVector(fP,.8).normalize();const m=V().copy(c).addScaledVector(dir,rr).sub(q);q.add(m);out.add(m)}}
+        if(dl<rr&&t>-.01){const dir=front?fP.clone():(dl>1e-3?d.clone().normalize():V()).addScaledVector(fP,.8).normalize();const dd=d.clone(),bb=dd.dot(dir),sv=-bb+Math.sqrt(Math.max(0,bb*bb-(dd.lengthSq()-rr*rr))),m=dir.clone().multiplyScalar(sv);q.add(m);out.add(m)}}
       return out};
     const solveArm=(sh,hand,a,c,pole)=>{const tot=a+c,reach=tot*.995,h0=hand.clone();let res;const front=Math.abs(V().subVectors(hand,pv).dot(lP))<Math.abs(V().subVectors(sh,pv).dot(lP))*.75;
       for(let it=0;it<10;it++){const d=V().subVectors(hand,sh);if(d.length()>reach)hand.copy(sh).addScaledVector(d.normalize(),reach);
