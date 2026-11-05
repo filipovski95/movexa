@@ -528,7 +528,12 @@ const PROPS3={
  ellip:()=>{const g=new THREE.Group();g.add(boxFrom(40,178,160,184,M.dark,.5));g.add(bar2(160,180,166,70,.03,M.dark));g.add(bar2(166,72,166,72,.02,M.steel));return g},
  bike:()=>{const g=new THREE.Group();g.add(bar2(88,124,112,160,.035,M.dark),bar2(112,160,150,96,.035,M.dark),bar2(70,182,160,182,.035,M.dark));g.add(boxFrom(74,118,100,126,M.pad,.16));const w=new THREE.Mesh(new THREE.CylinderGeometry(20*S2,20*S2,.05,28),M.plate);w.rotation.x=Math.PI/2;const p=c2(116,158);w.position.set(p[0],p[1],0);g.add(w);g.add(bar2(150,96,150,96,.02,M.steel));const hb=bar2(150,96,150,96,.02,M.steel);const q=c2(150,96);g.add(tube([q[0],q[1],-.2],[q[0],q[1],.2],.018,M.steel));return g},
  rower:()=>{const g=new THREE.Group();g.add(boxFrom(20,168,180,175,M.dark,.18));g.add(boxFrom(128,150,136,176,M.dark,.4));const w=new THREE.Mesh(new THREE.CylinderGeometry(16*S2,16*S2,.12,28),M.plate);w.rotation.x=Math.PI/2;const p=c2(168,150);w.position.set(p[0],p[1],0);g.add(w);return g},
- legpress:()=>{const g=new THREE.Group();const s=new THREE.Mesh(new THREE.BoxGeometry(.6,.06,.5),M.pad);const a=c2(40,150),b=c2(92,166);s.position.set((a[0]+b[0])/2,(a[1]+b[1])/2,0);s.rotation.z=Math.atan2(b[1]-a[1],b[0]-a[0])+.5;g.add(s);g.add(bar2(40,181,190,181,.03,M.dark));g.add(bar2(120,181,186,100,.025,M.steel,.3),bar2(120,181,186,100,.025,M.steel,-.3));return g}
+ legpress:()=>{const g=new THREE.Group();// 45° sled: reclined back pad, seat, floor frame, rails for the foot plate
+  const slab=(x1,y1,x2,y2,th,w,mat)=>{const a=c2(x1,y1),b=c2(x2,y2),L=Math.hypot(b[0]-a[0],b[1]-a[1]),m=box(L,th,w,mat,.03);m.position.set((a[0]+b[0])/2,(a[1]+b[1])/2,0);m.rotation.z=Math.atan2(b[1]-a[1],b[0]-a[0]);return m};
+  g.add(slab(64,168,100,170,.08,.5,M.pad),slab(84,170,36,141,.08,.5,M.pad),slab(46,138,26,126,.07,.3,M.pad));
+  g.add(slab(20,181,190,181,.05,.5,M.dark),bar2(82,174,82,181,.04,M.dark),bar2(44,150,44,181,.04,M.dark));
+  g.add(bar2(112,181,186,100,.025,M.steel,.3),bar2(112,181,186,100,.025,M.steel,-.3),bar2(186,100,186,181,.035,M.dark,.3),bar2(186,100,186,181,.035,M.dark,-.3));
+  g.add(pair(z=>bar2(86,162,86,150,.015,M.steel,z*1.5)));return g}
 };
 
 /* ================= 3D movement library ================= */
@@ -542,6 +547,14 @@ const HAND3D={
   props:"db1",cam:{target:[0,.75,0]},
   mistakes:[{id:"cave",name:"Knees caving in",fix:"Push your knees out so they follow your toes.",parts:["knees","adductors"],mod:f=>f.phase?{...f,kPole:[1,0,-.35]}:f},
             {id:"round",name:"Rounding your back",fix:"Keep your chest proud and back flat.",parts:["spine","lowerback"],mod:f=>f.phase?{...f,pitch:48,round:22,head:-28,root:[-.12,.6,0]}:f}]},
+ glutebridge:{frames:[
+  {t:.9,cue:["Lie on your back, knees bent","Feet flat, hip-width apart, arms by your sides"],root:[0,.11,0],pitch:-90,head:4,hand:[-.04,.03,.25],ePole:[0,1,.4],foot:[.5,.075,.14],kPole:[0,1,.15]},
+  {t:1.3,cue:["Drive through your heels","Lift your hips until your body is straight"],phase:"up",con:true,root:[-.03,.32,0],pitch:-117,head:26,hand:[-.04,.03,.25],ePole:[0,1,.4],foot:[.5,.075,.14],kPole:[0,1,.15]},
+  {t:.5,cue:["Squeeze your glutes","Knees, hips and shoulders in one line"],phase:"hold",root:[-.03,.32,0],pitch:-117,head:26,hand:[-.04,.03,.25],ePole:[0,1,.4],foot:[.5,.075,.14],kPole:[0,1,.15]},
+  {t:1.8,cue:["Lower slowly · 2 s","Ribs stay down, back flat"],phase:"down",root:[0,.11,0],pitch:-90,head:4,hand:[-.04,.03,.25],ePole:[0,1,.4],foot:[.5,.075,.14],kPole:[0,1,.15]}],
+  props:"mat",cam:{target:[.05,.25,0]},
+  mistakes:[{id:"arch",name:"Arching the lower back",fix:"Stop when knees, hips and shoulders line up. Keep ribs down.",parts:["lowerback"],mod:f=>f.phase?{...f,pitch:-128,root:[-.03,.4,0],round:-14}:f},
+            {id:"toes",name:"Pushing through the toes",fix:"Keep the heels down and drive through them.",parts:["calves"],mod:f=>f.phase?{...f,footPitch:-25,foot:[.53,.12,.14]}:f}]},
  overheadtri:{frames:EXL.triceps.frames,props:"overhead",cam:{target:[0,1.25,0]},mistakes:EXL.triceps.mistakes},
  latpd:{frames:EXL.latpd.frames,props:"lat",cam:{target:[-.1,1.05,0]},mistakes:EXL.latpd.mistakes},
  pushup:{frames:EXL.pushup.frames,props:"mat",cam:{target:[-.1,.35,0]},mistakes:EXL.pushup.mistakes}
@@ -602,15 +615,42 @@ function buildProps(){
   if(p==="db1"||p==="overhead"){const db=dumbbell(.28,.07);if(p==="overhead")db.rotation.z=Math.PI/2;props.add(db);props.userData.db=db}
   if(p==="lat"){const lm=latMachine();props.add(lm);props.userData.lat=lm}
   if(p==="mat")props.add(mat());
+  if(MACH[exId])props.userData.mach=machParts(MACH[exId]);
   if(mv.converted){
     for(const k of mv.props2)if(PROPS3[k])props.add(PROPS3[k]());
     if(mv.dyn==="db"){const a=dumbbell(.26,.06),b=dumbbell(.26,.06);props.add(a,b);props.userData.dbs=[a,b]}
     if(mv.dyn==="db1"){const a=dumbbell(.26,.06);props.add(a);props.userData.dbs=[a,null]}
     if(mv.dyn==="db1"){const a=dumbbell(.28,.07);props.add(a);props.userData.db=a}
-    if(mv.dyn==="handle"&&mv.anchor){const a=c2(mv.anchor[0],mv.anchor[1]);const cab=new THREE.Mesh(new THREE.CylinderGeometry(.005,.005,1,6),M.steel);props.add(cab);props.userData.cable={m:cab,a:V(a[0],a[1],0)}}
+    if(mv.dyn==="handle"&&mv.anchor&&!["press","ohpress","fly"].includes(MACH[exId])){const a=c2(mv.anchor[0],mv.anchor[1]);const cab=new THREE.Mesh(new THREE.CylinderGeometry(.005,.005,1,6),M.steel);props.add(cab);props.userData.cable={m:cab,a:V(a[0],a[1],0)}}
     if(mv.dyn==="pad"){const pd=new THREE.Mesh(new THREE.CylinderGeometry(.05,.05,.4,16),M.accent);pd.rotation.x=Math.PI/2;props.add(pd);props.userData.pad=pd}
     if(mv.dyn==="plate"){const pl=box(.06,.5,.6,M.accent,.01);props.add(pl);props.userData.plate=pl}
+    if(mv.dyn==="rope"){const rp=new THREE.Mesh(new THREE.BufferGeometry(),M.dark);rp.castShadow=true;props.add(rp);
+      const hs=[0,1].map(()=>{const h=new THREE.Mesh(new THREE.CylinderGeometry(.016,.016,.15,10),M.accent);props.add(h);return h});props.userData.rope={m:rp,hs}}
   }
+}
+// machine parts drawn around the hands so the coach always holds something real
+const MACH={chestpress:"press",shoulderpress:"ohpress",pecfly:"fly",pushdown:"bar",seatedrow:"vgrip"};
+function machParts(mk){const U={k:mk};
+  U.h=[0,1].map(()=>{const m=new THREE.Mesh(new THREE.CylinderGeometry(.018,.018,.14,14),M.dark);m.castShadow=true;props.add(m);return m});
+  const seg=(r,mat)=>{const m=tube([0,0,0],[0,1,0],r,mat);props.add(m);return m};
+  if(mk==="press"||mk==="ohpress"||mk==="fly"){U.l1=[0,1].map(()=>seg(.02,M.steel));U.l2=[0,1].map(()=>seg(.026,M.dark));U.post=[0,1].map(()=>seg(.035,M.dark))}
+  if(mk==="bar"){U.bar=seg(.014,M.steel);U.cab=seg(.005,M.steel);U.tow=seg(.045,M.dark);U.arm=seg(.035,M.dark);
+    U.pul=new THREE.Mesh(new THREE.TorusGeometry(.045,.012,10,24),M.steel);props.add(U.pul)}
+  if(mk==="vgrip"){U.bar=seg(.016,M.dark)}
+  return U}
+function machUpdate(U,J){
+  const g=[man.grip("L"),man.grip("R")],c=[0,1].map(i=>g[i]?g[i].c:J[i?"R":"L"].hand);
+  U.h.forEach((m,i)=>{m.position.copy(c[i]);if(g[i])m.quaternion.setFromUnitVectors(V(0,1,0),g[i].a)});
+  const sh=[J.L.sh,J.R.sh];
+  if(U.l1){c.forEach((h,i)=>{const s=sh[i],sz=Math.sign(s.z)||1;
+      const P=U.k==="press"?V(s.x-.32,s.y+.32,s.z+sz*.16):U.k==="ohpress"?V(s.x-.42,s.y-.18,s.z+sz*.16):V(s.x-.04,h.y+.02,s.z+sz*.14);
+      const E=h.clone().add(V(0,0,sz*.1));if(U.k==="fly")E.set(h.x,h.y+.02,h.z);
+      placeSeg(U.l1[i],h,E);placeSeg(U.l2[i],E,P);placeSeg(U.post[i],P,V(P.x,U.k==="fly"?2.05:.02,P.z))})}
+  if(U.k==="bar"){const m=V().addVectors(c[0],c[1]).multiplyScalar(.5),d=V().subVectors(c[1],c[0]).normalize();
+    placeSeg(U.bar,c[0].clone().addScaledVector(d,-.13),c[1].clone().addScaledVector(d,.13));
+    if(!U.A)U.A=V(m.x+.16,2.12,0);const A=U.A;placeSeg(U.cab,m,A);placeSeg(U.tow,V(A.x+.32,0,0),V(A.x+.32,2.25,0));placeSeg(U.arm,V(A.x+.32,2.22,0),V(A.x-.02,2.22,0));
+    U.pul.position.set(A.x,A.y+.04,0)}
+  if(U.k==="vgrip")placeSeg(U.bar,c[0],c[1]);
 }
 const ease=k=>k<.5?4*k*k*k:1-Math.pow(-2*k+2,3)/2;
 function lerpPose(a,b,k){const o={};for(const key of new Set([...Object.keys(a),...Object.keys(b)])){if(key==="cue"||key==="mod")continue;const x=a[key]??b[key],y=b[key]??a[key];
@@ -652,6 +692,13 @@ function update(dt){
   if(props.userData.lat){const lm=props.userData.lat;lm.userData.bar.position.copy(mid);placeSeg(lm.userData.cable,mid,V(.12,2.17,0));lm.userData.lift.position.y=Math.max(0,1.62-mid.y)*.55}
   if(props.userData.cable){placeSeg(props.userData.cable.m,mid,props.userData.cable.a)}
   if(props.userData.pad){props.userData.pad.position.copy(V().addVectors(J.L.ank,J.R.ank).multiplyScalar(.5)).add(V(.04,-.02,0))}
+  if(props.userData.mach)machUpdate(props.userData.mach,J);
+  if(props.userData.rope){// jump rope: one turn per hop, under the feet at the top of the hop, over the head in between
+    const R=props.userData.rope,gL=man.grip("L"),gR=man.grip("R"),hL=gL?gL.c:J.L.hand,hR=gR?gR.c:J.R.hand,T2=total(),th=2*Math.PI*((t%T2)/T2);
+    const x0=(hL.x+hR.x)/2-.04,yc=1.02,rx=.42,ry=1.06,C=V(x0-rx*Math.sin(th),yc-ry*Math.cos(th),0),hm=V().addVectors(hL,hR).multiplyScalar(.5),pts=[];
+    for(let i=0;i<=32;i++){const u=i/32,w=Math.pow(Math.sin(Math.PI*u),.4),p=V().lerpVectors(hL,hR,u);p.addScaledVector(V().subVectors(C,hm).setZ(0),w);p.z*=1+.45*w;p.y=Math.max(p.y,.012);pts.push(p)}
+    R.m.geometry.dispose();R.m.geometry=new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts),48,.006,6,false);
+    R.hs.forEach((h,i)=>{const g=i?gR:gL,c=g?g.c:(i?hR:hL);h.position.copy(c);if(g)h.quaternion.setFromUnitVectors(V(0,1,0),g.a)})}
   if(props.userData.plate){props.userData.plate.position.copy(V().addVectors(J.L.ank,J.R.ank).multiplyScalar(.5)).add(V(.08,0,0))}
   if(s.idx!==lastIdx){lastIdx=s.idx;const fr=mv.frames,n=fr.length,steps=n<=4;
     const bad=!!(mk&&s.frame.phase);
