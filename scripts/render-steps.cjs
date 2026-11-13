@@ -5,7 +5,7 @@ const {chromium}=require("playwright");
 const BACK=new Set(["lats","rhomboids","traps","hams","glutes","lowerback","reardelt","triceps","calves"]);
 (async()=>{
   const only=process.argv.slice(2);
-  const b=await chromium.launch({args:["--use-gl=angle","--use-angle=swiftshader","--enable-unsafe-swiftshader"]});
+  const b=await chromium.launch({executablePath:process.env.CHROME||undefined,args:["--use-gl=angle","--use-angle=swiftshader","--enable-unsafe-swiftshader","--no-sandbox"]}); // CHROME=/path/to/chrome uses an installed browser
   const p=await b.newPage({viewport:{width:420,height:820},deviceScaleFactor:2});
   p.on("pageerror",e=>console.log("page error:",e.message));
   await p.route("**/index.html",async r=>{const res=await r.fetch();let t=await res.text();
@@ -18,7 +18,7 @@ const BACK=new Set(["lats","rhomboids","traps","hams","glutes","lowerback","rear
     const shots=await p.evaluate(async([id,kind,BACK])=>{
       document.querySelectorAll(".wl,#R").forEach(e=>e.remove());
       const h=document.createElement("div");h.className="c3wrap";h.id="R";h.style.cssText="position:fixed;inset:0;z-index:99999;height:820px;background:none";document.body.appendChild(h);
-      await window.MX3D.mount(h,{id,EX:window.__EX,MUS:window.__MUS,kind,learn:true});
+      await window.MX3D.mount(h,{id,EX:window.__EX,MUS:window.__MUS,kind,learn:true,voice:false,lesson:false});
       const d=window.MX3D._dbg;d.studio();d.pause();
       const ends=d.times(),fr=d.frames();
       let k=fr.findIndex(f=>f.phase==="hold");if(k<0)k=fr.length>2?Math.max(1,fr.findLastIndex(f=>f.phase==="down")):1;if(k<0)k=fr.length-1;
