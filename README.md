@@ -11,6 +11,17 @@ On your Android phone: tap the link, open the downloaded file, and allow "Instal
 1. Open the app link (GitHub Pages) in Safari (iPhone) or Chrome (Android).
 2. iPhone: tap **Share → Add to Home Screen**. Android: tap **⋮ → Install app / Add to Home screen**.
 
+## The 3D form coach
+Every exercise opens with a short form lesson played by the 3D trainer (man or woman) in a dark studio:
+1. **Muscles** – the camera moves in on the muscles the exercise builds, glowing and labelled.
+2. **Set-up** – a close-up of the grip or stance, ringed in green.
+3. **Common mistakes** – each mistake is shown wrong (red figure, red joint line, ✕) and then corrected (green, ✓), with one line on why it matters and what to do instead.
+4. **Full move** – the complete rep, step by step, with voice cues.
+
+Beginners get the lesson automatically; other levels start on the full move and can tap any chapter. The lesson text and the mistakes live in `lessons.js` (one entry per exercise).
+
+**Testing the trainers.** `scripts/check-anatomy.cjs` poses both trainers in every step of every exercise and in every mistake, and fails if a body part is put together wrongly (head not facing the way the chest faces, a twisted leg or arm, a knee or elbow bending backwards, an ankle past its range, anything under the floor). Run it, then `scripts/render-steps.cjs`, after changing a movement.
+
 The offline coach answers common questions from `coach-kb.js`; add entries there to teach it more. Data is stored on your device (browser storage). Ask Coach (AI), account sync, Google Calendar and file downloads work only when the app is opened inside Claude.
 
 ## Before public launch

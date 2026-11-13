@@ -259,7 +259,7 @@ footer .row{gap:14px}
 @media (prefers-reduced-motion:reduce){.toast .ring{animation:none}.prog i{transition:none}}
 
 /* realistic 3D coach */
-.c3wrap{position:relative;min-height:560px;height:min(90vh,780px);background:radial-gradient(120% 90% at 50% 30%,#FFFFFF 0%,#EEF1F5 55%,#DDE2E9 100%);overflow:hidden;color:#F1F3F7}
+.c3wrap{position:relative;min-height:560px;height:min(90vh,780px);background:radial-gradient(110% 80% at 50% 38%,#3A4152 0%,#1C212B 48%,#0B0D12 100%);overflow:hidden;color:#F1F3F7}
 .c3wrap canvas{display:block;width:100%!important;height:calc(100% - var(--c3ctl,84px))!important;touch-action:none}
 .c3load{position:absolute;inset:0;display:grid;place-items:center;color:#97A1B2;font-size:14px}
 .c3svg{position:absolute;left:0;top:0;width:100%;height:calc(100% - var(--c3ctl,84px));pointer-events:none}
@@ -284,6 +284,15 @@ footer .row{gap:14px}
 .c3txt{display:grid;gap:2px;min-width:0;flex:1}.c3of{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:#FFB3A6;font-weight:800}
 .c3txt b{font-size:17px;line-height:1.25;font-weight:800}.c3txt>span{font-size:13.5px;line-height:1.35;color:#C5CCD8}
 .c3card.bad{background:rgba(70,12,22,.9);border-color:rgba(255,77,94,.6)}.c3card.bad .c3num{background:#E5203A}.c3card.bad b{color:#FF9AA5}
+.c3card.good{background:rgba(10,58,34,.9);border-color:rgba(34,224,106,.55)}.c3card.good .c3num{background:#15B657}.c3card.good b{color:#9BF2BF}
+.c3chap{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin-bottom:8px;padding-bottom:1px}.c3chap::-webkit-scrollbar{display:none}.c3chap:empty{display:none}
+.c3chap button{flex:none;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);color:#9AA4B5;font:inherit;font-size:12px;font-weight:800;padding:6px 12px;border-radius:999px;min-height:32px;white-space:nowrap}
+.c3chap button.done{color:#C5CCD8;border-color:rgba(255,255,255,.2)}.c3chap button.on{background:#FF5E48;border-color:#FF5E48;color:#fff}
+.c3chap button.k-fault.on{background:#E5203A;border-color:#E5203A}
+.c3badge{position:absolute;right:12px;top:54px;width:52px;height:52px;border-radius:50%;display:grid;place-items:center;font-size:28px;font-weight:900;line-height:1;color:#fff;opacity:0;transform:scale(.6);transition:opacity .25s,transform .25s}
+.c3badge.no{opacity:1;transform:none;background:#E5203A;box-shadow:0 0 0 4px rgba(229,32,58,.25),0 0 26px rgba(255,59,78,.75)}
+.c3badge.ok{opacity:1;transform:none;background:#15B657;box-shadow:0 0 0 4px rgba(21,182,87,.25),0 0 26px rgba(34,224,106,.7)}
+.c3inles .c3steps,.c3inles .c3work{display:none}.c3inles .c3txt{min-height:74px}
 .c3voice{pointer-events:auto;border:1px solid rgba(255,255,255,.1);background:rgba(14,17,23,.78);color:#fff;border-radius:10px;width:38px;height:32px;font-size:15px}
 .c3compact .c3card{padding:9px 11px}.c3compact .c3txt b{font-size:15px}.c3compact .c3num{width:30px;height:30px;font-size:15px}
 .c3tempo{height:3px;border-radius:2px;background:rgba(255,255,255,.12);overflow:hidden;margin-top:6px}.c3tempo i{display:block;height:100%;width:0;background:#FF5E48}
@@ -471,6 +480,7 @@ details.more[open]{display:grid;gap:8px}
 <script src="coach-kb.js"></script>
 <script src="musclemap.js"></script>
 <script src="guide.js"></script>
+<script src="lessons.js"></script>
 <script>
 (()=>{
 /* =============== CONFIG — fill these in before public launch =============== */
@@ -598,12 +608,12 @@ const EX={
   cues:["Lead with the elbows","Keep your neck long","2 seconds down"],
   mistakes:["Jerking the weight with your back","Shrugging shoulders to ears","Rounded spine"]},
  superman:{name:"Superman Hold",cat:"strength",eq:"bw",muscles:"Lower back, glutes, upper back",equip:"None",props:["mat"],
-  frames:[{h:[90,174],t:90,hd:[186,177],ft:[24,179],ks:1},{h:[90,173],t:80,hd:[184,150],ft:[28,162],ks:1}],
+  frames:[{h:[90,174],t:90,hd:[186,172],ep:[0,.4,1],ft:[21,178],ks:1},{h:[90,173],t:80,hd:[184,150],ep:[0,.4,1],ft:[23,165],ks:1}],
   steps:["Lie face down, arms stretched overhead.","Squeeze your glutes and lift arms, chest and legs a few centimetres.","Hold for 2–3 seconds, keeping your neck long.","Lower with control and repeat."],
   cues:["Look at the floor, not forward","Lift with your back and glutes together","Small lift is enough"],
   mistakes:["Cranking the neck up","Holding your breath","Swinging up fast"]},
  rdl:{name:"Romanian Deadlift",cat:"strength",eq:"db",muscles:"Hamstrings, glutes, lower back",equip:"Dumbbells or barbell",dyn:"db",
-  frames:[{h:[100,112],t:0,hd:[103,161],ft:[104,180]},{h:[82,117],t:72,hd:[130,158],ft:[104,180]}],
+  frames:[{h:[100,112],t:0,hd:[104,160],ft:[104,180]},{h:[78,118],t:65,hd:[118,146],ft:[104,180]}],
   steps:["Stand tall holding weights in front of your thighs.","Unlock knees slightly and keep them there.","Push hips back, sliding weights down your legs.","Stop when you feel a strong hamstring stretch, then drive hips forward."],
   cues:["It's a hinge, not a squat","Weights stay close to your legs","Flat back the whole time"],
   mistakes:["Rounding the back to reach lower","Bending knees too much","Leaning back at the top"]},
@@ -623,7 +633,7 @@ const EX={
   cues:["Torso tall","Front knee over mid-foot","Control every step"],
   mistakes:["Short steps that stress the knee","Front heel lifting","Wobbling side to side"]},
  chairdip:{name:"Bench / Chair Dip",cat:"strength",eq:"bw",muscles:"Triceps, chest, shoulders",equip:"Sturdy chair or bench",props:["floor","bench"],
-  frames:[{h:[104,140],t:-5,hd:[90,138],ft:[160,180]},{h:[104,164],t:-5,hd:[90,138],ft:[160,180]}],
+  frames:[{h:[104,140],t:-5,hd:[94,138],ft:[160,180]},{h:[104,160],t:-12,hd:[94,138],ft:[160,180]}],
   steps:["Sit on the edge of a sturdy bench, hands beside your hips.","Slide your hips off the front, feet flat, knees bent.","Bend your elbows straight back to lower until they reach about 90°.","Press back up until arms are straight."],
   cues:["Shoulders down and back","Keep hips close to the bench","Bend knees more to make it easier"],
   mistakes:["Dropping too deep (shoulder strain)","Elbows flaring out","Using a chair that can slide"]},
@@ -698,7 +708,7 @@ const EX={
   cues:["Stay on the balls of your feet","Tall posture","Low-impact option: march instead of jumping"],
   mistakes:["Leaning back","Knees too low","Holding your breath"]},
  mtn:{name:"Mountain Climbers",cat:"cardio",eq:"bw",muscles:"Core, shoulders, heart",equip:"None",props:["mat"],timed:true,
-  frames:[{h:[95,150],t:64,hd:[140,180],ft:[36,180],ft2:[108,170],ks:1,ks2:-1},{h:[95,150],t:64,hd:[140,180],ft:[108,170],ft2:[36,180],ks:-1,ks2:1}],
+  frames:[{h:[95,150],t:64,hd:[140,180],ft:[29,180],ft2:[108,170],ks:1,ks2:-1},{h:[95,150],t:64,hd:[140,180],ft:[108,170],ft2:[29,180],ks:-1,ks2:1}],
   steps:["Start in a high plank, hands under shoulders.","Drive one knee toward your chest.","Switch legs quickly.","Keep hips level the whole time."],
   cues:["Shoulders over wrists","Brace your core","Slow it down to learn it"],
   mistakes:["Hips bouncing up","Hands too far forward","Feet not reaching back"]},
@@ -708,12 +718,12 @@ const EX={
   cues:["Lead with your chest, not your head","Knees can bend slightly","Hold 30–45 seconds"],
   mistakes:["Bouncing","Rounding hard through the back","Forcing into pain"]},
  hipflexor:{name:"Half-kneeling Hip Flexor Stretch",cat:"mobility",eq:"bw",muscles:"Hip flexors, quads",equip:"None (pad under the knee)",props:["mat"],timed:true,
-  frames:[{h:[92,138],t:0,hd:[96,140],ft:[124,180],ft2:[46,180],ks2:-1},{h:[100,140],t:-6,hd:[102,142],ft:[124,180],ft2:[46,180],ks2:-1}],
+  frames:[{h:[92,138],t:0,hd:[96,140],ft:[124,180],ft2:[52,180],ks2:-1},{h:[100,141],t:-3,hd:[102,142],ft:[124,180],ft2:[52,180],ks2:-1}],
   steps:["Kneel on one knee, other foot flat in front.","Tuck your pelvis under and squeeze the glute of the back leg.","Shift your hips gently forward.","Hold, then switch sides."],
   cues:["Tall torso","Feel it at the front of the back hip","Hold 30 seconds per side"],
   mistakes:["Arching the lower back","Leaning forward","Knee on a hard floor"]},
  chestopen:{name:"Standing Chest Opener",cat:"mobility",eq:"bw",muscles:"Chest, front shoulders",equip:"None",timed:true,
-  frames:[{h:[100,112],t:0,hd:[102,160],ft:[104,180]},{h:[100,112],t:2,hd:[64,112],hd2:[60,110],es:-1,ft:[104,180]}],
+  frames:[{h:[100,112],t:0,hd:[90,150],hz:.05,ep:[-1,.2,.5],ft:[104,180]},{h:[100,112],t:-3,hd:[72,128],hz:.05,ep:[-.7,.7,.4],ft:[104,180]}],
   steps:["Stand tall and interlace your fingers behind your back.","Straighten your arms and draw shoulders back.","Lift your chest and lift your hands slightly.","Hold and breathe."],
   cues:["Chin level","Ribs down","Great after push days"],
   mistakes:["Arching the lower back","Shrugging","Forcing the shoulders"]}
@@ -790,13 +800,13 @@ FR("pecfly",[{h:[86,138],t:-8,hd:[84,92],hz:.62,ep:[-.4,-.1,1],ft:[126,180]},{h:
 FR("shoulderpress",[{h:[86,138],t:-8,hd:[92,90],hz:.3,ep:[0,-1,.6],ft:[126,180]},{h:[86,138],t:-8,hd:[82,38],hz:.2,ep:[0,-.2,1],ft:[126,180]}],{props:["floor","seatBack"]});
 FR("pushdown",[{h:[100,112],t:8,hd:[124,100],hz:.13,ep:[-1,-.3,.2],ft:[104,180]},{h:[100,112],t:8,hd:[114,150],hz:.13,ep:[-1,0,.2],ft:[104,180]}],{props:["floor"]});
 FR("latraise",[{h:[100,112],t:0,hd:[103,160],hz:.24,ep:[-.3,0,1],ft:[104,180]},{h:[100,112],t:0,hd:[104,68],hz:.74,ep:[0,1,.4],ft:[104,180]}],{dyn:"db",props:["floor"]});
-FR("crunch",[{h:[100,174],t:-90,hd:[46,166],es:-1,ft:[140,179]},{h:[100,174],t:-62,hd:[52,144],es:-1,ft:[140,179]}],{props:["mat"]});
+FR("crunch",[{h:[100,174],t:-90,hd:[40,165],hz:.2,ep:[-.3,.35,1],ft:[140,179]},{h:[100,174],t:-62,hd:[51,141],hz:.2,ep:[-.3,.6,1],ft:[140,179]}],{props:["mat"]});
 FR("hyperext",[{h:[96,122],t:122,hd:[118,150],hz:.06,ft:[44,160],ks:1},{h:[96,122],t:88,hd:[132,128],hz:.06,ft:[44,160],ks:1}],{props:["floor","hyper"]});
 FR("row",[{h:[84,116],t:78,hd:[136,158],hd2:[134,138],hz:.2,ep:[-.4,.9,.15],ft:[102,180],ft2:[44,138],ks2:-1},{h:[84,116],t:78,hd:[110,116],hd2:[134,138],hz:.2,ep:[-.4,.9,.15],ft:[102,180],ft2:[44,138],ks2:-1}],{dyn:"db1",props:["floor","rowbench"]});
 FR("curl",[{h:[100,112],t:0,hd:[101,160],hz:.21,ep:[-.3,-1,.15],ft:[104,180]},{h:[100,112],t:0,hd:[114,76],hz:.21,ep:[-.25,-1,.12],ft:[104,180]}],{dyn:"db",props:["floor"]});
-FR("plank",[{h:[95,161],t:82,hd:[168,179],hz:.12,ep:[-.3,-1,.25],ft:[33,180],ft2:[30,180],ks:1},{h:[95,160],t:82,hd:[168,179],hz:.12,ep:[-.3,-1,.25],ft:[33,180],ft2:[30,180],ks:1}],{props:["mat"]});
+FR("plank",[{h:[95,166],t:84,hd:[168,179],hz:.12,ep:[-.3,-1,.25],ft:[29,180],ks:1},{h:[95,165],t:84,hd:[168,179],hz:.12,ep:[-.3,-1,.25],ft:[29,180],ks:1}],{props:["mat"]});
 FR("ohp",[{h:[86,138],t:-6,hd:[92,90],hz:.3,ep:[0,-1,.6],ft:[126,180]},{h:[86,138],t:-6,hd:[84,38],hz:.2,ep:[0,-.2,1],ft:[126,180]}],{dyn:"db",props:["floor","seatBack"]});
-FR("deadlift",[{h:[100,112],t:0,hd:[103,161],ft:[104,180]},{h:[82,128],t:58,hd:[110,163],ft:[104,180]}],{dyn:"db",props:["floor"]});
+FR("deadlift",[{h:[100,112],t:0,hd:[105,160],hz:.24,ep:[-1,0,.3],ft:[104,180]},{h:[82,128],t:62,hd:[108,153],hz:.24,ep:[-1,.2,.3],ft:[104,180]}],{props:["floor"]});
 
 /* =============== coaches & plan engine =============== */
 const COACH={

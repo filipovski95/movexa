@@ -6,3 +6,6 @@ MOVEXA draws its own anatomy-atlas muscle map on top of them in `coach3d.js` (mu
 
 ## Exercise pictures (assets/steps/)
 Rendered by MOVEXA from the 3D humans above with MOVEXA's own animation, muscle map and equipment (`scripts/render-steps.cjs`). Rendering uses three.js (MIT).
+
+## Form lessons (lessons.js)
+Written for MOVEXA. The wrong/right demonstrations are produced by MOVEXA's own animation code in `coach3d.js`.
